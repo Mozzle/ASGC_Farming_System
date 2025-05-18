@@ -61,8 +61,8 @@ all: main-build
 main-build: ASGC_Farming_System_CM4.elf secondary-outputs
 
 # Tool invocations
-ASGC_Farming_System_CM4.elf ASGC_Farming_System_CM4.map: $(OBJS) $(USER_OBJS) C:\Users\Mylisa\Documents\ASGC_Farming_System\CM4\STM32H755ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "ASGC_Farming_System_CM4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Mylisa\Documents\ASGC_Farming_System\CM4\STM32H755ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ASGC_Farming_System_CM4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+ASGC_Farming_System_CM4.elf ASGC_Farming_System_CM4.map: $(OBJS) $(USER_OBJS) C:\Users\Mylisa\Documents\GitHub\ASGC_Farming_System\NUCLEO-H755ZI\ASGC_Farming_System\CM4\STM32H755ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "ASGC_Farming_System_CM4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Mylisa\Documents\GitHub\ASGC_Farming_System\NUCLEO-H755ZI\ASGC_Farming_System\CM4\STM32H755ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ASGC_Farming_System_CM4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

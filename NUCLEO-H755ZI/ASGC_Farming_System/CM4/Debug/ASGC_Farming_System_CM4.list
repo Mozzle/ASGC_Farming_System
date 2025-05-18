@@ -33,13 +33,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_macro  00038eab  00000000  00000000  0002be7c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_line   000083f8  00000000  00000000  00064d27  2**0
+ 15 .debug_line   0000851b  00000000  00000000  00064d27  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_str    0017d5ac  00000000  00000000  0006d11f  2**0
+ 16 .debug_str    0017d72c  00000000  00000000  0006d242  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_frame  00001ac8  00000000  00000000  001ea6cc  2**2
+ 17 .debug_frame  00001ac8  00000000  00000000  001ea970  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line_str 00000060  00000000  00000000  001ec194  2**0
+ 18 .debug_line_str 00000060  00000000  00000000  001ec438  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -183,13 +183,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  // LED ON
-	      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+	  	  // LED ON
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
  8100374:	2201      	movs	r2, #1
  8100376:	2101      	movs	r1, #1
  8100378:	480a      	ldr	r0, [pc, #40]	; (81003a4 <main+0x9c>)
  810037a:	f000 fa53 	bl	8100824 <HAL_GPIO_WritePin>
-	      HAL_Delay(100);
+	  	  HAL_Delay(100);
  810037e:	2064      	movs	r0, #100	; 0x64
  8100380:	f000 f934 	bl	81005ec <HAL_Delay>
 	      // LED OFF
@@ -198,10 +198,10 @@ int main(void)
  8100386:	2101      	movs	r1, #1
  8100388:	4806      	ldr	r0, [pc, #24]	; (81003a4 <main+0x9c>)
  810038a:	f000 fa4b 	bl	8100824 <HAL_GPIO_WritePin>
-	      HAL_Delay(100);
+	  	  HAL_Delay(100);
  810038e:	2064      	movs	r0, #100	; 0x64
  8100390:	f000 f92c 	bl	81005ec <HAL_Delay>
-	      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
  8100394:	e7ee      	b.n	8100374 <main+0x6c>
  8100396:	bf00      	nop
  8100398:	58024400 	.word	0x58024400

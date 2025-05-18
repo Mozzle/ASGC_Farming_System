@@ -6730,16 +6730,15 @@ LOAD C:/ST/STM32CubeIDE_1.11.2/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
 .debug_str      0x0000000000000000   0x1846b9
  .debug_str     0x0000000000000000   0x17c051 ./Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.o
                                      0x17c4d0 (size before relaxing)
- .debug_str     0x000000000017c051      0x887 ./Core/Src/AHT20.o
-                                     0x17c72a (size before relaxing)
- .debug_str     0x000000000017c8d8     0x1366 ./Core/Src/main.o
-                                     0x17dd4c (size before relaxing)
- .debug_str     0x000000000017dc3e      0x474 ./Core/Src/stm32h7xx_hal_msp.o
-                                     0x17da59 (size before relaxing)
- .debug_str     0x000000000017e0b2       0xc9 ./Core/Src/stm32h7xx_it.o
-                                     0x17bf5d (size before relaxing)
- .debug_str     0x000000000017e17b       0x34 ./Core/Startup/startup_stm32h755zitx.o
-                                         0x6c (size before relaxing)
+ .debug_str     0x000000000017c051      0x84f ./Core/Src/AHT20.o
+                                     0x17c753 (size before relaxing)
+ .debug_str     0x000000000017c8a0     0x1366 ./Core/Src/main.o
+                                     0x17dd75 (size before relaxing)
+ .debug_str     0x000000000017dc06      0x474 ./Core/Src/stm32h7xx_hal_msp.o
+                                     0x17da82 (size before relaxing)
+ .debug_str     0x000000000017e07a       0xc9 ./Core/Src/stm32h7xx_it.o
+                                     0x17bf86 (size before relaxing)
+ .debug_str     0x000000000017e143       0x6c ./Core/Startup/startup_stm32h755zitx.o
  .debug_str     0x000000000017e1af     0x11da ./Drivers/STM32H7xx_HAL_Driver/stm32h7xx_hal.o
                                      0x17d583 (size before relaxing)
  .debug_str     0x000000000017f389      0x39d ./Drivers/STM32H7xx_HAL_Driver/stm32h7xx_hal_cortex.o

@@ -129,12 +129,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  // LED ON
-	      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-	      HAL_Delay(100);
+	  	  // LED ON
+	  	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+	  	  HAL_Delay(100);
 	      // LED OFF
 	      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-	      HAL_Delay(100);
+	  	  HAL_Delay(100);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
