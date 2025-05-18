@@ -1,0 +1,2 @@
+../Core/Src/AHT20.c:10:6:AHT20_Init	32	static
+../Core/Src/AHT20.c:33:19:AHT20_Get_Data	72	static
