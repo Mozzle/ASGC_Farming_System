@@ -35,6 +35,51 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+/* ----------------------------------------------------------------------------
+ * 		THIS IS THE FEATURE SWITCHBOARD. THE DEFINES BELOW DETERMINE WHETHER
+ * 		OR NOT CERTAIN DEVICES ARE OR ARE NOT CONNECTED TO THE MICROCONTROLLER
+ * 		IF THEY ARE NOT CONNECTED, CALLS TO SYSTEM OUTPUT FUNCTIONS (DISPLAYS,
+ * 		MOTOR DRIVERS, ETC) WILL DO NOTHING. CALLS TO SYSTEM INPUTS (SENSORS)
+ * 		WILL PRODUCE KNOWN INVALID VALUES.
+ -----------------------------------------------------------------------------*/
+
+/* ILI9341 LCD Display -------------------------------------------------------*/
+#define ILI9341_ENABLED					SYS_FEATURE_DISABLED
+
+/* AHT20 Temperature and Humidity Sensor -------------------------------------*/
+#define AHT20_ENABLED					SYS_FEATURE_ENABLED
+
+/* AS7341 Light Sensor -------------------------------------------------------*/
+#define AS7341_ENABLED					SYS_FEATURE_DISABLED
+
+/* Computer Fan PWM Control Interface ----------------------------------------*/
+#define FAN_PWM_INTERFACE_ENABLED		SYS_FEATURE_DISABLED
+
+/* Serial USB to Interface with CNC Control board ----------------------------*/
+#define SKR_MINI_USB_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
+
+/* Serial USB to Interface with CNC Control board ----------------------------*/
+#define SKR_MINI_USB_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
+
+/* SEN0244 Electrical Conductivity Sensor ------------------------------------*/
+#define SEN0244_ENABLED					SYS_FEATURE_DISABLED
+
+/* SEN0169-V2 pH Sensor ------------------------------------------------------*/
+#define SEN0169_ENABLED					SYS_FEATURE_DISABLED
+
+/* VL53L1X Time-Of-Flight Sensor ---------------------------------------------*/
+#define VL53L1X_ENABLED					SYS_FEATURE_DISABLED
+
+/* MOSFET/Solid State Relay switching interface for Pumps and Valves ---------*/
+#define MOSFET_SSR_SWITCHING_ENABLED	SYS_FEATURE_DISABLED
+
+/* Mixing Motor Controller Interface -----------------------------------------*/
+#define MIXING_MOTOR_ENABLED			SYS_FEATURE_DISABLED
+
+/* Start and E-Stop Button Interface -----------------------------------------*/
+#define START_BUTTON_ENABLED			SYS_FEATURE_DISABLED
+#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_DISABLED
+
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 #endif
