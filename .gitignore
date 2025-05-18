@@ -1,0 +1,9 @@
+*.xml
+*.mk
+.\NUCLEO-H755ZI\ASGC_Farming_System\CM4\Debug\*
+.\NUCLEO-H755ZI\ASGC_Farming_System\CM7\Debug\*
+*.mxproject
+*.project
+*.ioc
+.\NUCLEO-H755ZI\ASGC_Farming_System\CM4\.settings\*
+.\NUCLEO-H755ZI\ASGC_Farming_System\CM&\.settings\*
