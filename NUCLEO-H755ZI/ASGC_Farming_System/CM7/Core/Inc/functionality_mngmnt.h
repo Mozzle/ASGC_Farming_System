@@ -1,25 +1,40 @@
-/*
+/*-----------------------------------------------------------------------------
  * functionality_mngmnt.h
  *
  *  Created on: May 18, 2025
  *      Author: Dylan
  *
- *  DESCRIPTION: The purpose of this file is to allow for development in an incomplete system
- *  E.g.: To be able to run and debug aspects of the system without having every single sensor
- *  and interface connected to your microcontroller.
+ *  DESCRIPTION: The purpose of this file is to allow for development in an
+ *  incomplete system E.g.: To be able to run and debug aspects of the system
+ *  without having every single sensor and interface connected to your
+ *  microcontroller.
  *
- *  We will use preprocessor defines to create 'mocked' versions of sensor/device functions when
- *  those devices are not actually physically present in the system. These mocked functions will
- *  return known invalid values that are defined in this header file
- */
+ *  We will use preprocessor defines to create 'mocked' versions of
+ *  sensor/device functions when those devices are not actually physically
+ *  present in the system. These mocked functions will return known invalid
+ *  values that are defined in this header file
+ *
+-----------------------------------------------------------------------------*/
 
 #ifndef INC_FUNCTIONALITY_MNGMNT_H_
 #define INC_FUNCTIONALITY_MNGMNT_H_
+
+#include "main.h"
 
 typedef uint8_t SYS_FEATURE_ENABLE_u8;
 enum {
 	SYS_FEATURE_DISABLED = 0,
 	SYS_FEATURE_ENABLED
+};
+
+typedef uint8_t SYS_RESULT;
+enum {
+	SYS_INVALID = 0,
+	SYS_SUCCESS,
+	SYS_NOT_INITIALIZED,
+	SYS_MEASUREMENT_SEND_FAIL,
+	SYS_MEASUREMENT_GET_FAIL,
+	SYS_DEVICE_DISABLED
 };
 
 // AHT 20 Temp & Humidity Sensor

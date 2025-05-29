@@ -2,8 +2,8 @@
 #define AHT20_H
 
 #include "main.h"
+#include "functionality_mngmnt.h"
 #include <stdbool.h>
-#include <stdint.h>
 
 // I2C Addresses and Registers
 #define AHT20_I2C_ADDR_WRITE			0x70
@@ -13,7 +13,7 @@
 #define AHT20_SOFT_RESET_REG			0xBA
 
 // Measurement Validity byte
-typedef uint8_t AHT20_valid_byte;
+/*typedef uint8_t AHT20_valid_byte;
 enum {
 	AHT20_INVALID = 0,
 	AHT20_VALID,
@@ -21,7 +21,7 @@ enum {
 	AHT20_MEASUREMENT_SEND_FAIL,
 	AHT20_MEASUREMENT_GET_FAIL,
 	AHT20_DEVICE_DISABLED
-};
+}; */
 
 
 #define AHT20_TEMP_CONVERSION_FACTOR	0.00019073486
@@ -31,7 +31,7 @@ enum {
 struct AHT20_Data {
 	float temperature;		// In Degrees Celsius
 	float humidity;			// Relative Humidity as a percent
-	AHT20_valid_byte valid;
+	SYS_RESULT validity;
 };
 
 // Function Declarations
