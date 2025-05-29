@@ -1,12 +1,18 @@
 #include "AHT20.h"
+#include "functionality_mngmnt.h"
+#include "main.h"
 
 bool AHT20_Initialized = false;
 
-/*
+/*---------------------------------------------------------
+ *
+ * 		AHT20_Init
+ *
  * Initializes the AHT20 Module.
  * NOTE: At least 40ms must have transpired between power on
  * and this function being called
- */
+ *
+ --------------------------------------------------------*/
 bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 	HAL_StatusTypeDef ret;	//I2C Transmit Status
 	uint8_t outMsg[3] = {AHT20_INITIALIZE_REG, 0x08, 0x00}; // Initialization Message
@@ -31,11 +37,16 @@ bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 }
 
 
-/*
- * Returns a struct containing the temperature and relative humidity data from
- * the AHT20 module. NOTE: This is currently a blocking function that will block
- * execution for about 85ms
- */
+/*---------------------------------------------------------
+ *
+ * 		AHT20_Get_Data
+ *
+ * Returns a struct containing the temperature and relative
+ * humidity data from the AHT20 module. NOTE: This is
+ * currently a blocking function that will block execution
+ * for about 85ms
+ *
+ --------------------------------------------------------*/
 struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 	HAL_StatusTypeDef ret;	// I2C Receipt Status
 	uint8_t inMsg[7];		// Message to be received
