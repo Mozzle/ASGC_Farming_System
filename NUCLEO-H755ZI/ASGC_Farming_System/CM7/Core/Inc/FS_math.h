@@ -19,5 +19,4 @@
 #define FLOAT_COMPARISON_EPSILON	1e-6f
 
 
-
 #endif /* INC_FS_MATH_H_ */

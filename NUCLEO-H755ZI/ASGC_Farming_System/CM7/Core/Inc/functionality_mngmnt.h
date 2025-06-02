@@ -27,6 +27,8 @@ enum {
 	SYS_FEATURE_ENABLED
 };
 
+// SYS_RESULT Typedef and possible values
+// Standardized function returns
 typedef uint8_t SYS_RESULT;
 enum {
 	SYS_INVALID = 0,
@@ -53,8 +55,6 @@ enum {
 
 //VL52L1X ToF Sensor
 #define VL53L1X_DIST_INVALID		-1.0f
-
-
 
 
 #endif /* INC_FUNCTIONALITY_MNGMNT_H_ */

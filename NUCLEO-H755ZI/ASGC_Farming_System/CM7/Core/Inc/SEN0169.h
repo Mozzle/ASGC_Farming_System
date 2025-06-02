@@ -2,7 +2,7 @@
  *
  * SEN0169.h
  *
- * 		SEN0169-V2 Water pH Sensor
+ * 		SEN0169-V2 Water pH Sensor Driver
  *
  *  Created on: May 28, 2025
  *      Author: Dylan
@@ -23,5 +23,6 @@ typedef float SEN0169_EC_Data;
 bool SEN0169_Init();
 
 SYS_RESULT SEN0169_Measure(float *data);
+
 
 #endif /* INC_SEN0169_H_ */

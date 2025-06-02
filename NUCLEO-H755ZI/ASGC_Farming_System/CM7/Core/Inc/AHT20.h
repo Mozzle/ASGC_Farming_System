@@ -1,3 +1,12 @@
+/*-----------------------------------------------------------------------------
+ * 	AHT20.h
+ *
+ *  Created on:
+ *
+ *  DESCRIPTION: AHT20 Temperature and Humidity Sensor Driver
+ *
+-----------------------------------------------------------------------------*/
+
 #ifndef AHT20_H
 #define AHT20_H
 
@@ -25,5 +34,6 @@ struct AHT20_Data {
 // Function Declarations
 bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout);
 struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c, uint32_t timeout);
+
 
 #endif

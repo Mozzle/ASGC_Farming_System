@@ -2,7 +2,8 @@
  *
  * fan_pwm_intf.h
  *
- * 		Fan Pulse-Width Modulation (PWM) Interface.
+ * 		Pulse-Width Modulation (PWM) Interface for driving air-circulating
+ * 		fans.
  *
  *  Created on: May 28, 2025
  *      Author: Dylan

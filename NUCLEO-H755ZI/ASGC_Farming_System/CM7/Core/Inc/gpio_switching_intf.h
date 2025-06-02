@@ -16,6 +16,8 @@
 
 #define VALVE_OPEN				true
 #define VALVE_CLOSED			false
+#define PUMP_ON					true
+#define PUMP_OFF				false
 
 #define CIRCULATING_PUMP_PORT	GPIOA
 #define CIRCULATING_PUMP_PIN	GPIO_PIN_0
@@ -40,5 +42,6 @@
 
 #define GPIO_SWITCHING_INTF_INIT_SUCCEED	true
 #define GPIO_SWITCHING_INTF_INIT_FAIL		false
+
 
 #endif /* INC_GPIO_SWITCHING_INTF_H_ */

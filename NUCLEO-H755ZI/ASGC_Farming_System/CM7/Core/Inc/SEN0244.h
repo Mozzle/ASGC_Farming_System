@@ -25,5 +25,4 @@ bool SEN0244_Init();
 SYS_RESULT SEN0244_Measure(float *data);
 
 
-
 #endif /* INC_SEN0244_H_ */

@@ -1,3 +1,12 @@
+/*-----------------------------------------------------------------------------
+ * 	AHT20.h
+ *
+ *  Created on:
+ *
+ *  DESCRIPTION: AHT20 Temperature and Humidity Sensor Driver
+ *
+-----------------------------------------------------------------------------*/
+
 #include "AHT20.h"
 
 
@@ -12,6 +21,7 @@ bool AHT20_Initialized = false;
  * 		function being called
  *
  ----------------------------------------------------------------------------*/
+
 bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 	HAL_StatusTypeDef ret;	//I2C Transmit Status
 	uint8_t outMsg[3] = {AHT20_INITIALIZE_REG, 0x08, 0x00}; // Initialization Message
@@ -45,6 +55,7 @@ bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
  * 		will block execution for about 85ms
  *
  ----------------------------------------------------------------------------*/
+
 struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 	HAL_StatusTypeDef ret;	// I2C Receipt Status
 	uint8_t inMsg[7];		// Message to be received
