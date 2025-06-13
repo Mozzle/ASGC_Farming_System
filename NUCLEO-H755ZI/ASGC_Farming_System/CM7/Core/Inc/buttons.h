@@ -17,5 +17,7 @@
 #define BUTTONS_INIT_SUCCEED	true
 #define BUTTONS_INIT_FAIL		false
 
+#define BUTTONS_ON				true
+#define BUTTONS_OFF				false
 
 #endif /* INC_BUTTONS_H_ */

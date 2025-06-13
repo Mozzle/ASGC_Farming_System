@@ -12,6 +12,13 @@
 #include "buttons.h"
 
 /*-----------------------------------------------------------------------------
+	Static Values
+ ----------------------------------------------------------------------------*/
+
+static bool start_button_state;
+static bool estop_button_state;
+
+/*-----------------------------------------------------------------------------
  *
  * 		buttons_Init()
  *
@@ -26,12 +33,16 @@ bool buttons_Init() {
 	// If start button is switchboard enabled, initialize it.
 	if (START_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
 
+		start_button_state = BUTTONS_OFF;
+
 		/* IMPLEMENT ME! */
 
 	}
 
 	// If EStop button is switchboard enabled, initialize it.
 	if (ESTOP_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
+
+		estop_button_state = BUTTONS_OFF;
 
 		/* IMPLEMENT ME! */
 
