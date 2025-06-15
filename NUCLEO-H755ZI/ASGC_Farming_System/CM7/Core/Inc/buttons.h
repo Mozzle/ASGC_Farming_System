@@ -17,11 +17,8 @@
 #define BUTTONS_INIT_SUCCEED	true
 #define BUTTONS_INIT_FAIL		false
 
-#define BUTTONS_ON				true
-#define BUTTONS_OFF				false
-
 bool Buttons_Init();
-SYS_RESULT Buttons_register_Start_button_intrpt();
-SYS_RESULT Buttons_register_EStop_button_intrpt();
+SYS_RESULT Buttons_start_button_intrpt(bool * start_state);
+SYS_RESULT Buttons_estop_button_intrpt(bool * estop_state, bool start_state);
 
 #endif /* INC_BUTTONS_H_ */

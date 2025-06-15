@@ -66,6 +66,15 @@ void Error_Handler(void);
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
+#define Start_Button_Pin GPIO_PIN_6
+#define Start_Button_GPIO_Port GPIOC
+#define Start_Button_EXTI_IRQn EXTI9_5_IRQn
+#define Estop_ButtonNC_Pin GPIO_PIN_7
+#define Estop_ButtonNC_GPIO_Port GPIOC
+#define Estop_ButtonNC_EXTI_IRQn EXTI9_5_IRQn
+#define Estop_ButtonNO_Pin GPIO_PIN_8
+#define Estop_ButtonNO_GPIO_Port GPIOC
+#define Estop_ButtonNO_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
@@ -118,9 +127,21 @@ void Error_Handler(void);
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/
-#define START_BUTTON_ENABLED			SYS_FEATURE_DISABLED
-#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_DISABLED
+#define START_BUTTON_ENABLED			SYS_FEATURE_ENABLED
+#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_ENABLED
 	 /* Buttons.h */
+
+/*------------------------------------------------------------------------------
+ * Normal Defines
+------------------------------------------------------------------------------*/
+#define SYSTEM_ON     true
+#define SYSTEM_OFF    false
+
+/*------------------------------------------------------------------------------
+ * Function Declarations
+------------------------------------------------------------------------------*/
+void ASGC_System_Startup();
+void ASGC_System_ESTOP();
 
 /* USER CODE END Private defines */
 

@@ -25,6 +25,7 @@
 
 #include "AHT20.h"
 #include "FAN_pwm_intf.h"
+#include "Buttons.h"
 
 /* USER CODE END Includes */
 
@@ -79,6 +80,9 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+bool SYSTEM_START_STATE;          /* Global Start State, triggered by Start Button */
+bool SYSTEM_ESTOP_STATE;          /* Global EStop State, triggered by EStop Button */
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,6 +112,11 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
 	struct AHT20_Data AHT20_data;
+
+
+  SYSTEM_START_STATE = SYSTEM_OFF;
+  SYSTEM_ESTOP_STATE = SYSTEM_OFF;
+
 
   /* USER CODE END 1 */
 /* USER CODE BEGIN Boot_Mode_Sequence_0 */
@@ -164,6 +173,13 @@ Error_Handler();
   MX_I2C1_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+
+  /* WAIT HERE UNTIL THE START BUTTON IS PRESSED 							 */
+  while (SYSTEM_START_STATE != SYSTEM_ON) {
+	  // Do nothing. Do we want to do something prior to system startup?
+	  // Perhaps display a prompt to press button to start on the screen?
+	  // Discuss and implement something here.
+  }
 
   HAL_Delay(45);
   FAN_pwm_intf_Init(htim3);
@@ -503,6 +519,7 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
@@ -515,12 +532,111 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
+  /*Configure GPIO pins : Start_Button_Pin Estop_ButtonNC_Pin */
+  GPIO_InitStruct.Pin = Start_Button_Pin|Estop_ButtonNC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Estop_ButtonNO_Pin */
+  GPIO_InitStruct.Pin = Estop_ButtonNO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(Estop_ButtonNO_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(Start_Button_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(Start_Button_EXTI_IRQn);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+
+/*------------------------------------------------------------------------------
+ *
+ * 	HAL_GPIO_EXTI_Callback
+ *
+ * 		Interrupt Callback function for GPIO Interrupts
+ *
+-------------------------------------------------------------
+
+-----------------*/
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{   
+    // If The INT Source Is The start button (PC6)
+    if(GPIO_Pin == GPIO_PIN_6) 
+    {
+      Buttons_start_button_intrpt(&SYSTEM_START_STATE);
+    }
+
+    // If The INT Source Is The EStop button (PC8 and PC7)
+    // The EStop Button uses two wires to determine a press. One is normally
+    // open (NO), and the other is normally closed (NC). This prevents any
+    // transients from accidentally registering an ESTOP press
+    else if (GPIO_Pin == GPIO_PIN_7 || GPIO_Pin == GPIO_PIN_8) {
+
+    	if ( HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_8) == GPIO_PIN_SET
+    	&& ( HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7) == GPIO_PIN_RESET)) {
+    		Buttons_estop_button_intrpt(&SYSTEM_ESTOP_STATE, SYSTEM_START_STATE);
+    	}
+    }
+}
+
+/*------------------------------------------------------------------------------
+ *
+ * 	ASGC_System_Startup
+ *
+ * 		Function called when system transitions on after the start button is
+ * 		pressed. Currently does nothing, but they may change at some point.
+ *
+------------------------------------------------------------------------------*/
+void ASGC_System_Startup() {
+
+}
+
+/*------------------------------------------------------------------------------
+ *
+ * 	ASGC_System_ESTOP
+ *
+ * 		Function called to stop all movement and pacify the system when the
+ * 		estop button is pressed. Function will need to be expanded as
+ * 		functionality is implemented.
+ *
+------------------------------------------------------------------------------*/
+void ASGC_System_ESTOP() {
+
+	//Send stop movement command over USB
+
+	//Stop the mixing motor
+
+	//Close all valves and stop all pumps
+
+	//Set fans to 0 duty cycle (Will not fully stop fans, these fans will still
+  //still spin at a minimum RPM at 0%)
+  FAN_pwm_intf_set_duty(FAN_PWM_INTF_0_PCT_DUTY);
+
+	//Send information to display indicating ESTOP Press
+
+	//Send information to Raspberry Pi indicating ESTOP Press
+
+	//Stop USB Host Traffic
+
+	//Shut down any analog traffic (EC/pH sensors)
+
+	//Stop I2C Traffic
+  HAL_I2C_DeInit(&hi2c1);
+
+  //(Potentially) Deregister interrupts?
+
+  //Locked in loop until power cycle
+  while(1) {
+    //May need to send data to the display here
+  }
+
+}
 
 /* USER CODE END 4 */
 

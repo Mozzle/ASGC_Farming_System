@@ -15,9 +15,6 @@
 	Static Values
  ----------------------------------------------------------------------------*/
 
-static bool start_button_state;
-static bool estop_button_state;
-
 /*-----------------------------------------------------------------------------
  *
  * 		Buttons_Init()
@@ -33,8 +30,6 @@ bool Buttons_Init() {
 	// If start button is switchboard enabled, initialize it.
 	if (START_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
 
-		start_button_state = BUTTONS_OFF;
-
 		/* IMPLEMENT ME! */
 
 	}
@@ -42,8 +37,6 @@ bool Buttons_Init() {
 	// If EStop button is switchboard enabled, initialize it.
 	if (ESTOP_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
 
-		estop_button_state = BUTTONS_OFF;
-
 		/* IMPLEMENT ME! */
 
 	}
@@ -53,53 +46,69 @@ bool Buttons_Init() {
 	return ret_val;
 }
 
-
 /*-----------------------------------------------------------------------------
  *
- * 		Buttons_register_Start_button_intrpt()
+ * 		Buttons_start_button_intrpt()
  *
- * 		Registers the Start Button's interrupt function:
- * 		(INSERT FUNC NAME HERE)
+ * 		Start Button's interrupt. Handles
  *
  ----------------------------------------------------------------------------*/
 
-// Look into how GPIO Interrupts are actually registered and used on STM32.
-// May need to register a function in main.c that has global scope.
-SYS_RESULT Buttons_register_Start_button_intrpt() {
+SYS_RESULT Buttons_start_button_intrpt(bool * start_state) {
 
 	SYS_RESULT ret_val = SYS_INVALID;
 
-	// If Start Button is switchboard disabled, return without registering function
+	// If Start Button is switchboard disabled, return without executing interrupt
 	if (START_BUTTON_ENABLED == SYS_FEATURE_DISABLED) {
 		ret_val = SYS_DEVICE_DISABLED;
 		return ret_val;
 	}
 
-	/* IMPLEMENT ME! */
+	/* If transitioning from system state off (boot up) to system state on 	 */
+	/* (start button pressed)												 */
+	if (*start_state == SYSTEM_OFF) {
+
+		*start_state = SYSTEM_ON;
+		ASGC_System_Startup();
+	}
+
+	if (*start_state == SYSTEM_ON) {
+		// Maybe have a future functionality for pressing the start button after
+		// the machine has been started. There may be debounce behavior that will
+		// need to be implemented as well, but likely isnt a problem when we only
+		// need the one press of the start button.
+	}
 
 	return ret_val;
 }
 
 /*-----------------------------------------------------------------------------
  *
- * 		Buttons_register_EStop_button_intrpt()
+ * 		Buttons_estop_button_intrpt()
  *
- * 		Registers the EStop Button's interrupt function:
- * 		(INSERT FUNC NAME HERE)
+ * 		E-Stop Button's interrupt function. Triggers entire system shutdown
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT Buttons_register_EStop_button_intrpt() {
+SYS_RESULT Buttons_estop_button_intrpt(bool * estop_state, bool start_state) {
 
 	SYS_RESULT ret_val = SYS_INVALID;
 
-	// If EStop Button is switchboard disabled, return without registering function
+	// If EStop Button is switchboard disabled, return without executing interrupt
 	if (ESTOP_BUTTON_ENABLED == SYS_FEATURE_DISABLED) {
 		ret_val = SYS_DEVICE_DISABLED;
 		return ret_val;
 	}
 
-	/* IMPLEMENT ME! */
+	/* If start button has not yet been pressed, do nothing 				 */
+	if (start_state == SYSTEM_OFF) {
+		return ret_val;
+	}
+	/* If transitioning from system state on to ESTOP on (estop pressed) 	 */
+	else if (*estop_state == SYSTEM_OFF) {
+		*estop_state = SYSTEM_ON;
+		ASGC_System_ESTOP();
+	}
 
 	return ret_val;
 }
