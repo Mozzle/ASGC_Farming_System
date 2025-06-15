@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"stm32_hal_legacy.h": "c",
+		"functionality_mngmnt.h": "c"
+	}
+}

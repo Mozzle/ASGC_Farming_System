@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
  *
- * buttons.c
+ * Buttons.c
  *
  * 		Code covering 'Start' and 'E-Stop' button interrupts and functionality
  *
@@ -9,7 +9,7 @@
  *
 -----------------------------------------------------------------------------*/
 
-#include "buttons.h"
+#include "Buttons.h"
 
 /*-----------------------------------------------------------------------------
 	Static Values
@@ -20,13 +20,13 @@ static bool estop_button_state;
 
 /*-----------------------------------------------------------------------------
  *
- * 		buttons_Init()
+ * 		Buttons_Init()
  *
  * 		Initializes the buttons Module.
  *
  ----------------------------------------------------------------------------*/
 
-bool buttons_Init() {
+bool Buttons_Init() {
 
 	bool ret_val = BUTTONS_INIT_FAIL;
 
@@ -56,7 +56,7 @@ bool buttons_Init() {
 
 /*-----------------------------------------------------------------------------
  *
- * 		buttons_register_Start_button_intrpt()
+ * 		Buttons_register_Start_button_intrpt()
  *
  * 		Registers the Start Button's interrupt function:
  * 		(INSERT FUNC NAME HERE)
@@ -65,7 +65,7 @@ bool buttons_Init() {
 
 // Look into how GPIO Interrupts are actually registered and used on STM32.
 // May need to register a function in main.c that has global scope.
-SYS_RESULT buttons_register_Start_button_intrpt() {
+SYS_RESULT Buttons_register_Start_button_intrpt() {
 
 	SYS_RESULT ret_val = SYS_INVALID;
 
@@ -82,14 +82,14 @@ SYS_RESULT buttons_register_Start_button_intrpt() {
 
 /*-----------------------------------------------------------------------------
  *
- * 		buttons_register_EStop_button_intrpt()
+ * 		Buttons_register_EStop_button_intrpt()
  *
  * 		Registers the EStop Button's interrupt function:
  * 		(INSERT FUNC NAME HERE)
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT buttons_register_EStop_button_intrpt() {
+SYS_RESULT Buttons_register_EStop_button_intrpt() {
 
 	SYS_RESULT ret_val = SYS_INVALID;
 

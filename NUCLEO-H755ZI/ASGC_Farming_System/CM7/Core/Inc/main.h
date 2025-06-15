@@ -28,11 +28,12 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
-#include <stdbool.h>
-#include "functionality_mngmnt.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include <stdbool.h>
+#include "functionality_mngmnt.h"
 
 /* USER CODE END Includes */
 
@@ -50,6 +51,8 @@ extern "C" {
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
+
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
@@ -87,8 +90,8 @@ void Error_Handler(void);
 
 
 /* Computer Fan PWM Control Interface ----------------------------------------*/
-#define FAN_PWM_INTERFACE_ENABLED		SYS_FEATURE_DISABLED
-	 /* fan_pwm_intf.c */
+#define FAN_PWM_INTERFACE_ENABLED		SYS_FEATURE_ENABLED
+	 /* FAN_pwm_intf.c */
 
 /* Serial USB to Interface with CNC Control board ----------------------------*/
 #define SKR_MINI_USB_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
@@ -108,7 +111,7 @@ void Error_Handler(void);
 
 /* MOSFET/Solid State Relay switching interface for Pumps and Valves ---------*/
 #define MOSFET_SSR_SWITCHING_ENABLED	SYS_FEATURE_DISABLED
-	 /* gpio_switching_intf.c */
+	 /* GPIO_switching_intf.c */
 
 /* Mixing Motor Controller Interface -----------------------------------------*/
 #define MIXING_MOTOR_ENABLED			SYS_FEATURE_DISABLED
@@ -117,7 +120,7 @@ void Error_Handler(void);
 /* Start and E-Stop Button Interface -----------------------------------------*/
 #define START_BUTTON_ENABLED			SYS_FEATURE_DISABLED
 #define ESTOP_BUTTON_ENABLED			SYS_FEATURE_DISABLED
-	 /* buttons.h */
+	 /* Buttons.h */
 
 /* USER CODE END Private defines */
 

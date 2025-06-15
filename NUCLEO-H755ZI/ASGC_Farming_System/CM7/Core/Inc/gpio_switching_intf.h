@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
  *
- *	gpio_switching_intf.h
+ *	GPIO_switching_intf.h
  *
  *		Created on: May 29, 2025
  *
@@ -13,6 +13,10 @@
 
 #include "main.h"
 #include "functionality_mngmnt.h"
+
+/*-----------------------------------------------------------------------------
+DEFINES
+-----------------------------------------------------------------------------*/
 
 #define VALVE_OPEN				true
 #define VALVE_CLOSED			false
@@ -43,5 +47,17 @@
 #define GPIO_SWITCHING_INTF_INIT_SUCCEED	true
 #define GPIO_SWITCHING_INTF_INIT_FAIL		false
 
+/*-----------------------------------------------------------------------------
+FUNCTION DECLARATIONS
+-----------------------------------------------------------------------------*/
+
+bool GPIO_switching_intf_Init();
+SYS_RESULT GPIO_set_circulating_pump(bool state);
+SYS_RESULT GPIO_set_drainage_pump(bool state);
+SYS_RESULT GPIO_set_fill_valve(bool state);
+SYS_RESULT GPIO_set_nutrient_soln_a_valve(bool state);
+SYS_RESULT GPIO_set_nutrient_soln_b_valve(bool state);
+SYS_RESULT GPIO_set_ph_up_valve(bool state);
+SYS_RESULT GPIO_set_ph_down_valve(bool state);
 
 #endif /* INC_GPIO_SWITCHING_INTF_H_ */

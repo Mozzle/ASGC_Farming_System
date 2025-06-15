@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
  *
- * fan_pwm_intf.h
+ * FAN_pwm_intf.h
  *
  * 		Pulse-Width Modulation (PWM) Interface for driving air-circulating
  * 		fans.
@@ -18,14 +18,28 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Fan PWM Intf Defines
 #define FAN_PWM_INTF_INIT_FAIL		false
 #define FAN_PWM_INTF_INIT_SUCCEED 	true
 
-bool fan_pwm_intf_Init();
+#define FAN_PWM_INTF_0_PCT_DUTY		(uint16_t) 0
+#define FAN_PWM_INTF_10_PCT_DUTY	(uint16_t) 960
+#define FAN_PWM_INTF_20_PCT_DUTY	(uint16_t) 1920
+#define FAN_PWM_INTF_25_PCT_DUTY	(uint16_t) 2400
+#define FAN_PWM_INTF_30_PCT_DUTY	(uint16_t) 2880
+#define FAN_PWM_INTF_40_PCT_DUTY	(uint16_t) 3840
+#define FAN_PWM_INTF_50_PCT_DUTY	(uint16_t) 4800
+#define FAN_PWM_INTF_60_PCT_DUTY	(uint16_t) 5760
+#define FAN_PWM_INTF_70_PCT_DUTY	(uint16_t) 6720
+#define FAN_PWM_INTF_75_PCT_DUTY	(uint16_t) 7200
+#define FAN_PWM_INTF_80_PCT_DUTY	(uint16_t) 7680
+#define FAN_PWM_INTF_90_PCT_DUTY	(uint16_t) 8640
+#define FAN_PWM_INTF_100_PCT_DUTY	(uint16_t) 9600
 
-SYS_RESULT fan_pwm_intf_set_duty(uint8_t duty);
-
-void clamp_duty();
+// Function Declaration
+bool FAN_pwm_intf_Init();
+SYS_RESULT FAN_pwm_intf_set_duty(uint16_t duty);
+uint16_t FAN_pwm_intf_get_duty_cycle();
 
 
 #endif /* FAN_PWM_INTF_H */

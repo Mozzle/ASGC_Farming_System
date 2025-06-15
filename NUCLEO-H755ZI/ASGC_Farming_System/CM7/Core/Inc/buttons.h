@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
  *
- * buttons.c
+ * Buttons.c
  *
  * 		Code covering 'Start' and 'E-Stop' button interrupts and functionality
  *
@@ -19,5 +19,9 @@
 
 #define BUTTONS_ON				true
 #define BUTTONS_OFF				false
+
+bool Buttons_Init();
+SYS_RESULT Buttons_register_Start_button_intrpt();
+SYS_RESULT Buttons_register_EStop_button_intrpt();
 
 #endif /* INC_BUTTONS_H_ */
