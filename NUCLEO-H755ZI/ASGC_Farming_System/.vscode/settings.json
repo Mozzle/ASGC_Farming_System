@@ -1,7 +1,8 @@
 {
 	"files.associations": {
 		"stm32_hal_legacy.h": "c",
-		"functionality_mngmnt.h": "c"
+		"functionality_mngmnt.h": "c",
+		"stdbool.h": "c"
 	},
 	"stm32-for-vscode.openOCDPath": false,
 	"stm32-for-vscode.armToolchainPath": false

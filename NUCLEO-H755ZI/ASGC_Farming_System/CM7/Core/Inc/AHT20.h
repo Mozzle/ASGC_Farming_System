@@ -1,4 +1,5 @@
 /*-----------------------------------------------------------------------------
+ *
  * 	AHT20.h
  *
  *  Created on:
@@ -33,7 +34,7 @@ struct AHT20_Data {
 
 // Function Declarations
 bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout);
-struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c, uint32_t timeout);
+struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c);
 
 
 #endif

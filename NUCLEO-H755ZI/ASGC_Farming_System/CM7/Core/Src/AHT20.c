@@ -56,13 +56,15 @@ bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
  *
  ----------------------------------------------------------------------------*/
 
-struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
+struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c) {
 	HAL_StatusTypeDef ret;	// I2C Receipt Status
+	uint32_t timeout;		// I2C Timeout
 	uint8_t inMsg[7];		// Message to be received
 	uint8_t outMsg[3] = {AHT20_MEASURE_TRIGGER_REG, 0x33, 0x00}; // Take Measurement Command
 	uint32_t rawData;
-
 	struct AHT20_Data newData;
+
+	timeout = 2000;
 	newData.temperature = 	0x0;
 	newData.humidity = 		0x0;
 	newData.validity = 		SYS_INVALID;

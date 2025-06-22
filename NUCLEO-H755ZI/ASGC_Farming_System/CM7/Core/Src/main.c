@@ -174,6 +174,7 @@ Error_Handler();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  SYSTEM_START_STATE = SYSTEM_ON;
   /* WAIT HERE UNTIL THE START BUTTON IS PRESSED 							 */
   while (SYSTEM_START_STATE != SYSTEM_ON) {
 	  // Do nothing. Do we want to do something prior to system startup?
@@ -181,6 +182,7 @@ Error_Handler();
 	  // Discuss and implement something here.
   }
 
+  ASGC_Timer_Init();
   HAL_Delay(45);
   FAN_pwm_intf_Init(htim3);
   AHT20_Init(&hi2c1, HAL_MAX_DELAY);
@@ -196,12 +198,12 @@ Error_Handler();
 
     /* USER CODE BEGIN 3 */
 
-	  /*AHT20_data = AHT20_Get_Data(&hi2c1, HAL_MAX_DELAY);
+	  AHT20_data = AHT20_Get_Data(&hi2c1);
 
 	  if (AHT20_data.humidity == 0.0) {
 		  AHT20_data.humidity = 2.0;
 	  }
-	  HAL_Delay(500); */
+	  HAL_Delay(50);
 
       //FAN_pwm_intf_set_duty(0);
       //HAL_Delay(5000);
