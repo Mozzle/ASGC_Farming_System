@@ -35,7 +35,7 @@
 						/* Maximum Y position of the CNC system in mm. 		 */
 						/* Value TBD but should be ~500			 			 */
 
-						
+
 #define SEED_DISPENSER_X_OFFSET_MM 			9999.9
 						/* X offset of the seed dispenser dispensing tube	 */
 						/* from the absolute CNC Position. Value TBD		 */
@@ -99,12 +99,12 @@ typedef struct {
 
 bool CNC_Init(void);
 uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos);
-bool CNC_Detect_Equipped_Toolhead(void);
+SYS_RESULT CNC_Detect_Equipped_Toolhead(void);
 
 
 SYS_RESULT CNC_Home_Command(void);
 SYS_RESULT CNC_Move_To_Pos(float x_pos, float y_pos);
-SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index)
+SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index);
 
 
 #endif /* __CNC_H */

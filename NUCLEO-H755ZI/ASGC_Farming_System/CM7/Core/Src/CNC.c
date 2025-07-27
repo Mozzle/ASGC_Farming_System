@@ -138,7 +138,11 @@ bool CNC_Init() {
 		return false;
 	}
 
-	CNC_Determine_Equipped_Toolhead();
+	if (CNC_Detect_Equipped_Toolhead() != SYS_SUCCESS) {
+		// If we failed to detect the equipped toolhead, we should not continue
+		CNC_Initialized = false;
+		return false;
+	}
 
 	// If we can determine the equipped toolhead, set the initialized flag to true
 	// Otherwise, we should probably have a hard error here that requires user intervention
@@ -198,10 +202,10 @@ uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos) {
  *
  ----------------------------------------------------------------------------*/
 
-bool CNC_Determine_Equipped_Toolhead() {
+SYS_RESULT CNC_Detect_Equipped_Toolhead() {
 
 	// No clue how to implement this right now
-
+	return SYS_SUCCESS;
 }
 
 
