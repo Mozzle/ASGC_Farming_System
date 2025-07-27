@@ -23,19 +23,20 @@
  *
  ----------------------------------------------------------------------------*/
 
-bool Buttons_Init() {
+bool Buttons_Init(bool *SYSTEM_START_STATE) {
 
 	bool ret_val = BUTTONS_INIT_FAIL;
 
-	// If start button is switchboard enabled, initialize it.
-	if (START_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
+	// If start button is switchboard disabled, skip the need to wait for the start
+	// button to be pressed to start the system.
+	if (START_BUTTON_ENABLED == SYS_FEATURE_DISABLED) {
 
-		/* IMPLEMENT ME! */
+		*SYSTEM_START_STATE = SYSTEM_ON;
 
 	}
 
-	// If EStop button is switchboard enabled, initialize it.
-	if (ESTOP_BUTTON_ENABLED == SYS_FEATURE_ENABLED) {
+	// If EStop button is switchboard disabled, initialize it.
+	if (ESTOP_BUTTON_ENABLED == SYS_FEATURE_DISABLED) {
 
 		/* IMPLEMENT ME! */
 

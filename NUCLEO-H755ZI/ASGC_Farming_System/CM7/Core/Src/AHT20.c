@@ -24,7 +24,7 @@ bool AHT20_Initialized = false;
 
 bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 	HAL_StatusTypeDef ret;	//I2C Transmit Status
-	uint8_t outMsg[3] = {AHT20_INITIALIZE_REG, 0x08, 0x00}; // Initialization Message
+	uint8_t outMsg[3] = {AHT20_INITIALIZE_REG, 0x08, 0x00}; // I2C Initialization Message
 
 	// If AHT20 is not enabled, dont try sending data to it over I2C
 	if (AHT20_ENABLED == SYS_FEATURE_DISABLED) {

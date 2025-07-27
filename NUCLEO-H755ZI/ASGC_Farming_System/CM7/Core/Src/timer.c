@@ -4,7 +4,10 @@
  *
  *  Created on:
  *
- *  DESCRIPTION: HAL interface to allow timer overflow
+ *  DESCRIPTION: HAL interface to allow timer overflow, so the system can keep
+ *  accurate time for longer than 49.7 days. All timing-based implementations
+ *  in this project should use getTimestamp() to fetch the milliseconds since
+ *  system on, rather than the HAL_GetTick() function.
  *
 -----------------------------------------------------------------------------*/
 
@@ -17,6 +20,18 @@ void ASGC_Timer_Init() {
 	s_overflowTimeMs = 0;
 	prev_32_bit_timestampMs = 0;
 }
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		getTimestamp
+ *
+ * 		Returns the number of milliseconds elapsed since the system clocks
+ * 		were initialized (power on).
+ *
+ * 		NOTE: This function needs to be tested. I think the STM32CubeIDE
+ * 		debugger allows for variable manipulation to test this function.
+ *
+ ----------------------------------------------------------------------------*/
 
 uint64_t getTimestamp() {
 

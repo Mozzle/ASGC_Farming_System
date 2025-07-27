@@ -127,8 +127,8 @@ void Error_Handler(void);
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/
-#define START_BUTTON_ENABLED			SYS_FEATURE_ENABLED
-#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_ENABLED
+#define START_BUTTON_ENABLED			SYS_FEATURE_DISABLED
+#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_DISABLED
 	 /* Buttons.h */
 
 /*------------------------------------------------------------------------------
