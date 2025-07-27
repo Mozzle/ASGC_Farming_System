@@ -87,48 +87,49 @@ void Error_Handler(void);
  -----------------------------------------------------------------------------*/
 
 /* ILI9341 LCD Display -------------------------------------------------------*/
-#define ILI9341_ENABLED					SYS_FEATURE_DISABLED
+#define ILI9341_ENABLED					        SYS_FEATURE_DISABLED
 
 
 /* AHT20 Temperature and Humidity Sensor -------------------------------------*/
-#define AHT20_ENABLED					SYS_FEATURE_ENABLED
+#define AHT20_ENABLED					          SYS_FEATURE_ENABLED
 	 /* AHT20.c */
 
 /* AS7341 Light Sensor -------------------------------------------------------*/
-#define AS7341_ENABLED					SYS_FEATURE_DISABLED
+#define AS7341_ENABLED					        SYS_FEATURE_DISABLED
 
 
 /* Computer Fan PWM Control Interface ----------------------------------------*/
-#define FAN_PWM_INTERFACE_ENABLED		SYS_FEATURE_ENABLED
+#define FAN_PWM_INTERFACE_ENABLED		    SYS_FEATURE_ENABLED
 	 /* FAN_pwm_intf.c */
 
 /* Serial USB to Interface with CNC Control board ----------------------------*/
 #define SKR_MINI_USB_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
+    /* CNC.c */
 
 
 /* SEN0244 Electrical Conductivity Sensor ------------------------------------*/
-#define SEN0244_ENABLED					SYS_FEATURE_DISABLED
+#define SEN0244_ENABLED					        SYS_FEATURE_DISABLED
 	 /* SEN0244.c */
 
 /* SEN0169-V2 pH Sensor ------------------------------------------------------*/
-#define SEN0169_ENABLED					SYS_FEATURE_DISABLED
+#define SEN0169_ENABLED					        SYS_FEATURE_DISABLED
 	 /* SEN0169.c */
 
 /* VL53L1X Time-Of-Flight Sensor ---------------------------------------------*/
-#define VL53L1X_ENABLED					SYS_FEATURE_DISABLED
+#define VL53L1X_ENABLED					        SYS_FEATURE_DISABLED
 
 
 /* MOSFET/Solid State Relay switching interface for Pumps and Valves ---------*/
-#define MOSFET_SSR_SWITCHING_ENABLED	SYS_FEATURE_DISABLED
+#define MOSFET_SSR_SWITCHING_ENABLED	  SYS_FEATURE_DISABLED
 	 /* GPIO_switching_intf.c */
 
 /* Mixing Motor Controller Interface -----------------------------------------*/
-#define MIXING_MOTOR_ENABLED			SYS_FEATURE_DISABLED
+#define MIXING_MOTOR_ENABLED			      SYS_FEATURE_DISABLED
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/
-#define START_BUTTON_ENABLED			SYS_FEATURE_DISABLED
-#define ESTOP_BUTTON_ENABLED			SYS_FEATURE_DISABLED
+#define START_BUTTON_ENABLED			      SYS_FEATURE_DISABLED
+#define ESTOP_BUTTON_ENABLED			      SYS_FEATURE_DISABLED
 	 /* Buttons.h */
 
 /*------------------------------------------------------------------------------

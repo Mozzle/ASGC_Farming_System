@@ -161,11 +161,13 @@ Error_Handler();
 	  // Discuss and implement something here.
   }
 
+  // Initialize all project modules
   ASGC_Timer_Init();
-  HAL_Delay(45);
   FAN_pwm_intf_Init(htim3);
-  AHT20_Init(&hi2c1, HAL_MAX_DELAY);
-  HAL_Delay(2000);
+  HAL_Delay(45);             // Must be called prior to AHT20_Init()
+  AHT20_Init(&hi2c1, 10000); // 10 second timeout
+  CNC_Init();
+  HAL_Delay(500);
 
   /* USER CODE END 2 */
 
