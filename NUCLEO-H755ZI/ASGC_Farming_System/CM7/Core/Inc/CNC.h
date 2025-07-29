@@ -17,9 +17,11 @@
 #include "main.h"
 
 #include <math.h>
-#include "usbd_cdc_if.h"
+//#include "usbd_cdc_if.h"
 #include "functionality_mngmnt.h"
 #include "timer.h"
+#include <stdio.h>
+#include  <string.h>
 
 #define CNC_NUM_NFT_CHANNELS 				4
                     	/* NOTE: Channel index increases with increasing y 	 */

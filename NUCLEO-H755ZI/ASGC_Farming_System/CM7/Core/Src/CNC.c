@@ -37,13 +37,13 @@ SYS_RESULT usb_send_gcode(const char *gcode, uint32_t timeout) {
 	uint16_t gcode_len = strlen(gcode);
 	if (gcode_len > 0) {
 
-		while (CDC_Transmit_FS((uint8_t *)gcode, gcode_len) != USBD_OK) {
-			// Wait until the USB CDC interface is ready to transmit
-			// This is a blocking call, so it will wait until the transmission is successful
-			if ((getTimestamp() - start_time) > timeout) {
-				return SYS_FAIL; // fail if timeout reached
-			}
-		}
+		//while (CDC_Transmit_FS((uint8_t *)gcode, gcode_len) != USBD_OK) {
+		//	// Wait until the USB CDC interface is ready to transmit
+		//	// This is a blocking call, so it will wait until the transmission is successful
+		//	if ((getTimestamp() - start_time) > timeout) {
+		//		return SYS_FAIL; // fail if timeout reached
+		//	}
+		//}
 
 		return SYS_SUCCESS; // Return success if the G-code command was sent successfully
 	}

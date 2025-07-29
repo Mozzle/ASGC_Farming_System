@@ -18,15 +18,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usb_device.h"
+#include "usb_host.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usbd_cdc_if.h"
+//#include "usbd_cdc_if.h"
+#include "usbh_cdc.h"
 #include "AHT20.h"
 #include "FAN_pwm_intf.h"
 #include "Buttons.h"
 #include "timer.h"
+#include "CNC.h"
 
 /* USER CODE END Includes */
 
@@ -79,6 +81,46 @@ static void MX_TIM3_Init(void);
 /* USER CODE BEGIN 0 */
 uint8_t TxBuffer[] = "Hello World!\r\n";
 uint8_t TxBufferLen = sizeof(TxBuffer);
+
+//USB HOST STUFF
+extern USBH_HandleTypeDef hUsbHostFS;
+extern ApplicationTypeDef Appli_state;
+#define RX_BUFF_SIZE	64
+uint8_t CDC_RX_Buffer[RX_BUFF_SIZE];
+uint8_t CDC_TX_Buffer[RX_BUFF_SIZE];
+
+typedef enum {
+	CDC_STATE_IDLE = 0,
+	CDC_RECEIVE
+}CDC_StateTypedef;
+
+CDC_StateTypedef CDC_STATE = CDC_STATE_IDLE;
+uint8_t i = 0;
+
+void CDC_HANDLE(void) {
+	switch(CDC_STATE) {
+	case CDC_STATE_IDLE:
+  {
+		USBH_CDC_Stop(&hUsbHostFS);
+    int len = sprintf((char*)CDC_TX_Buffer, "G28\r\n" );
+    if (USBH_CDC_Transmit(&hUsbHostFS, CDC_TX_Buffer, len) == USBH_OK) {
+      CDC_STATE = CDC_RECEIVE;
+    }
+    i++;
+    break;
+	}
+  case CDC_RECEIVE:
+  {
+    USBH_CDC_Stop(&hUsbHostFS);
+    USBH_StatusTypeDef usbresult = USBH_CDC_Receive(&hUsbHostFS, (uint8_t *)CDC_RX_Buffer, RX_BUFF_SIZE);
+    HAL_Delay(10000);
+    CDC_STATE = CDC_STATE_IDLE;
+    break;
+  }
+  default:
+    break;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -89,7 +131,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
 	struct AHT20_Data AHT20_data;
 
 
@@ -149,7 +191,7 @@ Error_Handler();
   MX_USART3_UART_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
-  MX_USB_DEVICE_Init();
+  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
 
   Buttons_Init(&SYSTEM_START_STATE);
@@ -184,10 +226,12 @@ Error_Handler();
 	  if (AHT20_data.humidity == 0.0) {
 		  AHT20_data.humidity = 2.0;
 	  }
-	  //CDC_Transmit_HS(TxBuffer, TxBufferLen);
-	  usbTxBufLen = snprintf((char *) usbTxBuf, USB_BUFLEN, "Temperature: %i\r\n", (int16_t) AHT20_data.temperature);
-	  CDC_Transmit_FS(usbTxBuf, usbTxBufLen);
-	  HAL_Delay(500);
+
+    if (Appli_state == APPLICATION_READY) {
+      CDC_HANDLE();
+    }
+    //CNC_Home_Command();
+	  //HAL_Delay(10000);
       //FAN_pwm_intf_set_duty(0);
       //HAL_Delay(5000);
       //FAN_pwm_intf_set_duty(FAN_PWM_INTF_100_PCT_DUTY);
@@ -433,6 +477,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(USB_OTG_FS_PWR_EN_GPIO_Port, USB_OTG_FS_PWR_EN_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : PB0 */
   GPIO_InitStruct.Pin = GPIO_PIN_0;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -448,6 +495,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF12_OTG2_FS;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USB_OTG_FS_PWR_EN_Pin */
+  GPIO_InitStruct.Pin = USB_OTG_FS_PWR_EN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(USB_OTG_FS_PWR_EN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : Start_Button_Pin Estop_ButtonNC_Pin */
   GPIO_InitStruct.Pin = Start_Button_Pin|Estop_ButtonNC_Pin;
