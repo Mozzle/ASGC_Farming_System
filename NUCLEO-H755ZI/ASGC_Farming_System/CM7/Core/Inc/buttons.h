@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
  *
- * Buttons.c
+ * Buttons.h
  *
  * 		Code covering 'Start' and 'E-Stop' button interrupts and functionality
  *
