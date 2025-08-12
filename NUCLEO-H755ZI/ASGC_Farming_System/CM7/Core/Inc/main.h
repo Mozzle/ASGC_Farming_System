@@ -66,8 +66,6 @@ void Error_Handler(void);
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
-#define USB_OTG_FS_PWR_EN_Pin GPIO_PIN_10
-#define USB_OTG_FS_PWR_EN_GPIO_Port GPIOD
 #define Start_Button_Pin GPIO_PIN_6
 #define Start_Button_GPIO_Port GPIOC
 #define Start_Button_EXTI_IRQn EXTI9_5_IRQn
