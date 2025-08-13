@@ -29,6 +29,8 @@ Raspberry Pi Packets
 -----------------------------------------------------------------------------*/
 // All RPI packets are 128 bytes long
 #define RPI_I2C_PACKET_SIZE 			128
+// Number of attempts to send a packet before giving up
+#define RPI_I2C_NUM_PKT_SEND_ATTEMPTS	3
 
 typedef uint8_t RPI_Packet_ID;
 enum {
@@ -38,7 +40,9 @@ enum {
 	RPI_WATER_DATA_PKT_ID,		// Water EC and pH Data
 	RPI_BUTTONS_PKT_ID,			// EStop and Start Button Data
 	RPI_NET_POT_STATUS_PKT_ID,
-	RPI_GET_AXES_POS_PKT_ID
+	RPI_GET_AXES_POS_PKT_ID,
+
+	RPI_I2C_NUM_PKT_IDS			// Number of packet IDs
 };
 
 typedef struct RPI_I2C_GCode_Packet {
@@ -60,5 +64,10 @@ typedef struct RPI_I2C_AHT20_Packet {
 // Compile Assert if packet not correct size
 _Static_assert(sizeof(RPI_I2C_AHT20_Packet_t) == RPI_I2C_PACKET_SIZE, "RPI I2C AHT20 Packet size mismatch");
 
+
+/*-----------------------------------------------------------------------------
+Function Prototypes
+-----------------------------------------------------------------------------*/
+SYS_RESULT RPI_I2C_Send_Gcode_Pkt(const char *gcode, uint32_t timeout);
 
 #endif // I2C_PACKETS_H

@@ -103,7 +103,7 @@ void Error_Handler(void);
 	 /* FAN_pwm_intf.c */
 
 /* Serial USB to Interface with CNC Control board ----------------------------*/
-#define SKR_MINI_USB_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
+#define RASPBERRY_PI_INTERFACE_ENABLED	SYS_FEATURE_ENABLED
     /* CNC.c */
 
 

@@ -12,6 +12,7 @@
 -----------------------------------------------------------------------------*/
 
 #include "CNC.h"
+#include "RPI_I2C.h"
 
 static CNC_NFT_Data CNC_DATA;
 bool CNC_Initialized = false;
@@ -27,30 +28,35 @@ bool CNC_Initialized = false;
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT usb_send_gcode(const char *gcode, uint32_t timeout) {
-	uint32_t start_time = getTimestamp(); // Get the current time in milliseconds
+SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
+	/*-------------------------------------------------------------------------
+	Local Variables
+ 	-------------------------------------------------------------------------*/
+	uint8_t i;
+	uint16_t gcode_len;
 
-	if (gcode == NULL) {
+	/*-------------------------------------------------------------------------
+	Validity Checks
+ 	-------------------------------------------------------------------------*/
+	if ( gcode == NULL ) {
 		return SYS_INVALID; // Return invalid if gcode is NULL
 	}
 
-	uint16_t gcode_len = strlen(gcode);
-	if (gcode_len > 0) {
-
-		//while (CDC_Transmit_FS((uint8_t *)gcode, gcode_len) != USBD_OK) {
-		//	// Wait until the USB CDC interface is ready to transmit
-		//	// This is a blocking call, so it will wait until the transmission is successful
-		//	if ((getTimestamp() - start_time) > timeout) {
-		//		return SYS_FAIL; // fail if timeout reached
-		//	}
-		//}
-
-		return SYS_SUCCESS; // Return success if the G-code command was sent successfully
-	}
-	else {
-		// If the G-code command is empty, do not send anything
+	gcode_len = strlen( gcode );
+	if ( gcode_len == 0 ) {
 		return SYS_INVALID;
 	}
+
+	/*-------------------------------------------------------------------------
+	Attempt to send the G-code command multiple times until success
+ 	-------------------------------------------------------------------------*/
+	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
+
+		if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
+			return SYS_SUCCESS; // Return success if the G-code command was sent successfully
+		}
+	}
+	return SYS_FAIL; // Return fail if the G-code command was not sent successfully
 
 }
 /*-----------------------------------------------------------------------------
@@ -68,7 +74,7 @@ SYS_RESULT usb_send_gcode(const char *gcode, uint32_t timeout) {
 bool CNC_Init() {
 
 	// If CNC is not enabled, do not try to initialize it
-	if (SKR_MINI_USB_INTERFACE_ENABLED == SYS_FEATURE_DISABLED) {
+	if (RASPBERRY_PI_INTERFACE_ENABLED == SYS_FEATURE_DISABLED) {
 		CNC_Initialized = true;
 		return false;
 	}
@@ -221,8 +227,8 @@ SYS_RESULT CNC_Detect_Equipped_Toolhead() {
 SYS_RESULT CNC_Home_Command() {
 
 	// Send the G-code command to home the CNC system
-	const char *gcode = "G28\n"; // G28 is the G-code command for homing
-	SYS_RESULT result = usb_send_gcode(gcode, 500); // 500ms timeout
+	const char *gcode = "G28"; // G28 is the G-code command for homing
+	SYS_RESULT result = usb_send_gcode(gcode, 100); // 100ms timeout
 
 	return result;
 }

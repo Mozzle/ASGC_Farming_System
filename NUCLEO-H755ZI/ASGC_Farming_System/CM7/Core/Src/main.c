@@ -75,7 +75,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t TxBuffer[6] = "Hello";
 
 /* USER CODE END 0 */
 
@@ -164,7 +163,13 @@ Error_Handler();
   FAN_pwm_intf_Init(htim3);
   HAL_Delay(45);             // Must be called prior to AHT20_Init()
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
-  CNC_Init();
+
+  if (CNC_Init() == SYS_SUCCESS) {
+
+  }
+  else {
+
+  }
   HAL_Delay(500);
 
   /* USER CODE END 2 */
@@ -182,14 +187,10 @@ Error_Handler();
 	  if (AHT20_data.humidity == 0.0) {
 		  AHT20_data.humidity = 2.0;
 	  }
+	  //For testing purposes
+	  //CNC_Home_Command();
 
-    //if (HAL_UART_Receive(&huart2, RxBuffer, 7, HAL_MAX_DELAY) == HAL_OK) {
-    //  HAL_UART_Transmit(&huart2, RxBuffer, 7, 10000);
-    //}
-	TxBuffer[0]++;
-    HAL_I2C_Master_Transmit(&hi2c1, (0x09 << 1), TxBuffer, 6, 1000);
-
-   // HAL_Delay(1000);
+	  // HAL_Delay(100);
 
   }
   /* USER CODE END 3 */
