@@ -28,7 +28,7 @@ class RPI_I2C_Packet_GCode:
         self.packet_id = data[PACKET_ID]
 
         # If the packet ID is not the gcode packet
-        if packet_id is not RPI_GCODE_PKT_ID:
+        if self.packet_id is not RPI_GCODE_PKT_ID:
             self.valid = False
         else:
             # Get packet validity from data

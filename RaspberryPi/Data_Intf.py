@@ -10,6 +10,7 @@ I2C_ADDR=9
 
 class Data_Interface:
    global pi
+   global e
 
    ''' ------------------------------------------------------------------------
    Data_Interface Init
@@ -18,6 +19,8 @@ class Data_Interface:
    ------------------------------------------------------------------------ '''
    def __init__(self):
       pi = pigpio.pi()
+      pkt_rec_count = 0
+      pkt_success_count = 0
 
       if not pi.connected:
          exit()
@@ -45,23 +48,26 @@ class Data_Interface:
 
       # If we received data
       if bytes_rec:
-         print(data[:-1])
+         #print(data[:-1])
+         pkt_rec_count += 1
 
-         if len(data) is not RPI_I2C_PACKET_SIZE:
+         if len(data) is not I2C_Packets.RPI_I2C_PACKET_SIZE:
             # Error of some kind
             # Maybe send back a 'data not received' pkt
+            print("ERROR: Packet length mismatch!")
             pass
 
          # Match the pkt_id
-         match data[PACKET_ID]:
+         match data[I2C_Packets.PACKET_ID]:
 
+            # ------------------------ ERROR PKT ID ---------------------------
             case I2C_Packets.RPI_ERR_PKT_ID:
                print("Yeah!")
 
+            # ------------------------ GCODE PKT ID ---------------------------
             case I2C_Packets.RPI_GCODE_PKT_ID:
-               print("GCode Packet!")
                # Parse the data into the packet struct
-               pkt = RPI_I2C_Packet_GCode(data)
+               pkt = I2C_Packets.RPI_I2C_Packet_GCode(data)
 
                # If packet is valid
                if pkt.valid is True:
@@ -69,29 +75,43 @@ class Data_Interface:
                   terminal_cmd = "echo " + pkt.gcode_str + " >> /tmp/printer"
                   call(terminal_cmd)
 
+                  if pkt.gcode_str == "G28":
+                     pkt_success_count += 1
+
+                  print("GCode [" + pkt_success_count + "/" + pkt_rec_count + "]: " + pkt.gcode_str)
+
+            # ---------------------- AHT20 DATA PKT ID ------------------------
             case I2C_Packets.RPI_AHT20_PKT_ID:
                print("Else!")
 
+            # ---------------------- WATER DATA PKT ID ------------------------
             case I2C_Packets.RPI_WATER_DATA_PKT_ID:
                pass
-
+            
+            # --------------------- BUTTONS DATA PKT ID -----------------------
             case I2C_Packets.RPI_BUTTONS_PKT_ID:
                pass
-
+            
+            # -------------------- NET POT STATUS PKT ID ----------------------
             case I2C_Packets.RPI_NET_POT_STATUS_PKT_ID:
                pass
-
+            
+            # ---------------- GET AXES DATA REQUEST PKT ID -------------------
             case I2C_Packets.RPI_GET_AXES_POS_PKT_ID:
                pass
 
+            # ----------------------- DEFAULT CASE ----------------------------
             case _:
                print("okay")
 
+         
+
 ''' ------------------------------------------------------------------------
-   Program Begin
+   Program Entry Point
    ------------------------------------------------------------------------ '''
 # Create the global pgio object
 pi = None
+e = None
 # Start the interface
 Interface = Data_Interface()
 
