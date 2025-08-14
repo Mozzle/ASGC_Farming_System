@@ -1,0 +1,3 @@
+[submodule "RaspberryPi/ASGC_Farming_Robot_RPi"]
+	path = RaspberryPi/ASGC_Farming_Robot_RPi
+	url = https://github.com/Mozzle/ASGC_Farming_Robot_RPi
