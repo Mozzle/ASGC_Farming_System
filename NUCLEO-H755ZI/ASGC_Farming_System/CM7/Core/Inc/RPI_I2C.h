@@ -29,7 +29,9 @@ Raspberry Pi Packets
 -----------------------------------------------------------------------------*/
 // All RPI packets are 128 bytes long
 #define RPI_I2C_PACKET_SIZE 			128
-// Number of attempts to send a packet before giving up
+#define RPI_I2C_PACKET_CHUNK_SIZE		16
+#define NUM_CHUNKS_PER_PACKET			( RPI_I2C_PACKET_SIZE / RPI_I2C_PACKET_CHUNK_SIZE )
+// Number of attempts to send a packet chunk before giving up
 #define RPI_I2C_NUM_PKT_SEND_ATTEMPTS	3
 
 typedef uint8_t RPI_Packet_ID;

@@ -32,7 +32,6 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 	/*-------------------------------------------------------------------------
 	Local Variables
  	-------------------------------------------------------------------------*/
-	uint8_t i;
 	uint16_t gcode_len;
 
 	/*-------------------------------------------------------------------------
@@ -48,14 +47,12 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 	}
 
 	/*-------------------------------------------------------------------------
-	Attempt to send the G-code command multiple times until success
+	Attempt to send the G-code command
  	-------------------------------------------------------------------------*/
-	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
-
-		if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
-			return SYS_SUCCESS; // Return success if the G-code command was sent successfully
-		}
+	if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
+		return SYS_SUCCESS; // Return success if the G-code command was sent successfully
 	}
+
 	return SYS_FAIL; // Return fail if the G-code command was not sent successfully
 
 }
