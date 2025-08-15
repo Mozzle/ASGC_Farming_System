@@ -34,10 +34,7 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	Local Variables
 	-------------------------------------------------------------------------*/
 	RPI_I2C_Packet_GCode_t gcode_packet;
-	uint8_t packet_bytes[RPI_I2C_PACKET_SIZE];
 	HAL_StatusTypeDef status;
-	uint8_t packet_chunk[RPI_I2C_PACKET_CHUNK_SIZE];
-	uint8_t i, j;
 
 	/*-------------------------------------------------------------------------
 	Clear struct
@@ -59,34 +56,15 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	strncpy((char *)gcode_packet.gcode_str, gcode, sizeof(gcode_packet.gcode_str) - 1);
 	gcode_packet.gcode_str[sizeof(gcode_packet.gcode_str) - 1] = '\0'; // Ensure null termination
 
-	memcpy(packet_bytes, &gcode_packet, sizeof(RPI_I2C_Packet_GCode_t));
-
 	/*-------------------------------------------------------------------------
-	For each packet chunk
+	Send the packet using HAL
 	-------------------------------------------------------------------------*/
-	for( i = 0; i < NUM_CHUNKS_PER_PACKET; i++ ) {
+	status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_packet, RPI_I2C_PACKET_SIZE, timeout);
 
-		/*---------------------------------------------------------------------
-		Pack the packet chunk
-		---------------------------------------------------------------------*/
-		for ( j = (i * NUM_CHUNKS_PER_PACKET); j < (( i+1 ) * NUM_CHUNKS_PER_PACKET); j++ ) {
-			packet_chunk[(j % RPI_I2C_PACKET_CHUNK_SIZE)] = packet_bytes[j];
-		}
-
-		/*---------------------------------------------------------------------
-		Attempt to send the packet chunk
-		---------------------------------------------------------------------*/
-		for ( j = 0; j < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; j++ ) {
-			status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &packet_chunk, RPI_I2C_PACKET_CHUNK_SIZE, timeout);
-			if ( status == HAL_OK ) {
-				break;
-			}
-		}
-		if ( status != HAL_OK ) {
-			return SYS_FAIL;
-		}
-
+	if (status == HAL_OK) {
+		return SYS_SUCCESS;
 	}
-
-	return SYS_SUCCESS;
+	else {
+		return SYS_FAIL;
+	}
 }
