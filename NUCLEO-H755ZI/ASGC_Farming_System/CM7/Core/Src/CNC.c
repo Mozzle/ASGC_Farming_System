@@ -43,7 +43,7 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 	}
 
 	gcode_len = strlen( gcode );
-	if ( gcode_len == 0 ) {
+	if ( gcode_len == 0 || gcode_len > RPI_I2C_GCODE_PACKET_SIZE ) {
 		return SYS_INVALID;
 	}
 

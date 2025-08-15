@@ -28,7 +28,7 @@ Raspberry Pi Addresses
 Raspberry Pi Packets
 -----------------------------------------------------------------------------*/
 // All RPI packets are 128 bytes long
-#define RPI_I2C_PACKET_SIZE 			128
+#define RPI_I2C_MAX_PACKET_SIZE 		128
 // Number of attempts to send a packet before giving up
 #define RPI_I2C_NUM_PKT_SEND_ATTEMPTS	3
 
@@ -49,21 +49,20 @@ typedef struct RPI_I2C_GCode_Packet {
 	RPI_Packet_ID packet_id;
 	bool valid;
 	uint8_t gcode_str[64];
-	uint8_t pad[62]; 			// Padding to ensure struct is 128 bytes
 } RPI_I2C_Packet_GCode_t;
-// Compile Assert if packet not correct size
-_Static_assert(sizeof(RPI_I2C_Packet_GCode_t) == RPI_I2C_PACKET_SIZE, "RPI I2C GCode Packet size mismatch");
+
+#define RPI_I2C_GCODE_PACKET_SIZE	sizeof(RPI_I2C_Packet_GCode_t)
 
 typedef struct RPI_I2C_AHT20_Packet {
 	RPI_Packet_ID packet_id;
 	bool valid;
 	uint8_t pad1[2];			// Structs (and most other multi-byte data types) must be aligned on memory addresses
 	AHT20_Data_t aht20_data;	// that are a multiple of 4. So we add this 2-byte padding after the uint8 and bool to
-	uint8_t pad2[111];			// be explicit about what the data structure looks like.
+								// be explicit about what the data structure looks like.
 } RPI_I2C_AHT20_Packet_t;
-// Compile Assert if packet not correct size
-_Static_assert(sizeof(RPI_I2C_AHT20_Packet_t) == RPI_I2C_PACKET_SIZE, "RPI I2C AHT20 Packet size mismatch");
 
+#define RPI_I2C_AHT20_PACKET_SIZE	sizeof(RPI_I2C_Packet_GCode_t)
+_Static_assert ((sizeof(RPI_I2C_AHT20_Packet_t) == 16), "Error Size");
 
 /*-----------------------------------------------------------------------------
 Function Prototypes

@@ -59,7 +59,7 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	/*-------------------------------------------------------------------------
 	Send the packet using HAL
 	-------------------------------------------------------------------------*/
-	status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_packet, RPI_I2C_PACKET_SIZE, timeout);
+	status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_packet, RPI_I2C_GCODE_PACKET_SIZE, timeout);
 
 	if (status == HAL_OK) {
 		return SYS_SUCCESS;
