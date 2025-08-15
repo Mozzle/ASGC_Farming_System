@@ -184,13 +184,13 @@ Error_Handler();
     
 	  AHT20_data = AHT20_Get_Data(&hi2c1);
 
-	  if (AHT20_data.humidity == 0.0) {
-		  AHT20_data.humidity = 2.0;
-	  }
+	  //if (AHT20_data.humidity == 0.0) {
+	  //  AHT20_data.humidity = 2.0;
+	  //}
 	  //For testing purposes
-	  //CNC_Home_Command();
+	  CNC_Home_Command();
 
-	  // HAL_Delay(100);
+	   HAL_Delay(75);
 
   }
   /* USER CODE END 3 */
