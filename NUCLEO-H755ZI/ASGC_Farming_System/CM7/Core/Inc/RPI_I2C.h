@@ -48,7 +48,8 @@ enum {
 typedef struct RPI_I2C_GCode_Packet {
 	RPI_Packet_ID packet_id;
 	bool valid;
-	uint8_t gcode_str[60];
+	uint8_t gcode_str[64];
+	uint8_t pad[3];				// End padding
 } RPI_I2C_Packet_GCode_t;
 
 #define RPI_I2C_GCODE_PACKET_SIZE	sizeof(RPI_I2C_Packet_GCode_t)

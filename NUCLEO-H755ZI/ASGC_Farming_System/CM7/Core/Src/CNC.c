@@ -227,7 +227,7 @@ SYS_RESULT CNC_Detect_Equipped_Toolhead() {
 SYS_RESULT CNC_Home_Command() {
 
 	// Send the G-code command to home the CNC system
-	const char *gcode = "G28"; // G28 is the G-code command for homing
+	const char *gcode = "G28 0123456789012345678901234567890123"; // G28 is the G-code command for homing
 	SYS_RESULT result = usb_send_gcode(gcode, 100); // 100ms timeout
 
 	return result;
