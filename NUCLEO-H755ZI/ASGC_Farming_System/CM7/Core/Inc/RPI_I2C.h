@@ -41,6 +41,7 @@ enum {
 	RPI_BUTTONS_PKT_ID,			// EStop and Start Button Data
 	RPI_NET_POT_STATUS_PKT_ID,
 	RPI_GET_AXES_POS_PKT_ID,
+	RPI_ACK_PKT_ID,
 
 	RPI_I2C_NUM_PKT_IDS			// Number of packet IDs
 };
@@ -48,8 +49,7 @@ enum {
 typedef struct RPI_I2C_GCode_Packet {
 	RPI_Packet_ID packet_id;
 	bool valid;
-	uint8_t gcode_str[64];
-	uint8_t pad[3];				// End padding
+	uint8_t gcode_str[14];
 } RPI_I2C_Packet_GCode_t;
 
 #define RPI_I2C_GCODE_PACKET_SIZE	sizeof(RPI_I2C_Packet_GCode_t)
@@ -62,8 +62,15 @@ typedef struct RPI_I2C_AHT20_Packet {
 								// be explicit about what the data structure looks like.
 } RPI_I2C_AHT20_Packet_t;
 
-#define RPI_I2C_AHT20_PACKET_SIZE	sizeof(RPI_I2C_Packet_GCode_t)
-_Static_assert ((sizeof(RPI_I2C_AHT20_Packet_t) == 16), "Error Size");
+#define RPI_I2C_AHT20_PACKET_SIZE	sizeof(RPI_I2C_AHT20_Packet_t)
+
+typedef struct RPI_I2C_ACK_Packet {
+	RPI_Packet_ID packet_id;
+	bool ack;
+} RPI_I2C_ACK_Packet_t;
+
+#define RPI_I2C_ACK_PACKET_SIZE	sizeof(RPI_I2C_ACK_Packet_t)
+
 
 /*-----------------------------------------------------------------------------
 Function Prototypes

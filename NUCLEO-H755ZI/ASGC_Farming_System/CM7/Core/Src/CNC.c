@@ -47,14 +47,8 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 		return SYS_INVALID;
 	}
 
-	/*-------------------------------------------------------------------------
-	Attempt to send the G-code command multiple times until success
- 	-------------------------------------------------------------------------*/
-	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
-
-		if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
-			return SYS_SUCCESS; // Return success if the G-code command was sent successfully
-		}
+	if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
+		return SYS_SUCCESS; // Return success if the G-code command was sent successfully
 	}
 	return SYS_FAIL; // Return fail if the G-code command was not sent successfully
 
@@ -227,7 +221,7 @@ SYS_RESULT CNC_Detect_Equipped_Toolhead() {
 SYS_RESULT CNC_Home_Command() {
 
 	// Send the G-code command to home the CNC system
-	const char *gcode = "G28 0123456789012345678901234567890123"; // G28 is the G-code command for homing
+	const char *gcode = "G28 012345678"; // G28 is the G-code command for homing
 	SYS_RESULT result = usb_send_gcode(gcode, 100); // 100ms timeout
 
 	return result;

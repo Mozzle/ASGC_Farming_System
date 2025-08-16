@@ -16,7 +16,6 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
-
 /*-----------------------------------------------------------------------------
  *
  * RPI_I2C_Send_Gcode_Pkt
@@ -34,7 +33,9 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	Local Variables
 	-------------------------------------------------------------------------*/
 	RPI_I2C_Packet_GCode_t gcode_packet;
+	RPI_I2C_ACK_Packet_t ack_packet;
 	HAL_StatusTypeDef status;
+	uint8_t i;
 
 	/*-------------------------------------------------------------------------
 	Clear struct
@@ -56,15 +57,22 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	strncpy((char *)gcode_packet.gcode_str, gcode, sizeof(gcode_packet.gcode_str) - 1);
 	gcode_packet.gcode_str[sizeof(gcode_packet.gcode_str) - 1] = '\0'; // Ensure null termination
 
-	/*-------------------------------------------------------------------------
-	Send the packet using HAL
-	-------------------------------------------------------------------------*/
-	status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_packet, RPI_I2C_GCODE_PACKET_SIZE, timeout);
+	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
+		/*-------------------------------------------------------------------------
+		Send the packet using HAL
+		-------------------------------------------------------------------------*/
+		status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_packet, RPI_I2C_GCODE_PACKET_SIZE, timeout);
 
-	if (status == HAL_OK) {
-		return SYS_SUCCESS;
+		/*-------------------------------------------------------------------------
+		If we sent the packet successfully, wait for ack packet
+		-------------------------------------------------------------------------*/
+		if (status == HAL_OK) {
+			HAL_Delay(1);
+			status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &ack_packet, 2, 3);
+			if (status == HAL_OK && ack_packet.packet_id == RPI_ACK_PKT_ID && ack_packet.ack == true ) {
+				break;
+			}
+		}
 	}
-	else {
-		return SYS_FAIL;
-	}
+	return SYS_FAIL;
 }
