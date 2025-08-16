@@ -186,11 +186,11 @@ Error_Handler();
 	  if (AHT20_data.humidity == 0.0) {
 	    AHT20_data.humidity = 2.0;
 	  }
-	  HAL_Delay(15);
+	  HAL_Delay(10);
 	  //For testing purposes
 	  CNC_Home_Command();
 
-	   HAL_Delay(50);
+	   HAL_Delay(10);
 
   }
   /* USER CODE END 3 */
