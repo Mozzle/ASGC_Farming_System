@@ -38,9 +38,10 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	uint8_t i;
 
 	/*-------------------------------------------------------------------------
-	Clear struct
+	Clear structs
 	-------------------------------------------------------------------------*/
 	memset(&gcode_packet, 0, sizeof(RPI_I2C_Packet_GCode_t));
+	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
 
 	/*-------------------------------------------------------------------------
 	Return invalid if no meanigful gcode is provided
