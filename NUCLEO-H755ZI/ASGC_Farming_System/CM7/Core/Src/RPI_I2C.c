@@ -16,15 +16,26 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
+static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_ACK_Packet_t ackPacket, uint32_t timeout );
+
+
 /*-----------------------------------------------------------------------------
  *
  * RPI_I2C_Send_Gcode_Pkt
  *
  * 		Sends gcode command given by 'gcode' to the Raspberry Pi over I2C.
  * 		Timeout (milliseconds) is the maximum time to wait for the I2C
- * 		transaction to complete. Reccommended timeout is 100ms.
+ * 		transaction to complete. Reccommended timeout is 10ms.
+ *
+ * 		Raspberry Pi I2C FIFO buffer only has a size of 16 bytes, so this
+ * 		large GCode packet must be broken up into multiple chunks and sent
+ * 		one-by-one.
+ *
  * 		Returns SYS_SUCCESS if the command was sent successfully, otherwise
  * 		SYS_FAIL.
+ *
+ * 		Testing, this compound packet function takes ~15ms to complete. It
+ * 		currently includes a minimum of 5ms of Delay() time
  *
 -----------------------------------------------------------------------------*/
 
@@ -34,16 +45,20 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	-------------------------------------------------------------------------*/
 	RPI_I2C_Packet_GCode_0_t gcode_0_packet;
 	RPI_I2C_Packet_GCode_1_t gcode_1_packet;
+	RPI_I2C_Packet_GCode_2_t gcode_2_packet;
+	RPI_I2C_Packet_GCode_3_t gcode_3_packet;
+	RPI_I2C_Packet_GCode_4_t gcode_4_packet;
 	RPI_I2C_ACK_Packet_t ack_packet;
 	HAL_StatusTypeDef status;
-	uint8_t i;
-	uint8_t b = 0;
 
 	/*-------------------------------------------------------------------------
 	Clear structs
 	-------------------------------------------------------------------------*/
 	memset(&gcode_0_packet, 0, sizeof(RPI_I2C_Packet_GCode_0_t));
 	memset(&gcode_1_packet, 0, sizeof(RPI_I2C_Packet_GCode_1_t));
+	memset(&gcode_2_packet, 0, sizeof(RPI_I2C_Packet_GCode_2_t));
+	memset(&gcode_3_packet, 0, sizeof(RPI_I2C_Packet_GCode_3_t));
+	memset(&gcode_4_packet, 0, sizeof(RPI_I2C_Packet_GCode_4_t));
 	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
 
 	/*-------------------------------------------------------------------------
@@ -54,64 +69,137 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	}
 
 	/*-------------------------------------------------------------------------
-	Pack the packet
+	Pack the packets
 	-------------------------------------------------------------------------*/
 	gcode_0_packet.packet_id = RPI_GCODE_0_PKT_ID;
 	gcode_0_packet.valid = true;
 	strncpy((char *)gcode_0_packet.gcode_str, gcode, sizeof(gcode_0_packet.gcode_str));
-	//gcode_0_packet.gcode_str[sizeof(gcode_0_packet.gcode_str) - 1] = '\0'; // Ensure null termination
 	
 	gcode_1_packet.packet_id = RPI_GCODE_1_PKT_ID;
 	strncpy((char *)gcode_1_packet.gcode_str, (gcode + sizeof(gcode_0_packet.gcode_str)), sizeof(gcode_1_packet.gcode_str));
 
-	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
-		/*-------------------------------------------------------------------------
-		Send the packet using HAL
-		-------------------------------------------------------------------------*/
-		status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_0_packet, RPI_I2C_GCODE_0_PACKET_SIZE, timeout);
+	gcode_2_packet.packet_id = RPI_GCODE_2_PKT_ID;
+	strncpy((char *)gcode_2_packet.gcode_str, (gcode + sizeof(gcode_0_packet.gcode_str) + sizeof(gcode_1_packet.gcode_str)), sizeof(gcode_2_packet.gcode_str));
 
-		/*-------------------------------------------------------------------------
-		If we sent the packet successfully, wait for ack packet
-		-------------------------------------------------------------------------*/
-		if (status == HAL_OK) {
-			HAL_Delay(1);
-			status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &ack_packet, 2, 3);
-			if (status == HAL_OK && ack_packet.packet_id == RPI_ACK_PKT_ID && ack_packet.ack == true ) {
-				break;
-			}
-			else if (status != HAL_OK) {
-				b++;
-			}
-		}
-	}
+	gcode_3_packet.packet_id = RPI_GCODE_3_PKT_ID;
+	strncpy((char *)gcode_3_packet.gcode_str, (gcode + sizeof(gcode_0_packet.gcode_str) + (sizeof(gcode_1_packet.gcode_str) * 2)), sizeof(gcode_3_packet.gcode_str));
+
+	gcode_4_packet.packet_id = RPI_GCODE_4_PKT_ID;
+	strncpy((char *)gcode_4_packet.gcode_str, (gcode + sizeof(gcode_0_packet.gcode_str) + (sizeof(gcode_1_packet.gcode_str) * 3)), sizeof(gcode_4_packet.gcode_str));
+	/*-------------------------------------------------------------------------
+	Send packet chunk 0
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&gcode_0_packet, RPI_I2C_GCODE_0_PACKET_SIZE, ack_packet, timeout);
 
 	if (status != HAL_OK) {
 		return SYS_FAIL;
 	}
 
-	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
-		/*-------------------------------------------------------------------------
-		Send the packet using HAL
-		-------------------------------------------------------------------------*/
-		status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, &gcode_1_packet, RPI_I2C_GCODE_1_PACKET_SIZE, timeout);
+	/*-------------------------------------------------------------------------
+	Reset the ACK packet
+	-------------------------------------------------------------------------*/
+	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
 
-		/*-------------------------------------------------------------------------
-		If we sent the packet successfully, wait for ack packet
-		-------------------------------------------------------------------------*/
-		if (status == HAL_OK) {
-			HAL_Delay(1);
-			status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &ack_packet, 2, 3);
-			if (status == HAL_OK && ack_packet.packet_id == RPI_ACK_PKT_ID && ack_packet.ack == true ) {
-				break;
-			}
-			else if (status != HAL_OK) {
-				b++;
-			}
-		}
-	}
+	/*-------------------------------------------------------------------------
+	Send packet chunk 1
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&gcode_1_packet, RPI_I2C_GCODE_1_PACKET_SIZE, ack_packet, timeout);
 
 	if (status != HAL_OK) {
 		return SYS_FAIL;
 	}
+
+	/*-------------------------------------------------------------------------
+	Reset the ACK packet
+	-------------------------------------------------------------------------*/
+	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
+
+	/*-------------------------------------------------------------------------
+	Send packet chunk 2
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&gcode_2_packet, RPI_I2C_GCODE_2_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	/*-------------------------------------------------------------------------
+	Reset the ACK packet
+	-------------------------------------------------------------------------*/
+	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
+
+	/*-------------------------------------------------------------------------
+	Send packet chunk 3
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&gcode_3_packet, RPI_I2C_GCODE_3_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	/*-------------------------------------------------------------------------
+	Reset the ACK packet
+	-------------------------------------------------------------------------*/
+	memset(&ack_packet, 0, sizeof(RPI_I2C_ACK_Packet_t));
+
+	/*-------------------------------------------------------------------------
+	Send packet chunk 4
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&gcode_4_packet, RPI_I2C_GCODE_4_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
 	return SYS_SUCCESS;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *
+ * _send_i2c_packet
+ *
+ * 		Helper function that directly interfaces with the HAL_I2C functions.
+ * 		Sends the I2C Packet. If fails to send, tries up to
+ * 		RPI_I2C_NUM_PKT_SEND_ATTEMPTS times. After sending packet, the function
+ * 		waits to receive a RPI_I2C_ACK_Packet_t packet from the Raspberry Pi.
+ * 		This function confirms that the Pi sends a positive ACK.
+ *
+ * 		Args:
+ * 		*packetData: A packet struct defined in RPI_I2C.h
+ * 		packetSize: sizeof(packetData)
+ * 		ackPacket: the struct container for the ack packet.
+ * 		timeout: Message send timeout in milliseconds
+ *
+ * 		NOTE: No individual packet should be longer than 16 bytes.
+ *
+-----------------------------------------------------------------------------*/
+static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_ACK_Packet_t ackPacket, uint32_t timeout ) {
+	HAL_StatusTypeDef status;
+	uint8_t i;
+
+	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
+			/*-------------------------------------------------------------------------
+			Send the packet using HAL
+			-------------------------------------------------------------------------*/
+			status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, packetData, packetSize, timeout);
+
+			/*-------------------------------------------------------------------------
+			If we sent the packet successfully, wait for ack packet
+			-------------------------------------------------------------------------*/
+			if (status == HAL_OK) {
+				HAL_Delay(1);
+
+				/*---------------------------------------------------------------------
+				Receive the ACK packet
+				---------------------------------------------------------------------*/
+				status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &ackPacket, RPI_I2C_ACK_PACKET_SIZE, 3);
+
+				if (status == HAL_OK && ackPacket.packet_id == RPI_ACK_PKT_ID && ackPacket.ack == true ) {
+					break;
+				}
+			}
+		}
+	return status;
+
 }

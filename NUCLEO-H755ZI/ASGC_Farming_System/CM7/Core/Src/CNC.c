@@ -32,7 +32,6 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 	/*-------------------------------------------------------------------------
 	Local Variables
  	-------------------------------------------------------------------------*/
-	uint8_t i;
 	uint16_t gcode_len;
 
 	/*-------------------------------------------------------------------------
@@ -224,7 +223,7 @@ SYS_RESULT CNC_Detect_Equipped_Toolhead() {
 SYS_RESULT CNC_Home_Command() {
 
 	// Send the G-code command to home the CNC system
-	const char *gcode = "G28 0123456789ABCDEFGHIJKLMNO"; // G28 is the G-code command for homing
+	const char *gcode = "G28"; // G28 is the G-code command for homing
 	SYS_RESULT result = usb_send_gcode(gcode, 100); // 100ms timeout
 
 	return result;

@@ -5,6 +5,12 @@
  * 		Header containing I2C address and the I2C packet
  * 		structure for communication with the Raspberry Pi.
  *
+ * 		NOTE: Because of the size of the I2C FIFO buffer for the Raspberry Pi,
+ * 		transmitting more than 16 bytes in a single transmission is not
+ * 		reliable. As such, all larger packets are broken into packet chunks
+ * 		and sent back-to-back. This is why there is RPI_GCODE_0_PKT,
+ * 		RPI_GCODE_1_PKT, RPI_GCODE_2_PKT, etc.
+ *
  *  Created on: August 12, 2025
  *      Author: Dylan
  *
