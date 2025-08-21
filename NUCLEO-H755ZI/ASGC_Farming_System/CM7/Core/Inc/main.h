@@ -112,7 +112,7 @@ void Error_Handler(void);
 	 /* SEN0244.c */
 
 /* SEN0169-V2 pH Sensor ------------------------------------------------------*/
-#define SEN0169_ENABLED					        SYS_FEATURE_DISABLED
+#define SEN0169_ENABLED					        SYS_FEATURE_ENABLED
 	 /* SEN0169.c */
 
 /* VL53L1X Time-Of-Flight Sensor ---------------------------------------------*/
