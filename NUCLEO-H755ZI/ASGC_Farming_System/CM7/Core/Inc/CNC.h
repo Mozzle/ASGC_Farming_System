@@ -17,15 +17,14 @@
 #include "main.h"
 
 #include <math.h>
-//#include "usbd_cdc_if.h"
 #include "functionality_mngmnt.h"
 #include "timer.h"
 #include <stdio.h>
-#include  <string.h>
+#include <string.h>
 
 #define CNC_NUM_NFT_CHANNELS 				4
                     	/* NOTE: Channel index increases with increasing y 	 */
-						/* position in the system							 */					
+						/* position in the system							 */
 #define CNC_NUM_NET_POTS_PER_NFT_CHANNEL 	10
 						/* NOTE: Hole index increases with increasing x pos  */
 						/* in the system									 */
@@ -99,6 +98,9 @@ typedef struct {
 
 } CNC_NFT_Data;
 
+/*-----------------------------------------------------------------------------
+FUNCTION DECLARATIONS
+-----------------------------------------------------------------------------*/
 bool CNC_Init(void);
 uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos);
 SYS_RESULT CNC_Detect_Equipped_Toolhead(void);

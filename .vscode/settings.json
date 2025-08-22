@@ -2,6 +2,8 @@
 	"files.associations": {
 		"stdbool.h": "c",
 		"aht20.h": "c",
-		"stdio.h": "c"
-	}
+		"stdio.h": "c",
+		"compare": "c"
+	},
+	"workbench.colorTheme": "Default Dark Modern"
 }
