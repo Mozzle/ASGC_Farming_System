@@ -62,6 +62,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define L298_IN2_Pin GPIO_PIN_7
+#define L298_IN2_GPIO_Port GPIOF
+#define L298_IN1_Pin GPIO_PIN_9
+#define L298_IN1_GPIO_Port GPIOF
 #define STLINK_RX_Pin GPIO_PIN_8
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
@@ -124,7 +128,7 @@ void Error_Handler(void);
 	 /* GPIO_switching_intf.c */
 
 /* Mixing Motor Controller Interface -----------------------------------------*/
-#define MIXING_MOTOR_ENABLED			      SYS_FEATURE_DISABLED
+#define MIXING_MOTOR_ENABLED			      SYS_FEATURE_ENABLED
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/

@@ -27,6 +27,7 @@
 #include "timer.h"
 #include "CNC.h"
 #include "SEN0169.h"
+#include "mixing_motor.h"
 
 /* USER CODE END Includes */
 
@@ -180,6 +181,7 @@ Error_Handler();
   }
   HAL_Delay(500);
   SEN0169_pH_Data pH_Data;
+  bool doOnce = false;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -189,7 +191,11 @@ Error_Handler();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    
+	  if (!doOnce && getTimestamp() > 3000) {
+		  mixing_motor_mix_for_time(5000);
+		  doOnce = true;
+	  }
+
 	  AHT20_data = AHT20_Get_Data(&hi2c1);
 
 	  if (AHT20_data.humidity == 0.0) {
@@ -198,10 +204,9 @@ Error_Handler();
 	  HAL_Delay(40);
 	  //For testing purposes
 	  CNC_Home_Command();
+	   //SEN0169_Measure_SMA(&pH_Data);
 
-
-	   HAL_Delay(10);
-	   SEN0169_Measure_SMA(&pH_Data);
+	  mixing_motor_handle_state();
 
   }
   /* USER CODE END 3 */
@@ -463,7 +468,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 30000;
+  htim4.Init.Period = 60000;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -605,16 +610,26 @@ static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
-
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, L298_IN2_Pin|L298_IN1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : L298_IN2_Pin L298_IN1_Pin */
+  GPIO_InitStruct.Pin = L298_IN2_Pin|L298_IN1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB0 */
   GPIO_InitStruct.Pin = GPIO_PIN_0;

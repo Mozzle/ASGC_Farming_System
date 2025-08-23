@@ -148,6 +148,8 @@ SYS_RESULT mixing_motor_apply_brake() {
 	HAL_GPIO_WritePin(L298_IN1_PORT, L298_IN1_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(L298_IN2_PORT, L298_IN2_PIN, GPIO_PIN_RESET);
 
+	return ret_val;
+
 }
 
 /*-----------------------------------------------------------------------------
@@ -185,8 +187,8 @@ SYS_RESULT mixing_motor_mix_for_time(uint16_t timeout_ms) {
 		return SYS_DEVICE_DISABLED;
 	}
 
-	// Set motor to 75% speed
-	SYS_RESULT ret_val = mixing_motor_drive(MOTOR_SPEED_75_PCT);
+	// Set motor to 50% speed
+	SYS_RESULT ret_val = mixing_motor_drive(MOTOR_SPEED_100_PCT);
 
 	// Set motor state machine variables
 	mix_end_timestamp = ((uint64_t)(getTimestamp() + timeout_ms));
