@@ -12,6 +12,7 @@
 #include "SEN0169.h"
 #include "timer.h"
 
+// ADC hanldler declared in main.c
 extern ADC_HandleTypeDef hadc1;
 
 static struct pH_Moving_Avg pH_History[pH_MOVING_AVG_ENTRIES];
@@ -26,14 +27,21 @@ bool SEN0169_Init() {
 			return SEN0169_INIT_SUCCEED;
 	}
 
-	HAL_StatusTypeDef status = HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
-
-	if ( status == HAL_OK ) {
-		return SEN0169_INIT_SUCCEED;
-	}
-	else {
+	/*-------------------------------------------------------------------------
+	Run ADC Calibration
+	-------------------------------------------------------------------------*/
+	if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK ) {
 		return SEN0169_INIT_FAIL;
 	}
+
+	/*-------------------------------------------------------------------------
+	Start the ADC. Exit if the ADC fails to start
+	-------------------------------------------------------------------------*/
+	if ( HAL_ADC_Start(&hadc1) != HAL_OK ) {
+		return SEN0169_INIT_FAIL;
+	}
+
+	return SEN0169_INIT_SUCCEED;
 
 }
 
@@ -71,27 +79,11 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
 	}
 
 	/*-------------------------------------------------------------------------
-	Start the ADC. Exit if the ADC fails to start
-	-------------------------------------------------------------------------*/
-	if ( HAL_ADC_Start(&hadc1) != HAL_OK ) {
-		ret_val = SYS_MEASUREMENT_GET_FAIL;
-		return ret_val;
-	}
-	HAL_Delay(1);
-	/*-------------------------------------------------------------------------
 	Take SEN0169_NUM_MEASUREMENTS measurements from ADC
 	-------------------------------------------------------------------------*/
 	for( i = 0; i < SEN0169_NUM_MEASUREMENTS; i++ ) {
 		HAL_ADC_PollForConversion(&hadc1, 1);
 		sum += HAL_ADC_GetValue(&hadc1);
-	}
-
-	/*-------------------------------------------------------------------------
-	Stop the ADC
-	-------------------------------------------------------------------------*/
-	if ( HAL_ADC_Stop(&hadc1) != HAL_OK ) {
-			ret_val = SYS_MEASUREMENT_GET_FAIL;
-			return ret_val;
 	}
 
 	/*-------------------------------------------------------------------------
@@ -211,4 +203,15 @@ void clamp_pH(SEN0169_pH_Data *pH_Data) {
 	else if ( *pH_Data < 0 ) {
 		*pH_Data = 0.0;
 	}
+}
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		SEN0169_Stop_ADC
+ *
+ * 		Stops the ADC from taking any more measurements.
+ *
+ ----------------------------------------------------------------------------*/
+void SEN0169_Stop_ADC() {
+	HAL_ADC_Stop(&hadc1);
 }

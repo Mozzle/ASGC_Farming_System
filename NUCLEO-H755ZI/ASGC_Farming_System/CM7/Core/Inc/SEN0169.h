@@ -21,7 +21,7 @@
 #define SEN0169_ANALOG_BANK 		GPIOA
 #define SEN0169_ANALOG_PIN 			GPIO_PIN_6
 
-#define SEN0169_NUM_MEASUREMENTS	50
+#define SEN0169_NUM_MEASUREMENTS	40
 
 /*-------------------------------------------------------------------------
 EXPERIMENTALLY DETERMINED VALUE
@@ -51,6 +51,8 @@ bool SEN0169_Init();
 SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data);
 
 SYS_RESULT SEN0169_Measure_SMA(SEN0169_pH_Data * pH_Data);
+
+void SEN0169_Stop_ADC();
 
 
 #endif /* INC_SEN0169_H_ */

@@ -66,10 +66,16 @@ void Error_Handler(void);
 #define L298_IN2_GPIO_Port GPIOF
 #define L298_IN1_Pin GPIO_PIN_9
 #define L298_IN1_GPIO_Port GPIOF
+#define ADC1_SEN0169_Pin GPIO_PIN_6
+#define ADC1_SEN0169_GPIO_Port GPIOA
+#define ADC2_SEN0244_Pin GPIO_PIN_4
+#define ADC2_SEN0244_GPIO_Port GPIOC
 #define STLINK_RX_Pin GPIO_PIN_8
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
+#define TIM4_MOTOR_PWM_Pin GPIO_PIN_12
+#define TIM4_MOTOR_PWM_GPIO_Port GPIOD
 #define Start_Button_Pin GPIO_PIN_6
 #define Start_Button_GPIO_Port GPIOC
 #define Start_Button_EXTI_IRQn EXTI9_5_IRQn
@@ -79,6 +85,8 @@ void Error_Handler(void);
 #define Estop_ButtonNO_Pin GPIO_PIN_8
 #define Estop_ButtonNO_GPIO_Port GPIOC
 #define Estop_ButtonNO_EXTI_IRQn EXTI9_5_IRQn
+#define TIM3_FANS_PWM_Pin GPIO_PIN_4
+#define TIM3_FANS_PWM_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
