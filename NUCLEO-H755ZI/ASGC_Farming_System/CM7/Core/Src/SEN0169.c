@@ -14,6 +14,7 @@
 
 // ADC hanldler declared in main.c
 extern ADC_HandleTypeDef hadc1;
+bool SEN0169_ADC_On = false;
 
 static struct pH_Moving_Avg pH_History[pH_MOVING_AVG_ENTRIES];
 static uint8_t pH_HistoryIndex = 0;
@@ -40,6 +41,7 @@ bool SEN0169_Init() {
 	if ( HAL_ADC_Start(&hadc1) != HAL_OK ) {
 		return SEN0169_INIT_FAIL;
 	}
+	SEN0169_ADC_On = true;
 
 	return SEN0169_INIT_SUCCEED;
 
@@ -61,11 +63,8 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
 	/*-------------------------------------------------------------------------
 	Local variables
 	-------------------------------------------------------------------------*/
-	int32_t sum = 0;
-			/* sum is 32 bits - same as the measurement return of
-			 * HAL_ADC_GetValue - because the ADC is configured to make 16-bit
-			 * measurements, so there should be no chance of overflow here. */
-	float avgMeasurement = 0;
+	uint32_t measurement[SEN0169_NUM_MEASUREMENTS] = {0};
+	double medianMeasurement = 0;
 	uint8_t i;
 
 	SYS_RESULT ret_val = SYS_INVALID;
@@ -73,7 +72,7 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
 	/*-------------------------------------------------------------------------
 	If driver is switchboard disabled, exit without doing anything.
 	-------------------------------------------------------------------------*/
-	if (SEN0169_ENABLED == SYS_FEATURE_DISABLED) {
+	if (SEN0169_ENABLED == SYS_FEATURE_DISABLED || SEN0169_ADC_On == false) {
 		ret_val = SYS_DEVICE_DISABLED;
 		return ret_val;
 	}
@@ -83,18 +82,18 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
 	-------------------------------------------------------------------------*/
 	for( i = 0; i < SEN0169_NUM_MEASUREMENTS; i++ ) {
 		HAL_ADC_PollForConversion(&hadc1, 1);
-		sum += HAL_ADC_GetValue(&hadc1);
+		measurement[i] = HAL_ADC_GetValue(&hadc1);
 	}
 
 	/*-------------------------------------------------------------------------
 	Calculate the pH:
-	1) take average of measurements.
-	2) voltage = (avg measurement * 3.3) / 4096
+	1) take median of measurements.
+	2) voltage = (median measurement * 3.3) / 4096
 	3) pH = voltage * -5.6012 + 15.498
 	-------------------------------------------------------------------------*/
-	avgMeasurement = (float)sum / SEN0169_NUM_MEASUREMENTS;
+	medianMeasurement = getMedian_u32(measurement, SEN0169_NUM_MEASUREMENTS);
 
-	*pH_Data = ( avgMeasurement * SEN0169_CONVERSION_FACTOR ) + SEN0169_INTERCEPT_OFFSET;
+	*pH_Data = ( medianMeasurement * SEN0169_CONVERSION_FACTOR ) + SEN0169_INTERCEPT_OFFSET;
 
 	clamp_pH(pH_Data);
 
@@ -114,79 +113,79 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT SEN0169_Measure_SMA(SEN0169_pH_Data * pH_Data) {
-	/*-------------------------------------------------------------------------
-	Local Variables
-	-------------------------------------------------------------------------*/
-	bool SMA_isCurrent = false;
-	SEN0169_pH_Data * tmpData;
-	SYS_RESULT ret_val;
-	uint8_t i = 0;
-	uint64_t curTime;
-	uint64_t timeMinusTimeout;
-	float sum = 0;
-
-	/*-------------------------------------------------------------------------
-	While not all of the data for the simple moving average is not considered
-	'current':
-	-------------------------------------------------------------------------*/
-	while (SMA_isCurrent == false) {
-		/*---------------------------------------------------------------------
-		Take a measurement
-		---------------------------------------------------------------------*/
-		ret_val = SEN0169_Measure(tmpData);
-
-		if (ret_val != SYS_SUCCESS) {
-			return SYS_FAIL;
-		}
-
-		/*---------------------------------------------------------------------
-		Add measurement to circular buffer
-		---------------------------------------------------------------------*/
-		pH_History[pH_HistoryIndex].pH_Data = *tmpData;
-		curTime = getTimestamp();
-		pH_History[pH_HistoryIndex].timestamp = curTime;
-
-		pH_HistoryIndex = ( ( pH_HistoryIndex + 1 ) % pH_MOVING_AVG_ENTRIES);
-
-		/*---------------------------------------------------------------------
-		Determine the timestamp of pH_MOVING_AVG_TIMEOUT_MS ago.
-		---------------------------------------------------------------------*/
-		SMA_isCurrent = true;
-		if (curTime < pH_MOVING_AVG_TIMEOUT_MS ) {
-			timeMinusTimeout = 0;
-		}
-		else {
-			timeMinusTimeout = curTime - pH_MOVING_AVG_TIMEOUT_MS;
-		}
-
-		/*---------------------------------------------------------------------
-		Determine if every measurement in the circular buffer happened in the
-		last pH_MOVING_AVG_TIMEOUT_MS milliseconds. If not, stay in while loop
-		until all measurements are 'current'.
-		---------------------------------------------------------------------*/
-		for ( i = 0; i < pH_MOVING_AVG_ENTRIES; i++ ) {
-
-			if ( ( timeMinusTimeout ) > pH_History[i].timestamp ) {
-				SMA_isCurrent = false;
-			}
-		}
-
-	}
-
-	/*-------------------------------------------------------------------------
-	Get average pH of all values in buffer and return that average.
-	-------------------------------------------------------------------------*/
-	for ( i = 0; i < pH_MOVING_AVG_ENTRIES; i++ ) {
-		sum += pH_History[i].pH_Data;
-	}
-
-	*pH_Data = ( sum / (float) pH_MOVING_AVG_ENTRIES );
-
-	clamp_pH(pH_Data);
-
-	return SYS_SUCCESS;
-}
+//SYS_RESULT SEN0169_Measure_SMA(SEN0169_pH_Data * pH_Data) {
+//	/*-------------------------------------------------------------------------
+//	Local Variables
+//	-------------------------------------------------------------------------*/
+//	bool SMA_isCurrent = false;
+//	SEN0169_pH_Data * tmpData;
+//	SYS_RESULT ret_val;
+//	uint8_t i = 0;
+//	uint64_t curTime;
+//	uint64_t timeMinusTimeout;
+//	float sum = 0;
+//
+//	/*-------------------------------------------------------------------------
+//	While not all of the data for the simple moving average is not considered
+//	'current':
+//	-------------------------------------------------------------------------*/
+//	while (SMA_isCurrent == false) {
+//		/*---------------------------------------------------------------------
+//		Take a measurement
+//		---------------------------------------------------------------------*/
+//		ret_val = SEN0169_Measure(tmpData);
+//
+//		if (ret_val != SYS_SUCCESS) {
+//			return SYS_FAIL;
+//		}
+//
+//		/*---------------------------------------------------------------------
+//		Add measurement to circular buffer
+//		---------------------------------------------------------------------*/
+//		pH_History[pH_HistoryIndex].pH_Data = *tmpData;
+//		curTime = getTimestamp();
+//		pH_History[pH_HistoryIndex].timestamp = curTime;
+//
+//		pH_HistoryIndex = ( ( pH_HistoryIndex + 1 ) % pH_MOVING_AVG_ENTRIES);
+//
+//		/*---------------------------------------------------------------------
+//		Determine the timestamp of pH_MOVING_AVG_TIMEOUT_MS ago.
+//		---------------------------------------------------------------------*/
+//		SMA_isCurrent = true;
+//		if (curTime < pH_MOVING_AVG_TIMEOUT_MS ) {
+//			timeMinusTimeout = 0;
+//		}
+//		else {
+//			timeMinusTimeout = curTime - pH_MOVING_AVG_TIMEOUT_MS;
+//		}
+//
+//		/*---------------------------------------------------------------------
+//		Determine if every measurement in the circular buffer happened in the
+//		last pH_MOVING_AVG_TIMEOUT_MS milliseconds. If not, stay in while loop
+//		until all measurements are 'current'.
+//		---------------------------------------------------------------------*/
+//		for ( i = 0; i < pH_MOVING_AVG_ENTRIES; i++ ) {
+//
+//			if ( ( timeMinusTimeout ) > pH_History[i].timestamp ) {
+//				SMA_isCurrent = false;
+//			}
+//		}
+//
+//	}
+//
+//	/*-------------------------------------------------------------------------
+//	Get average pH of all values in buffer and return that average.
+//	-------------------------------------------------------------------------*/
+//	for ( i = 0; i < pH_MOVING_AVG_ENTRIES; i++ ) {
+//		sum += pH_History[i].pH_Data;
+//	}
+//
+//	*pH_Data = ( sum / (float) pH_MOVING_AVG_ENTRIES );
+//
+//	clamp_pH(pH_Data);
+//
+//	return SYS_SUCCESS;
+//}
 
 /*-----------------------------------------------------------------------------
  *
@@ -214,4 +213,5 @@ void clamp_pH(SEN0169_pH_Data *pH_Data) {
  ----------------------------------------------------------------------------*/
 void SEN0169_Stop_ADC() {
 	HAL_ADC_Stop(&hadc1);
+	SEN0169_ADC_On = false;
 }

@@ -27,7 +27,7 @@ typedef float SEN0244_EC_Data;
 
 bool SEN0244_Init();
 
-SYS_RESULT SEN0244_Measure(float *data);
+SYS_RESULT SEN0244_Measure(double *tdsData);
 
 void SEN0244_Stop_ADC();
 

@@ -33,7 +33,7 @@ THIS CONVERSION FACTOR IS DETERMINED BY:
 #define SEN0169_INTERCEPT_OFFSET	15.498
 
 
-typedef float SEN0169_pH_Data;
+typedef double SEN0169_pH_Data;
 
 struct pH_Moving_Avg {
 	SEN0169_pH_Data pH_Data;
