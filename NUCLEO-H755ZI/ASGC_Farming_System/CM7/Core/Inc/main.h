@@ -62,6 +62,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define CIRCULATING_PUMP_Pin GPIO_PIN_10
+#define CIRCULATING_PUMP_GPIO_Port GPIOE
+#define DRAINAGE_PUMP_Pin GPIO_PIN_11
+#define DRAINAGE_PUMP_GPIO_Port GPIOE
+#define FILL_VALVE_Pin GPIO_PIN_12
+#define FILL_VALVE_GPIO_Port GPIOE
+#define NUTRIENT_SOLN_A_Pin GPIO_PIN_13
+#define NUTRIENT_SOLN_A_GPIO_Port GPIOE
+#define NUTRIENT_SOLN_B_Pin GPIO_PIN_14
+#define NUTRIENT_SOLN_B_GPIO_Port GPIOE
+#define PH_UP_VALVE_Pin GPIO_PIN_15
+#define PH_UP_VALVE_GPIO_Port GPIOE
+#define PH_DOWN_VALVE_Pin GPIO_PIN_10
+#define PH_DOWN_VALVE_GPIO_Port GPIOB
 #define STLINK_RX_Pin GPIO_PIN_8
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
