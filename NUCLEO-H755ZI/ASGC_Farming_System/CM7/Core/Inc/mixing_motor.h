@@ -29,13 +29,38 @@ DEFINES
 #define MIXING_MOTOR_INIT_SUCCEED	true
 #define MIXING_MOTOR_INIT_FAIL		false
 
+#define L298_IN1_PIN                GPIO_PIN_9
+#define L298_IN1_PORT               GPIOF
+
+#define L298_IN2_PIN                GPIO_PIN_7
+#define L298_IN2_PORT               GPIOF
+
+#define MOTOR_SPEED_0_PCT           0
+#define MOTOR_SPEED_10_PCT          6000
+#define MOTOR_SPEED_25_PCT          15000
+#define MOTOR_SPEED_50_PCT          30000
+#define MOTOR_SPEED_75_PCT          45000
+#define MOTOR_SPEED_100_PCT         60000
+
+typedef enum {
+    MOTOR_STATE_NONE,
+    MOTOR_STATE_RUNNING,
+    MOTOR_STATE_SPINDOWN,
+} Motor_State;
+
+#define MOTOR_SPINDOWN_TIME_MS      1100
+
+
 /*-----------------------------------------------------------------------------
 FUNCTION DECLARATIONS
 -----------------------------------------------------------------------------*/
 
-bool mixing_motor_Init();
-SYS_RESULT mixing_motor_drive(uint8_t speed);
+bool mixing_motor_Init(TIM_HandleTypeDef htim);
+SYS_RESULT mixing_motor_drive(uint16_t speed);
 SYS_RESULT mixing_motor_stop();
+SYS_RESULT mixing_motor_apply_brake();
+SYS_RESULT mixing_motor_mix_for_time(uint16_t timeout_ms);
+void mixing_motor_handle_state();
 
 
 #endif /* INC_MIXING_MOTOR_H_ */
