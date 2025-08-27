@@ -22,7 +22,7 @@
 
 bool GPIO_switching_intf_Init() {
 
-	bool ret_val = GPIO_SWITCHING_INTF_INIT_FAIL;
+	bool ret_val = GPIO_SWITCHING_INTF_INIT_SUCCEED;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -31,7 +31,14 @@ bool GPIO_switching_intf_Init() {
 	}
 
 
-	/* IMPLEMENT ME! */
+	//Intialize all GPIO pins to off (false), before it is changed with below functions 
+	HAL_GPIO_WritePin(CIRCULATING_PUMP_PORT, CIRCULATING_PUMP_PIN, PUMP_OFF); 
+	HAL_GPIO_WritePin(DRAINAGE_PUMP_PORT, DRAINAGE_PUMP_PIN, PUMP_OFF); 
+	HAL_GPIO_WritePin(FILL_VALVE_PORT, FILL_VALVE_PIN, VALVE_CLOSED); 
+	HAL_GPIO_WritePin(NUTRIENT_SOLN_A_PORT, NUTRIENT_SOLN_A_PIN, VALVE_CLOSED); 
+	HAL_GPIO_WritePin(NUTRIENT_SOLN_B_PORT, NUTRIENT_SOLN_B_PIN, VALVE_CLOSED); 
+	HAL_GPIO_WritePin(PH_UP_VALVE_PORT, PH_UP_VALVE_PIN, VALVE_CLOSED); 
+	HAL_GPIO_WritePin(PH_DOWN_VALVE_PORT, PH_DOWN_VALVE_PIN, VALVE_CLOSED); 
 
 	return ret_val;
 }
@@ -51,7 +58,7 @@ bool GPIO_switching_intf_Init() {
 
 SYS_RESULT GPIO_set_circulating_pump(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -59,7 +66,8 @@ SYS_RESULT GPIO_set_circulating_pump(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin E10 high, and return result 
+	HAL_GPIO_WritePin(CIRCULATING_PUMP_PORT, CIRCULATING_PUMP_PIN, state); 
 
 	return result;
 }
@@ -80,7 +88,7 @@ SYS_RESULT GPIO_set_circulating_pump(bool state) {
 
 SYS_RESULT GPIO_set_drainage_pump(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -88,7 +96,8 @@ SYS_RESULT GPIO_set_drainage_pump(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin E11 high, and return result 
+	HAL_GPIO_WritePin(DRAINAGE_PUMP_PORT, DRAINAGE_PUMP_PIN, state); 
 
 	return result;
 }
@@ -109,7 +118,7 @@ SYS_RESULT GPIO_set_drainage_pump(bool state) {
 
 SYS_RESULT GPIO_set_fill_valve(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -117,7 +126,8 @@ SYS_RESULT GPIO_set_fill_valve(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin E12 high, and return result 
+	HAL_GPIO_WritePin(FILL_VALVE_PORT, FILL_VALVE_PIN, state); 
 
 	return result;
 }
@@ -138,7 +148,7 @@ SYS_RESULT GPIO_set_fill_valve(bool state) {
 
 SYS_RESULT GPIO_set_nutrient_soln_a_valve(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -146,7 +156,8 @@ SYS_RESULT GPIO_set_nutrient_soln_a_valve(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin E13 high, and return result 
+	HAL_GPIO_WritePin(NUTRIENT_SOLN_A_PORT, NUTRIENT_SOLN_A_PIN, state); 
 
 	return result;
 }
@@ -167,7 +178,7 @@ SYS_RESULT GPIO_set_nutrient_soln_a_valve(bool state) {
 
 SYS_RESULT GPIO_set_nutrient_soln_b_valve(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -175,7 +186,8 @@ SYS_RESULT GPIO_set_nutrient_soln_b_valve(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin E14 high, and return result 
+	HAL_GPIO_WritePin(NUTRIENT_SOLN_B_PORT, NUTRIENT_SOLN_B_PIN, state); 
 
 	return result;
 }
@@ -196,7 +208,7 @@ SYS_RESULT GPIO_set_nutrient_soln_b_valve(bool state) {
 
 SYS_RESULT GPIO_set_ph_up_valve(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -204,8 +216,8 @@ SYS_RESULT GPIO_set_ph_up_valve(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
-
+	//Set GPIO pin E15 high, and return result 
+	HAL_GPIO_WritePin(PH_UP_VALVE_PORT, PH_UP_VALVE_PIN, state); 
 	return result;
 }
 
@@ -225,7 +237,7 @@ SYS_RESULT GPIO_set_ph_up_valve(bool state) {
 
 SYS_RESULT GPIO_set_ph_down_valve(bool state) {
 
-	SYS_RESULT result = SYS_INVALID;
+	SYS_RESULT result = SYS_SUCCESS;
 
 	// If switching interface is switchboard disabled, exit without doing anything.
 	if (MOSFET_SSR_SWITCHING_ENABLED == SYS_FEATURE_DISABLED) {
@@ -233,7 +245,8 @@ SYS_RESULT GPIO_set_ph_down_valve(bool state) {
 		return result;
 	}
 
-	/* IMPLEMENT ME! */
+	//Set GPIO pin B10 high, and return result 
+	HAL_GPIO_WritePin(PH_DOWN_VALVE_PORT, PH_DOWN_VALVE_PIN, GPIO_PIN_SET); 
 
 	return result;
 }

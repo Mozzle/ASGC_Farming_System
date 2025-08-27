@@ -28,6 +28,7 @@
 #include "CNC.h"
 #include "SEN0169.h"
 #include "mixing_motor.h"
+#include "gpio_switching_intf.h"
 
 /* USER CODE END Includes */
 
@@ -179,6 +180,7 @@ Error_Handler();
   HAL_Delay(45);             // Must be called prior to AHT20_Init()
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
   SEN0169_Init();
+  GPIO_switching_intf_Init();
 
   if (CNC_Init() == SYS_SUCCESS) {
 
@@ -711,11 +713,19 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOF, L298_IN2_Pin|L298_IN1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, CIRCULATING_PUMP_Pin|DRAINAGE_PUMP_Pin|FILL_VALVE_Pin|NUTRIENT_SOLN_A_Pin
+                          |NUTRIENT_SOLN_B_Pin|PH_UP_VALVE_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(PH_DOWN_VALVE_GPIO_Port, PH_DOWN_VALVE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : L298_IN2_Pin L298_IN1_Pin */
   GPIO_InitStruct.Pin = L298_IN2_Pin|L298_IN1_Pin;
@@ -731,6 +741,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : CIRCULATING_PUMP_Pin DRAINAGE_PUMP_Pin FILL_VALVE_Pin NUTRIENT_SOLN_A_Pin
+                           NUTRIENT_SOLN_B_Pin PH_UP_VALVE_Pin */
+  GPIO_InitStruct.Pin = CIRCULATING_PUMP_Pin|DRAINAGE_PUMP_Pin|FILL_VALVE_Pin|NUTRIENT_SOLN_A_Pin
+                          |NUTRIENT_SOLN_B_Pin|PH_UP_VALVE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PH_DOWN_VALVE_Pin */
+  GPIO_InitStruct.Pin = PH_DOWN_VALVE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(PH_DOWN_VALVE_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB14 */
   GPIO_InitStruct.Pin = GPIO_PIN_14;
@@ -871,8 +897,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
