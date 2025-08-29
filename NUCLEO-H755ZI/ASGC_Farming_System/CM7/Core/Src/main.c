@@ -29,6 +29,7 @@
 #include "SEN0169.h"
 #include "mixing_motor.h"
 #include "gpio_switching_intf.h"
+#include "Adafruit_AS7341.h"
 
 /* USER CODE END Includes */
 
@@ -181,6 +182,7 @@ Error_Handler();
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
   SEN0169_Init();
   GPIO_switching_intf_Init();
+  Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
 
   if (CNC_Init() == SYS_SUCCESS) {
 

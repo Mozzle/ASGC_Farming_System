@@ -11,6 +11,7 @@
 
 #include "SEN0169.h"
 #include "timer.h"
+#include "FS_math.h"
 
 // ADC hanldler declared in main.c
 extern ADC_HandleTypeDef hadc1;
