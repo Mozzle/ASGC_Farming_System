@@ -30,6 +30,7 @@
 #include "mixing_motor.h"
 #include "gpio_switching_intf.h"
 #include "Adafruit_AS7341.h"
+#include "ILI9341.h"
 
 /* USER CODE END Includes */
 
