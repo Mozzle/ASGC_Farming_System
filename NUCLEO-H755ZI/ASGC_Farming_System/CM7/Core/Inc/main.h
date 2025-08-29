@@ -117,7 +117,7 @@ void Error_Handler(void);
 
 
 /* AHT20 Temperature and Humidity Sensor -------------------------------------*/
-#define AHT20_ENABLED					          SYS_FEATURE_ENABLED
+#define AHT20_ENABLED					          SYS_FEATURE_DISABLED
 	 /* AHT20.c */
 
 /* AS7341 Light Sensor -------------------------------------------------------*/
@@ -125,11 +125,11 @@ void Error_Handler(void);
 
 
 /* Computer Fan PWM Control Interface ----------------------------------------*/
-#define FAN_PWM_INTERFACE_ENABLED		    SYS_FEATURE_ENABLED
+#define FAN_PWM_INTERFACE_ENABLED		    SYS_FEATURE_DISABLED
 	 /* FAN_pwm_intf.c */
 
 /* Serial USB to Interface with CNC Control board ----------------------------*/
-#define RASPBERRY_PI_INTERFACE_ENABLED	SYS_FEATURE_ENABLED
+#define RASPBERRY_PI_INTERFACE_ENABLED	SYS_FEATURE_DISABLED
     /* CNC.c */
 
 
@@ -138,7 +138,7 @@ void Error_Handler(void);
 	 /* SEN0244.c */
 
 /* SEN0169-V2 pH Sensor ------------------------------------------------------*/
-#define SEN0169_ENABLED					        SYS_FEATURE_ENABLED
+#define SEN0169_ENABLED					        SYS_FEATURE_DISABLED
 	 /* SEN0169.c */
 
 /* VL53L1X Time-Of-Flight Sensor ---------------------------------------------*/
@@ -150,7 +150,7 @@ void Error_Handler(void);
 	 /* GPIO_switching_intf.c */
 
 /* Mixing Motor Controller Interface -----------------------------------------*/
-#define MIXING_MOTOR_ENABLED			      SYS_FEATURE_ENABLED
+#define MIXING_MOTOR_ENABLED			      SYS_FEATURE_DISABLED
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/
