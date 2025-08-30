@@ -82,8 +82,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "ILI9341_STM32_Driver.h"
-#include "spi.h"
-#include "gpio.h"
+#include "stm32h7xx_hal_spi.h"
+#include "stm32h7xx_hal_gpio.h"
 
 /* Global Variables ------------------------------------------------------------------*/
 volatile uint16_t LCD_HEIGHT = ILI9341_SCREEN_HEIGHT;
@@ -92,8 +92,8 @@ volatile uint16_t LCD_WIDTH	 = ILI9341_SCREEN_WIDTH;
 /* Initialize SPI */
 void ILI9341_SPI_Init(void)
 {
-MX_SPI5_Init();																							//SPI INIT
-MX_GPIO_Init();																							//GPIO INIT
+//MX_SPI1_Init();																							//SPI INIT
+//MX_GPIO_Init();																							//GPIO INIT
 HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);	//CS OFF
 }
 

@@ -30,7 +30,7 @@
 #include "mixing_motor.h"
 #include "gpio_switching_intf.h"
 #include "Adafruit_AS7341.h"
-#include "ILI9341_STM32_Driver.h"
+#include "ILI9341/ILI9341_STM32_Driver.h"
 
 /* USER CODE END Includes */
 
@@ -777,7 +777,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOF, L298_IN2_Pin|L298_IN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(ILI9341_CS_GPIO_Port, ILI9341_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, ILI9341_CS_Pin|ILI9341_DC_Pin|ILI9341_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, CIRCULATING_PUMP_Pin|DRAINAGE_PUMP_Pin|FILL_VALVE_Pin|NUTRIENT_SOLN_A_Pin
@@ -793,12 +793,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ILI9341_CS_Pin */
-  GPIO_InitStruct.Pin = ILI9341_CS_Pin;
+  /*Configure GPIO pins : ILI9341_CS_Pin ILI9341_DC_Pin ILI9341_RST_Pin */
+  GPIO_InitStruct.Pin = ILI9341_CS_Pin|ILI9341_DC_Pin|ILI9341_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(ILI9341_CS_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB0 */
   GPIO_InitStruct.Pin = GPIO_PIN_0;

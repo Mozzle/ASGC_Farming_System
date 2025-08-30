@@ -3,7 +3,10 @@
 		"stdbool.h": "c",
 		"aht20.h": "c",
 		"stdio.h": "c",
-		"compare": "c"
+		"compare": "c",
+		"stm32h7xx_hal_spi.h": "c",
+		"gpio.h": "c",
+		"ili9341_stm32_driver.h": "c"
 	},
 	"workbench.colorTheme": "Default Dark Modern"
 }

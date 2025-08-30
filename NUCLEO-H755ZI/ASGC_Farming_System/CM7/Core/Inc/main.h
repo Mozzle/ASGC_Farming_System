@@ -101,6 +101,10 @@ void Error_Handler(void);
 #define Estop_ButtonNO_Pin GPIO_PIN_8
 #define Estop_ButtonNO_GPIO_Port GPIOC
 #define Estop_ButtonNO_EXTI_IRQn EXTI9_5_IRQn
+#define ILI9341_DC_Pin GPIO_PIN_8
+#define ILI9341_DC_GPIO_Port GPIOA
+#define ILI9341_RST_Pin GPIO_PIN_9
+#define ILI9341_RST_GPIO_Port GPIOA
 #define TIM3_FANS_PWM_Pin GPIO_PIN_4
 #define TIM3_FANS_PWM_GPIO_Port GPIOB
 
