@@ -80,6 +80,32 @@
 //
 //-----------------------------------
 
+
+
+/* ASGC FARMING ROBOT PROJECT-----------------------------------------------------------------------
+ *
+ * 	See the STM32H7 Nucleo User Manual for details on the Nucleo board's pin locations:
+ * 	https://www.st.com/resource/en/user_manual/dm00499171.pdf
+ *
+ * 	Message Dylan on Discord if you're having any issues finding pin locations
+ *
+ *  PINOUTS FOR ILI9341:
+ *
+ *   STM32 Nucleo Board  -->  ILI9341
+ *
+ *   GND				 -->  GND
+ *   3V3				 -->  VIN
+ *   PA5			     -->  CLK
+ *   PG9				 -->  MISO		(This pin is not actually necessary, but wire it anyway)
+ *   PA7				 -->  MOSI
+ *   PA4				 -->  CS
+ *   PA8				 -->  D/C
+ *   PA9				 -->  RST
+ *
+ *
+ *
+ -------------------------------------------------------------------------------------------------*/
+
 /* Includes ------------------------------------------------------------------*/
 #include "ILI9341_STM32_Driver.h"
 #include "stm32h7xx_hal_spi.h"
@@ -377,7 +403,7 @@ if(Sending_in_Block != 0)
 {
 	for(uint32_t j = 0; j < (Sending_in_Block); j++)
 		{
-		HAL_SPI_Transmit(HSPI_INSTANCE, (unsigned char *)burst_buffer, Buffer_Size, 10);	
+		HAL_SPI_Transmit(HSPI_INSTANCE, (unsigned char *)burst_buffer, Buffer_Size, 10);
 		}
 }
 
