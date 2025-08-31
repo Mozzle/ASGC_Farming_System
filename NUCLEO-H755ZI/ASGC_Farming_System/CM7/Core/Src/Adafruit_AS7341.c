@@ -21,6 +21,8 @@
 
 #include "Adafruit_AS7341.h"
 
+#include "main.h" // For switchboard functionality
+
 static uint8_t last_spectral_int_source = 0;
 static I2C_HandleTypeDef *i2c_han = NULL;///< Pointer to I2C bus interface
 static uint8_t i2c_addr = 0;
@@ -54,12 +56,21 @@ bool Adafruit_AS7341_begin(uint8_t i2c_address, I2C_HandleTypeDef *i2c_handle,
  */
 bool Adafruit_AS7341__init(int32_t sensor_id) {
 
+	if (AS7341_ENABLED == SYS_FEATURE_DISABLED) {
+		return true;
+	}
+
 	// make sure we're talking to the right chip
 	if ((Adafruit_AS7341_readRegisterByte(AS7341_WHOAMI) & 0xFC) != (AS7341_CHIP_ID << 2)) {
 		return false;
 	}
 
 	Adafruit_AS7341_powerEnable(true);
+
+	// CONFIG VALUES
+	Adafruit_AS7341_setATIME(100);
+	Adafruit_AS7341_setASTEP(999);
+	Adafruit_AS7341_setGain(AS7341_GAIN_256X);
 	return true;
 }
 
@@ -82,6 +93,10 @@ int8_t Adafruit_AS7341_getFlickerDetectStatus(void) {
  */
 uint16_t Adafruit_AS7341_readChannel(as7341_adc_channel_t channel) {
 	// each channel has two bytes, so offset by two for each next channel
+
+	if (AS7341_ENABLED == SYS_FEATURE_DISABLED) {
+		return 1; // AS7341 disabled value
+	}
 
 	uint8_t data[2];
 	Adafruit_AS7341_readRegister((uint16_t) (AS7341_CH0_DATA_L + 2 * channel), data, 2);
@@ -109,6 +124,10 @@ uint16_t Adafruit_AS7341_getChannel(as7341_color_channel_t channel) {
  * @return true: success false: failure
  */
 bool Adafruit_AS7341_readAllChannels(uint16_t *readings_buffer) {
+
+	if (AS7341_ENABLED == SYS_FEATURE_DISABLED) {
+		return true;
+	}
 
 	Adafruit_AS7341_setSMUXLowChannels(true);        // Configure SMUX to read low channels
 	Adafruit_AS7341_enableSpectralMeasurement(true); // Start integration
@@ -186,6 +205,14 @@ bool Adafruit_AS7341_checkReadingProgress() {
  * @return true: success false: failure
  */
 bool Adafruit_AS7341_getAllChannels(uint16_t *readings_buffer) {
+
+	if (AS7341_ENABLED == SYS_FEATURE_DISABLED) {
+		for (int i = 0; i < 12; i++) {
+			readings_buffer[i] = 1; // AS7341 disabled value
+		}
+		return true;
+	}
+
 	for (int i = 0; i < 12; i++)
 		readings_buffer[i] = _channel_readings[i];
 	return true;
@@ -226,6 +253,10 @@ void Adafruit_AS7341_delayForData(uint32_t waitTime) {
  * @return true: success false: failure
  */
 bool Adafruit_AS7341_ReadAllChannels(void) {
+	if (AS7341_ENABLED == SYS_FEATURE_DISABLED) {
+		return true;
+	}
+
 	return Adafruit_AS7341_readAllChannels(_channel_readings);
 }
 

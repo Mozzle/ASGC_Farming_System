@@ -189,8 +189,9 @@ Error_Handler();
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
   SEN0169_Init();
   GPIO_switching_intf_Init();
-  //Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
-  ILI9341_Init();
+  Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
+  
+  //ILI9341_Init();
 
   if (CNC_Init() == SYS_SUCCESS) {
 
@@ -202,14 +203,15 @@ Error_Handler();
   SEN0169_pH_Data pH_Data;
   bool doOnce = false;
 
-  ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
-  ILI9341_Fill_Screen(BLACK);
-  ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 10, BLACK, 1, WHITE);
-  ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 20, RED, 2, WHITE);
-  ILI9341_Draw_Text("Lorem Ipsum", 10, 40, BLUE, 3, PINK);
-  ILI9341_Draw_Text("Test test test", 50, 210, WHITE, 3, BLACK);
-  ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
-  ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
+  //ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
+  //ILI9341_Fill_Screen(BLACK);
+  //ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 10, BLACK, 1, WHITE);
+  //ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 20, RED, 2, WHITE);
+  //ILI9341_Draw_Text("Lorem Ipsum", 10, 40, BLUE, 3, PINK);
+  //ILI9341_Draw_Text("Test test test", 50, 210, WHITE, 3, BLACK);
+  //ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
+  //ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -233,6 +235,9 @@ Error_Handler();
 	  //For testing purposes
 	  CNC_Home_Command();
 	   //SEN0169_Measure_SMA(&pH_Data);
+    uint16_t AS7341_Values[12];
+    Adafruit_AS7341_ReadAllChannels();
+    Adafruit_AS7341_getAllChannels(&AS7341_Values);
 
 	  mixing_motor_handle_state();
 
