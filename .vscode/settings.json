@@ -8,7 +8,8 @@
 		"gpio.h": "c",
 		"ili9341_stm32_driver.h": "c",
 		"main.h": "c",
-		"sen0169.h": "c"
+		"sen0169.h": "c",
+		"gpio_switching_intf.h": "c"
 	},
 	"workbench.colorTheme": "Default Dark Modern"
 }

@@ -152,7 +152,7 @@ void Error_Handler(void);
 
 
 /* MOSFET/Solid State Relay switching interface for Pumps and Valves ---------*/
-#define MOSFET_SSR_SWITCHING_ENABLED	  SYS_FEATURE_DISABLED
+#define MOSFET_SSR_SWITCHING_ENABLED	  SYS_FEATURE_ENABLED
 	 /* GPIO_switching_intf.c */
 
 /* Mixing Motor Controller Interface -----------------------------------------*/

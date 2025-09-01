@@ -254,6 +254,12 @@ Error_Handler();
     // Get distance measurement from VL53L1X ToF sensor
     VL53L1X_GetRangingMeasurementData( Dev, &RangingData );
 
+    //Test MOSTFET GPIO switching interface
+//    GPIO_set_ph_up_valve(VALVE_OPEN);
+//    HAL_Delay(3000);
+//    GPIO_set_ph_up_valve(VALVE_CLOSED);
+//    HAL_Delay(3000);
+
     mixing_motor_handle_state();
 
   }
