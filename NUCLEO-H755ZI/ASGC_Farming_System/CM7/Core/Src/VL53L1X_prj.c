@@ -4,7 +4,10 @@
  *  Created on: 8/31/2025
  *
  *  DESCRIPTION: Project specific implementation for the VL53L1X Time-Of-Flight
- *  sensor driver.
+ *  sensor API.
+ * 
+ *  This project uses the VL53L1X API provided by STMicroelectronics:
+ * 	https://www.st.com/en/embedded-software/stsw-img007.html
  *
 -----------------------------------------------------------------------------*/
 

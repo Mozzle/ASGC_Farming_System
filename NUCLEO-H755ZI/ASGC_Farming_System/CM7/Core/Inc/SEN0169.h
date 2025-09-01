@@ -35,22 +35,12 @@ THIS CONVERSION FACTOR IS DETERMINED BY:
 
 typedef double SEN0169_pH_Data;
 
-struct pH_Moving_Avg {
-	SEN0169_pH_Data pH_Data;
-	uint64_t timestamp;
-};
-
-#define pH_MOVING_AVG_ENTRIES		4
-#define pH_MOVING_AVG_TIMEOUT_MS	5000
-
 /*-------------------------------------------------------------------------
 FUNCTION DECLARATIONS
 -------------------------------------------------------------------------*/
 bool SEN0169_Init();
 
 SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data);
-
-SYS_RESULT SEN0169_Measure_SMA(SEN0169_pH_Data * pH_Data);
 
 void SEN0169_Stop_ADC();
 

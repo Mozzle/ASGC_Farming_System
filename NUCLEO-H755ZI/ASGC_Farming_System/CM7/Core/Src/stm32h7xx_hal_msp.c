@@ -138,7 +138,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
     __HAL_RCC_GPIOC_CLK_ENABLE();
     /**ADC2 GPIO Configuration
-    PC4     ------> ADC2_INP4
+    PC0     ------> ADC2_INP10
     */
     GPIO_InitStruct.Pin = ADC2_SEN0244_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -192,7 +192,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     }
 
     /**ADC2 GPIO Configuration
-    PC4     ------> ADC2_INP4
+    PC0     ------> ADC2_INP10
     */
     HAL_GPIO_DeInit(ADC2_SEN0244_GPIO_Port, ADC2_SEN0244_Pin);
 

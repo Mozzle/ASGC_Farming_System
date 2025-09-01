@@ -244,8 +244,8 @@ Error_Handler();
 	  HAL_Delay(40);
 	  //For testing purposes
 	  CNC_Home_Command();
-	   //SEN0169_Measure_SMA(&pH_Data);
-	  SEN0244_Measure(&tdsData, AHT20_data.temperature);
+	  SEN0169_Measure(&pH_Data);
+	SEN0244_Measure(&tdsData, AHT20_data.temperature);
 
     uint16_t AS7341_Values[12];
     Adafruit_AS7341_ReadAllChannels();
@@ -254,7 +254,7 @@ Error_Handler();
     // Get distance measurement from VL53L1X ToF sensor
     VL53L1X_GetRangingMeasurementData( Dev, &RangingData );
 
-	  mixing_motor_handle_state();
+    mixing_motor_handle_state();
 
   }
   /* USER CODE END 3 */
@@ -456,7 +456,7 @@ static void MX_ADC2_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Channel = ADC_CHANNEL_10;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;

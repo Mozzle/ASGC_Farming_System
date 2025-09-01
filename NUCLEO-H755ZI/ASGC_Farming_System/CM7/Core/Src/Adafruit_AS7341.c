@@ -17,7 +17,9 @@
 
 /* Update by P. Chwalek to be compatible for STM32 C++ project (non-Arduino) */
 
-/* CONVERTED FROM C++ TO C BY Dylan Collier									 */
+/*-----------------------------------------------------------------------------
+	CONVERTED FROM C++ TO C BY Dylan Collier
+-----------------------------------------------------------------------------*/
 
 #include "Adafruit_AS7341.h"
 

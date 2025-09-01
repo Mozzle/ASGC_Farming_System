@@ -50,7 +50,9 @@
 
  */
 
-/* CONVERTED FROM C++ TO C BY Dylan Collier									 */
+/*-----------------------------------------------------------------------------
+	CONVERTED FROM C++ TO C BY Dylan Collier
+-----------------------------------------------------------------------------*/
 
 #ifndef _ADAFRUIT_AS7341_H
 #define _ADAFRUIT_AS7341_H
