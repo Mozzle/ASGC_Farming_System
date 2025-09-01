@@ -140,7 +140,7 @@ void Error_Handler(void);
 
 
 /* SEN0244 Electrical Conductivity Sensor ------------------------------------*/
-#define SEN0244_ENABLED					        SYS_FEATURE_DISABLED
+#define SEN0244_ENABLED					        SYS_FEATURE_ENABLED
 	 /* SEN0244.c */
 
 /* SEN0169-V2 pH Sensor ------------------------------------------------------*/

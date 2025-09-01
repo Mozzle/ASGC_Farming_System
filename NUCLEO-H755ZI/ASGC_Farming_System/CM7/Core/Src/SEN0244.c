@@ -35,9 +35,9 @@ bool SEN0244_Init() {
 	/*-------------------------------------------------------------------------
 	Start the ADC. Exit if the ADC fails to start
 	-------------------------------------------------------------------------*/
-	if ( HAL_ADC_Start(&hadc2) != HAL_OK ) {
-		return SEN0244_INIT_FAIL;
-	}
+	//if ( HAL_ADC_Start(&hadc2) != HAL_OK ) {
+	//	return SEN0244_INIT_FAIL;
+	//}
 	SEN0244_ADC_On = true;
 
 	return SEN0244_INIT_SUCCEED;
@@ -54,7 +54,7 @@ bool SEN0244_Init() {
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT SEN0244_Measure(double *tdsData) {
+SYS_RESULT SEN0244_Measure(double *tdsData, float tempData) {
 
 	/*-------------------------------------------------------------------------
 	Local Variables
@@ -76,12 +76,14 @@ SYS_RESULT SEN0244_Measure(double *tdsData) {
 	Take SEN0244_NUM_MEASUREMENTS measurements from ADC
 	-------------------------------------------------------------------------*/
 	for( i = 0; i < SEN0244_NUM_MEASUREMENTS; i++ ) {
-		HAL_ADC_PollForConversion(&hadc2, 1);
+		HAL_ADC_Start(&hadc2);
+		HAL_ADC_PollForConversion(&hadc2, 2);
 		measurement[i] = HAL_ADC_GetValue(&hadc2);
 	}
 
-	medianVoltage = ( getMedian_u32(measurement, SEN0244_NUM_MEASUREMENTS) * 3.3 ) / 4096.0;
-	*tdsData = (133.42*medianVoltage*medianVoltage*medianVoltage - 255.86*medianVoltage*medianVoltage + 857.39*medianVoltage)*0.5;
+	medianVoltage = ( ( getMedian_u32(measurement, SEN0244_NUM_MEASUREMENTS) * 3.3 ) / 4096.0);
+	double tempCompensation = medianVoltage / ( 1.0 + ( 0.02*(tempData-25.0 ) ) );
+	*tdsData = ( (133.42*tempCompensation*tempCompensation*tempCompensation - 255.86*tempCompensation*tempCompensation + 857.39*tempCompensation)*0.5);
 
 	return ret_val;
 }

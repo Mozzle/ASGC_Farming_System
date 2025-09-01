@@ -27,11 +27,13 @@
 #include "timer.h"
 #include "CNC.h"
 #include "SEN0169.h"
+#include "SEN0244.h"
 #include "mixing_motor.h"
 #include "gpio_switching_intf.h"
 #include "Adafruit_AS7341.h"
 #include "ILI9341/ILI9341_STM32_Driver.h"
 #include "ILI9341/ILI9341_GFX.h"
+#include "vl53l1_api.h"
 
 /* USER CODE END Includes */
 
@@ -69,6 +71,10 @@ UART_HandleTypeDef huart3;
 /* USER CODE BEGIN PV */
 bool SYSTEM_START_STATE;          /* Global Start State, triggered by Start Button */
 bool SYSTEM_ESTOP_STATE;          /* Global EStop State, triggered by EStop Button */
+
+VL53L1_RangingMeasurementData_t RangingData;
+VL53L1_Dev_t  vl53l1_c; // center module
+VL53L1_DEV    Dev = &vl53l1_c;
 
 /* USER CODE END PV */
 
@@ -172,6 +178,7 @@ Error_Handler();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+
   Buttons_Init(&SYSTEM_START_STATE);
 
   /* WAIT HERE UNTIL THE START BUTTON IS PRESSED 							 */
@@ -188,8 +195,10 @@ Error_Handler();
   HAL_Delay(45);             // Must be called prior to AHT20_Init()
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
   SEN0169_Init();
+  SEN0244_Init();
   GPIO_switching_intf_Init();
   Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
+  VL53L1X_prj_Init(Dev, &hi2c1);
   
   //ILI9341_Init();
 
@@ -201,6 +210,7 @@ Error_Handler();
   }
   HAL_Delay(500);
   SEN0169_pH_Data pH_Data;
+  double tdsData;
   bool doOnce = false;
 
   //ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
@@ -235,9 +245,14 @@ Error_Handler();
 	  //For testing purposes
 	  CNC_Home_Command();
 	   //SEN0169_Measure_SMA(&pH_Data);
+	  SEN0244_Measure(&tdsData, AHT20_data.temperature);
+
     uint16_t AS7341_Values[12];
     Adafruit_AS7341_ReadAllChannels();
     Adafruit_AS7341_getAllChannels(&AS7341_Values);
+
+    // Get distance measurement from VL53L1X ToF sensor
+    VL53L1X_GetRangingMeasurementData( Dev, &RangingData );
 
 	  mixing_motor_handle_state();
 

@@ -82,7 +82,7 @@ SYS_RESULT SEN0169_Measure(SEN0169_pH_Data *pH_Data) {
 	Take SEN0169_NUM_MEASUREMENTS measurements from ADC
 	-------------------------------------------------------------------------*/
 	for( i = 0; i < SEN0169_NUM_MEASUREMENTS; i++ ) {
-		HAL_ADC_PollForConversion(&hadc1, 1);
+		HAL_ADC_PollForConversion(&hadc1, 5);
 		measurement[i] = HAL_ADC_GetValue(&hadc1);
 	}
 

@@ -6,7 +6,9 @@
 		"compare": "c",
 		"stm32h7xx_hal_spi.h": "c",
 		"gpio.h": "c",
-		"ili9341_stm32_driver.h": "c"
+		"ili9341_stm32_driver.h": "c",
+		"main.h": "c",
+		"sen0169.h": "c"
 	},
 	"workbench.colorTheme": "Default Dark Modern"
 }
