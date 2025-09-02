@@ -33,13 +33,13 @@ Defines and includes
 /*-----------------------------------------------------------------------------
 typedefs
 -----------------------------------------------------------------------------*/
-typedef float SEN0244_EC_Data;
+typedef double SEN0244_TDS_Data;
 
 /*-----------------------------------------------------------------------------
 Function Declarations
 -----------------------------------------------------------------------------*/
 bool SEN0244_Init();
-SYS_RESULT SEN0244_Measure(double *tdsData, float tempData);
+SYS_RESULT SEN0244_Measure(SEN0244_TDS_Data *tdsData, float tempData);
 void SEN0244_Stop_ADC();
 
 

@@ -176,6 +176,11 @@ void Error_Handler(void);
 void ASGC_System_Startup();
 void ASGC_System_ESTOP();
 
+SYS_RESULT AHT20_Get_Data_TASK();
+SYS_RESULT SEN0169_Get_Data_TASK();
+SYS_RESULT SEN0244_Get_Data_TASK();
+SYS_RESULT AS7341_Get_Data_TASK();
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

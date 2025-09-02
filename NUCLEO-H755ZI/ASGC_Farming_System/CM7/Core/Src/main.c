@@ -34,6 +34,7 @@
 #include "ILI9341/ILI9341_STM32_Driver.h"
 #include "ILI9341/ILI9341_GFX.h"
 #include "vl53l1_api.h"
+#include "Scheduler.h"
 
 /* USER CODE END Includes */
 
@@ -69,12 +70,33 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-bool SYSTEM_START_STATE;          /* Global Start State, triggered by Start Button */
-bool SYSTEM_ESTOP_STATE;          /* Global EStop State, triggered by EStop Button */
 
+/*-----------------------------------------------------------------------------
+GLOBAL VARIABLES
+-----------------------------------------------------------------------------*/
+
+bool SYSTEM_START_STATE;            /* Global Start State, triggered by Start Button  */
+bool SYSTEM_ESTOP_STATE;            /* Global EStop State, triggered by EStop Button  */
+
+uint64_t globalTimestamp = 0;       /* Global timestamp in ms since system start      */
+uint64_t systemStartTimestamp = 0;  /* Timestamp in ms of start button press          */
+
+// VL53L1X Time of Flight Distance Sensor Data
 VL53L1_RangingMeasurementData_t RangingData;
 VL53L1_Dev_t  vl53l1_c; // center module
 VL53L1_DEV    Dev = &vl53l1_c;
+
+// AHT20 Temperature and Humidity Data
+struct AHT20_Data AHT20_data;
+
+// SEN0169 pH Data
+SEN0169_pH_Data pH_Data;
+
+// SEN0244 TDS Data
+SEN0244_TDS_Data tdsData;
+
+// AS7341 Spectral Sensor Data
+uint16_t AS7341_Values[12];
 
 /* USER CODE END PV */
 
@@ -107,13 +129,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
-	struct AHT20_Data AHT20_data;
-
 
   SYSTEM_START_STATE = SYSTEM_OFF;
   SYSTEM_ESTOP_STATE = SYSTEM_OFF;
-
 
   /* USER CODE END 1 */
 /* USER CODE BEGIN Boot_Mode_Sequence_0 */
@@ -135,7 +153,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  	  // Init_ILI9341()
 
   /* USER CODE END Init */
 
@@ -199,7 +216,6 @@ Error_Handler();
   GPIO_switching_intf_Init();
   Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
   VL53L1X_prj_Init(Dev, &hi2c1);
-  
   //ILI9341_Init();
 
   if (CNC_Init() == SYS_SUCCESS) {
@@ -208,11 +224,10 @@ Error_Handler();
   else {
 
   }
-  HAL_Delay(500);
-  SEN0169_pH_Data pH_Data;
-  double tdsData;
-  bool doOnce = false;
 
+  Scheduler_Init();
+  HAL_Delay(100);
+  
   //ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
   //ILI9341_Fill_Screen(BLACK);
   //ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 10, BLACK, 1, WHITE);
@@ -222,6 +237,8 @@ Error_Handler();
   //ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
   //ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
 
+  uint64_t timestamp_test[10];
+  uint8_t i = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -231,28 +248,20 @@ Error_Handler();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (!doOnce && getTimestamp() > 3000) {
-		  mixing_motor_mix_for_time(5000);
-		  doOnce = true;
-	  }
+    // Update global timestamp
+    globalTimestamp = getTimestamp();
 
-	  AHT20_data = AHT20_Get_Data(&hi2c1);
+    timestamp_test[i] = globalTimestamp;
+    i = (i + 1) % 10;
+    // Run the scheduler update every loop iteration
+    Scheduler_Update();
 
-	  if (AHT20_data.humidity == 0.0) {
-	    AHT20_data.humidity = 2.0;
-	  }
-	  HAL_Delay(40);
+
 	  //For testing purposes
-	  CNC_Home_Command();
-	  SEN0169_Measure(&pH_Data);
-	SEN0244_Measure(&tdsData, AHT20_data.temperature);
-
-    uint16_t AS7341_Values[12];
-    Adafruit_AS7341_ReadAllChannels();
-    Adafruit_AS7341_getAllChannels(&AS7341_Values);
+	  //CNC_Home_Command();
 
     // Get distance measurement from VL53L1X ToF sensor
-    VL53L1X_GetRangingMeasurementData( Dev, &RangingData );
+    // VL53L1X_GetRangingMeasurementData( Dev, &RangingData );
 
     //Test MOSTFET GPIO switching interface
 //    GPIO_set_ph_up_valve(VALVE_OPEN);
@@ -982,6 +991,75 @@ void ASGC_System_ESTOP() {
   }
 
 }
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	AHT20_Get_Data_TASK
+ *
+ * 		Scheduler task to get data from the AHT20 sensor.
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT AHT20_Get_Data_TASK() {
+  AHT20_data = AHT20_Get_Data(&hi2c1);
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	SEN0169_Get_Data_TASK
+ *
+ * 		Scheduler task to get pH data from the SEN0169 sensor.
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT SEN0169_Get_Data_TASK() {
+  SEN0169_Measure(&pH_Data);
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	SEN0244_Get_Data_TASK
+ *
+ * 		Scheduler task to get TDS data from the SEN0244 sensor.
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT SEN0244_Get_Data_TASK() {
+  SEN0244_Measure(&tdsData, AHT20_data.temperature);
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	AS7341_Get_Data_TASK
+ *
+ * 		Scheduler task to get spectral data from the AS7341 sensor and update the
+ *    daily light integral (DLI) calculation.
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT AS7341_Get_Data_TASK() {
+  Adafruit_AS7341_ReadAllChannels();
+  Adafruit_AS7341_getAllChannels(&AS7341_Values);
+
+  // Update DLI calculation
+
+  return SYS_SUCCESS;
+}
+
 
 /* USER CODE END 4 */
 
