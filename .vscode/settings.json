@@ -11,7 +11,8 @@
 		"sen0169.h": "c",
 		"gpio_switching_intf.h": "c",
 		"rpi_i2c.h": "c",
-		"stm32h7xx_hal.h": "c"
+		"stm32h7xx_hal.h": "c",
+		"fsm.h": "c"
 	},
 	"workbench.colorTheme": "Default Dark Modern"
 }

@@ -19,7 +19,7 @@
 #ifndef INC_FUNCTIONALITY_MNGMNT_H_
 #define INC_FUNCTIONALITY_MNGMNT_H_
 
-#include "main.h"
+#include <stdint.h>
 
 typedef uint8_t SYS_FEATURE_ENABLE_u8;
 enum {

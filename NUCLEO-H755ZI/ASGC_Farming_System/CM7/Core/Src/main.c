@@ -37,6 +37,7 @@
 #include "vl53l1_api.h"
 #include "FSM.h"
 #include "Scheduler.h"
+#include "VL53L1X_prj.h"
 
 /* USER CODE END Includes */
 
@@ -245,8 +246,6 @@ Error_Handler();
   //ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
   //ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
 
-  uint64_t timestamp_test[10];
-  uint8_t i = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -993,7 +992,9 @@ void ASGC_System_ESTOP() {
 
   //(Potentially) Deregister interrupts?
 
-  //Locked in loop until power cycle
+  // Disable interrupts
+  __disable_irq();
+  // Locked in loop until power cycle
   while(1) {
     //May need to send data to the display here
   }
@@ -1013,6 +1014,10 @@ void ASGC_System_ESTOP() {
 SYS_RESULT AHT20_Get_Data_TASK() {
   AHT20_data = AHT20_Get_Data(&hi2c1);
 
+  // Send Data to Raspberry Pi
+
+  // Send Data to Display
+
   return SYS_SUCCESS;
 }
 
@@ -1029,6 +1034,10 @@ SYS_RESULT AHT20_Get_Data_TASK() {
 SYS_RESULT SEN0169_Get_Data_TASK() {
   SEN0169_Measure(&pH_Data);
 
+  // Send Data to Raspberry Pi
+
+  // Send Data to Display
+
   return SYS_SUCCESS;
 }
 
@@ -1044,6 +1053,10 @@ SYS_RESULT SEN0169_Get_Data_TASK() {
 ------------------------------------------------------------------------------*/
 SYS_RESULT SEN0244_Get_Data_TASK() {
   SEN0244_Measure(&tdsData, AHT20_data.temperature);
+
+  // Send Data to Raspberry Pi
+
+  // Send Data to Display
 
   return SYS_SUCCESS;
 }
@@ -1064,6 +1077,10 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   Adafruit_AS7341_getAllChannels(&AS7341_Values);
 
   // Update DLI calculation
+
+  // Send Data to Raspberry Pi
+
+  // Send Data to Display
 
   return SYS_SUCCESS;
 }
