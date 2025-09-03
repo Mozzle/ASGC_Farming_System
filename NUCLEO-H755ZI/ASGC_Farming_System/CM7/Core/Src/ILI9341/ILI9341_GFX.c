@@ -265,7 +265,7 @@ void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, 
 {
     while (*Text) {
         ILI9341_Draw_Char(*Text++, X, Y, Colour, Size, Background_Colour);
-        X += CHAR_WIDTH*Size;
+        X += CHAR_WIDTH*Size*0.87;
     }
 }
 
