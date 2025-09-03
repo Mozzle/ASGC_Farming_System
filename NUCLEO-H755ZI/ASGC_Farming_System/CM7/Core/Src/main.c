@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "functionality_mngmnt.h"
 #include "AHT20.h"
 #include "FAN_pwm_intf.h"
 #include "Buttons.h"
@@ -34,6 +35,7 @@
 #include "ILI9341/ILI9341_STM32_Driver.h"
 #include "ILI9341/ILI9341_GFX.h"
 #include "vl53l1_api.h"
+#include "FSM.h"
 #include "Scheduler.h"
 
 /* USER CODE END Includes */
@@ -205,7 +207,9 @@ Error_Handler();
 	  // Discuss and implement something here.
   }
 
-  // Initialize all project modules
+  /*---------------------------------------------------------------------------
+  INITIALIZE ALL DEVICE DRIVERS
+  ---------------------------------------------------------------------------*/
   ASGC_Timer_Init();
   FAN_pwm_intf_Init(htim3);
   mixing_motor_Init(htim4);
@@ -225,6 +229,10 @@ Error_Handler();
 
   }
 
+  /*---------------------------------------------------------------------------
+  INITIALIZE ALL HIGH-LEVEL MODULES
+  ---------------------------------------------------------------------------*/
+  FSM_Init();
   Scheduler_Init();
   HAL_Delay(100);
   
@@ -251,8 +259,8 @@ Error_Handler();
     // Update global timestamp
     globalTimestamp = getTimestamp();
 
-    timestamp_test[i] = globalTimestamp;
-    i = (i + 1) % 10;
+    // Update the FSM state
+    FSM_Update();
     // Run the scheduler update every loop iteration
     Scheduler_Update();
 

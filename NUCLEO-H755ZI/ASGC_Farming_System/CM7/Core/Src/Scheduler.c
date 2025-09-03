@@ -24,7 +24,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
  ----------------------------------------------------------------------------*/
  void Scheduler_Init() {
 	// AHT20 Data Retrieval Task
-	Task_List[AHT20_GET_DATA_TASK].enabled = true;
+	Task_List[AHT20_GET_DATA_TASK].enabled = false;
 	Task_List[AHT20_GET_DATA_TASK].interval_ms = AHT20_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[AHT20_GET_DATA_TASK].last_run_timestamp = 0;
 	Task_List[AHT20_GET_DATA_TASK].num_consecutive_failures = 0;
@@ -33,7 +33,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 
 
 	// SEN0169 pH Data Retrieval Task
-	Task_List[SEN0169_GET_DATA_TASK].enabled = true;
+	Task_List[SEN0169_GET_DATA_TASK].enabled = false;
 	Task_List[SEN0169_GET_DATA_TASK].interval_ms = SEN0169_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[SEN0169_GET_DATA_TASK].last_run_timestamp = 0;
 	Task_List[SEN0169_GET_DATA_TASK].num_consecutive_failures = 0;
@@ -41,7 +41,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[SEN0169_GET_DATA_TASK].failure_handler = NULL; // Add failure handler later
 
 	// SEN0244 TDS Data Retrieval Task
-	Task_List[SEN0244_GET_DATA_TASK].enabled = true;
+	Task_List[SEN0244_GET_DATA_TASK].enabled = false;
 	Task_List[SEN0244_GET_DATA_TASK].interval_ms = SEN0244_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[SEN0244_GET_DATA_TASK].last_run_timestamp = 0;
 	Task_List[SEN0244_GET_DATA_TASK].num_consecutive_failures = 0;
@@ -49,7 +49,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[SEN0244_GET_DATA_TASK].failure_handler = NULL; // Add failure handler later
 
 	// AS7341 Spectral Data Retrieval and DLI Calculation Task
-	Task_List[AS7341_GET_DATA_TASK].enabled = true;
+	Task_List[AS7341_GET_DATA_TASK].enabled = false;
 	Task_List[AS7341_GET_DATA_TASK].interval_ms = AS7341_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[AS7341_GET_DATA_TASK].last_run_timestamp = 0;
 	Task_List[AS7341_GET_DATA_TASK].num_consecutive_failures = 0;
@@ -117,10 +117,27 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
  *
  ----------------------------------------------------------------------------*/
  void Scheduler_Enable_Task(Scheduler_Task_ID_t task_id, uint32_t ms_delay) {
+	 /*------------------------------------------------------------------------
+	   LOCAL VARIABLES
+	  -----------------------------------------------------------------------*/
+	 uint64_t curTime;
+	 uint64_t newLastRunTime;
+
 	// If the task ID is valid
 	if (task_id < NUM_SCHEDULER_TASKS) {
+		curTime = getTimestamp();
+		newLastRunTime = curTime - Task_List[task_id].interval_ms;
+
+		// Protect from underflow of last_run_timestamp
+		if (newLastRunTime > curTime) {
+			newLastRunTime = ms_delay;
+		}
+		else {
+			newLastRunTime = newLastRunTime + ms_delay;
+		}
+
 		Task_List[task_id].enabled = true;
-		Task_List[task_id].last_run_timestamp = getTimestamp() - Task_List[task_id].interval_ms + ms_delay;
+		Task_List[task_id].last_run_timestamp = newLastRunTime;
 		Task_List[task_id].num_consecutive_failures = 0;
 	}
  }
