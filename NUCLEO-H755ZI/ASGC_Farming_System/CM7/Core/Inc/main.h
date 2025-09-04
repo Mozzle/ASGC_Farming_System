@@ -160,7 +160,7 @@ void Error_Handler(void);
 	 /* mixing_motor.c */
 
 /* Start and E-Stop Button Interface -----------------------------------------*/
-#define START_BUTTON_ENABLED			      SYS_FEATURE_DISABLED
+#define START_BUTTON_ENABLED			      SYS_FEATURE_ENABLED
 #define ESTOP_BUTTON_ENABLED			      SYS_FEATURE_DISABLED
 	 /* Buttons.h */
 
@@ -176,10 +176,12 @@ void Error_Handler(void);
 void ASGC_System_Startup();
 void ASGC_System_ESTOP();
 
+// TASK FUNCTIONS - These are all the functions that will be registered in Scheduler.c
 SYS_RESULT AHT20_Get_Data_TASK();
 SYS_RESULT SEN0169_Get_Data_TASK();
 SYS_RESULT SEN0244_Get_Data_TASK();
 SYS_RESULT AS7341_Get_Data_TASK();
+SYS_RESULT CNC_Dispense_Seeds_TASK();
 
 /* USER CODE END Private defines */
 

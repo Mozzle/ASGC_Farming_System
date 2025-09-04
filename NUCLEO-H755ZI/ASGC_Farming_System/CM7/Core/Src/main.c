@@ -101,6 +101,9 @@ SEN0244_TDS_Data tdsData;
 // AS7341 Spectral Sensor Data
 uint16_t AS7341_Values[12];
 
+/*-----------------------------------------------------------------------------
+FUNCTION PROTOTYPES
+-----------------------------------------------------------------------------*/
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,6 +125,9 @@ static void MX_SPI1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+/*-----------------------------------------------------------------------------
+MAIN() FUNCTION
+-----------------------------------------------------------------------------*/
 /* USER CODE END 0 */
 
 /**
@@ -183,7 +189,9 @@ Error_Handler();
 /* USER CODE END Boot_Mode_Sequence_2 */
 
   /* USER CODE BEGIN SysInit */
-
+  /*---------------------------------------------------------------------------
+  PERIPHERAL INITIALIZATION
+  ---------------------------------------------------------------------------*/
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -198,19 +206,10 @@ Error_Handler();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-
-  Buttons_Init(&SYSTEM_START_STATE);
-
-  /* WAIT HERE UNTIL THE START BUTTON IS PRESSED 							 */
-  while (SYSTEM_START_STATE != SYSTEM_ON) {
-	  // Do nothing. Do we want to do something prior to system startup?
-	  // Perhaps display a prompt to press button to start on the screen?
-	  // Discuss and implement something here.
-  }
-
   /*---------------------------------------------------------------------------
-  INITIALIZE ALL DEVICE DRIVERS
+  DEVICE DRIVER INITIALIZATION
   ---------------------------------------------------------------------------*/
+  Buttons_Init(&SYSTEM_START_STATE);
   ASGC_Timer_Init();
   FAN_pwm_intf_Init(htim3);
   mixing_motor_Init(htim4);
@@ -235,7 +234,6 @@ Error_Handler();
   ---------------------------------------------------------------------------*/
   FSM_Init();
   Scheduler_Init();
-  HAL_Delay(100);
   
   //ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
   //ILI9341_Fill_Screen(BLACK);
@@ -246,6 +244,8 @@ Error_Handler();
   //ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
   //ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
 
+  HAL_Delay(100);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -255,6 +255,7 @@ Error_Handler();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
     // Update global timestamp
     globalTimestamp = getTimestamp();
 
@@ -922,9 +923,7 @@ static void MX_GPIO_Init(void)
  *
  * 		Interrupt Callback function for GPIO Interrupts
  *
--------------------------------------------------------------
-
------------------*/
+------------------------------------------------------------------------------*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {   
     // If The INT Source Is The start button (PC6)
@@ -1001,6 +1000,16 @@ void ASGC_System_ESTOP() {
 
 }
 
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ *
+ * 	SCHEDULER TASK FUNCTIONS
+ * 
+ *  The following functions are all tasks that are scheduled in Scheduler.c.
+ *  They are all in main.c to have global access.
+ *
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 /*------------------------------------------------------------------------------
  *
@@ -1081,6 +1090,21 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   // Send Data to Raspberry Pi
 
   // Send Data to Display
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	CNC_Dispense_Seeds_TASK
+ *
+ * 		Scheduler task to invoke the mini state machine that controls the dispersal
+ *    of seeds.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT CNC_Dispense_Seeds_TASK() {
+  CNC_Dispense_Seeds();
 
   return SYS_SUCCESS;
 }

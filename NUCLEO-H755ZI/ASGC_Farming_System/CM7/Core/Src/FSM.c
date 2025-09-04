@@ -11,6 +11,8 @@
 
 #include "FSM.h"
 #include "timer.h"
+#include "Scheduler.h"
+#include "gpio_switching_intf.h"
 
 /*-----------------------------------------------------------------------------
 STATIC VARIABLES
@@ -166,8 +168,26 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
     FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateStartTimestamp = getTimestamp();
-    // Open Fill Valve, Enable AHT20 Task, Enable SEN0169 Task, Enable SEN0244
-    // Task, Enable AS7341 Task
+
+    GPIO_set_fill_valve(VALVE_OPEN);
+
+    /*-------------------------------------------------------------------------
+    Experimentally determined task time to complete, as of commit dedd01f:
+    AHT20_GET_DATA_TASK: ~81ms
+    SEN0169_GET_DATA_TASK: ~2ms
+    SEN0244_GET_DATA_TASK: ~1ms
+    AS7341_GET_DATA_TASK: ~535ms
+    Placing 35ms offset between tasks, as tasks may grow with implementation of
+    data sharing with Raspberry Pi and Display.
+    See the 'SW Task Timing' sheet in the ASGC_Automated_Farming_System 
+    spreadsheet for a visualization of the task scheduling.
+    -------------------------------------------------------------------------*/ 
+    Scheduler_Enable_Task(AHT20_GET_DATA_TASK, 0);
+    Scheduler_Enable_Task(SEN0169_GET_DATA_TASK, 116);
+    Scheduler_Enable_Task(SEN0244_GET_DATA_TASK, 153);
+    Scheduler_Enable_Task(AS7341_GET_DATA_TASK, 189);
+
+
     return SYS_SUCCESS;
 }
 
@@ -176,7 +196,7 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_TCF() {
 
     // If FSM_STATE_FILL_RESERVOIR_DWELL_TIME time has elapsed since entering state
     if ( ( getTimestamp() - FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateStartTimestamp ) >= FSM_STATE_FILL_RESERVOIR_DWELL_TIME) {
-        // currentFSMState = [NEXT STATE]
+        currentFSMState = FSM_STATE_CNC_HOMING;
         FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateActivated = false;
     }
 
@@ -192,7 +212,8 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_TCF() {
         -> FSM_STATE_FILL_RESERVOIR
 
     Action Upon State Activation:
-        Send CNC Homing command to Raspberry Pi, Turn on circulating pump, ...
+        Turn on circulating pump, close fill valve, send CNC Homing command to
+        Raspberry Pi
 
     Transitions out of this state:
         -> XXXXX
@@ -202,12 +223,18 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 SYS_RESULT FSM_State_CNC_HOMING_SAF() {
     FSM_STATES[FSM_STATE_CNC_HOMING].stateStartTimestamp = getTimestamp();
-    // Send CNC Homing command to Raspberry Pi, Turn on circulating pump, ...
+
+    GPIO_set_fill_valve(VALVE_CLOSED);
+    GPIO_set_circulating_pump(PUMP_ON);
+    CNC_Home_Command();
 
     return SYS_SUCCESS;
 }
 
 SYS_RESULT FSM_State_CNC_HOMING_TCF() {
-
+    // Wait a short amount of time.
+    // Send command to Raspberry Pi to verify homing is complete.
+    // If homing is complete, transition to next state.
+    // otherwise, wait another short amount of time and check again.
     return SYS_SUCCESS;
 }

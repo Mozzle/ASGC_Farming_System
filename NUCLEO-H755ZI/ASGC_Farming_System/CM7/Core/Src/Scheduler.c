@@ -55,6 +55,13 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[AS7341_GET_DATA_TASK].num_consecutive_failures = 0;
 	Task_List[AS7341_GET_DATA_TASK].task_function = AS7341_Get_Data_TASK;
 	Task_List[AS7341_GET_DATA_TASK].failure_handler = NULL; // Add failure handler later
+
+	Task_List[CNC_DISPENSE_SEEDS_TASK].enabled = false;
+	Task_List[CNC_DISPENSE_SEEDS_TASK].interval_ms = CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS;
+	Task_List[CNC_DISPENSE_SEEDS_TASK].last_run_timestamp = 0;
+	Task_List[CNC_DISPENSE_SEEDS_TASK].num_consecutive_failures = 0;
+	Task_List[CNC_DISPENSE_SEEDS_TASK].task_function = CNC_Dispense_Seeds_TASK;
+	Task_List[CNC_DISPENSE_SEEDS_TASK].failure_handler = NULL; // Add failure handler later
  }
 
 /*-----------------------------------------------------------------------------

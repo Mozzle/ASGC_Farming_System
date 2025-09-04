@@ -67,16 +67,15 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
  *
  ----------------------------------------------------------------------------*/
 
-bool CNC_Init() {
+SYS_RESULT CNC_Init() {
 
 	// If CNC is not enabled, do not try to initialize it
 	if (RASPBERRY_PI_INTERFACE_ENABLED == SYS_FEATURE_DISABLED) {
 		CNC_Initialized = true;
-		return false;
+		return SYS_SUCCESS;
 	}
 
 	CNC_DATA = (CNC_NFT_Data) {
-		.equipped_toolhead = 2, // No toolhead equipped
 		.channel_holes = {
 			// The (x, y) of each hole will be experimentally determined and
 			// hardcoded here.
@@ -134,25 +133,12 @@ bool CNC_Init() {
 		}
 	};
 
-	if (CNC_Home_Command() != SYS_SUCCESS) {
-		// If the homing command failed to send, we should not continue
-		CNC_Initialized = false;
-		return false;
-	}
-
-	if (CNC_Detect_Equipped_Toolhead() != SYS_SUCCESS) {
-		// If we failed to detect the equipped toolhead, we should not continue
-		CNC_Initialized = false;
-		return false;
-	}
-
-	// If we can determine the equipped toolhead, set the initialized flag to true
-	// Otherwise, we should probably have a hard error here that requires user intervention
-	if (CNC_DATA.equipped_toolhead != CNC_TOOLHEAD_UNKNOWN) {
-		CNC_Initialized = true;
-	} else {
-		CNC_Initialized = false;
-	}
+	// CNC homing is now handled by a FSM state.
+	//if (CNC_Home_Command() != SYS_SUCCESS) {
+	//	// If the homing command failed to send, we should not continue
+	//	CNC_Initialized = false;
+	//	return false;
+	//}
 
 	return CNC_Initialized;
 }
@@ -194,22 +180,6 @@ uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos) {
 }
  
 
-/*-----------------------------------------------------------------------------
- *
- * 		CNC_Determine_Equipped_Toolhead
- *
- * 		Determines the currently equipped toolhead on the CNC system. This 
- * 		function will update the CNC_DATA.equipped_toolhead field with the 
- * 		currently equipped toolhead.
- *
- ----------------------------------------------------------------------------*/
-
-SYS_RESULT CNC_Detect_Equipped_Toolhead() {
-
-	// No clue how to implement this right now
-	return SYS_SUCCESS;
-}
-
 
 /*-----------------------------------------------------------------------------
  *
@@ -247,26 +217,26 @@ SYS_RESULT CNC_Move_To_Position(float x_pos, float y_pos) {
 		return SYS_NOT_INITIALIZED; // If CNC is not initialized, return error
 	}
 
-	if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_SEED_DISPENSER) {
-		// If the seed dispenser is equipped, adjust the position for the dispenser offset
-		x_pos += SEED_DISPENSER_X_OFFSET_MM;
-		y_pos += SEED_DISPENSER_Y_OFFSET_MM;
-		
-		/* Example of clamping to max position if out of bounds
-		if (x_pos > SEED_DISPENSER_MAX_X_POS_MM) {
-			x_pos = SEED_DISPENSER_MAX_X_POS_MM;
-		} */
-
-	} else if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_LIFTER_ARM) {
-		// If the lifter arm is equipped, adjust the position for the lifter arm offset
-		x_pos += LIFTER_X_OFFSET_MM;
-		y_pos += LIFTER_Y_OFFSET_MM;
-
-		/* Example of clamping to max position if out of bounds
-		if (x_pos > LIFTER_MAX_X_POS_MM) {
-			x_pos = LIFTER_MAX_X_POS_MM;
-		} */
-	}
+//	if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_SEED_DISPENSER) {
+//		// If the seed dispenser is equipped, adjust the position for the dispenser offset
+//		x_pos += SEED_DISPENSER_X_OFFSET_MM;
+//		y_pos += SEED_DISPENSER_Y_OFFSET_MM;
+//		
+//		/* Example of clamping to max position if out of bounds
+//		if (x_pos > SEED_DISPENSER_MAX_X_POS_MM) {
+//			x_pos = SEED_DISPENSER_MAX_X_POS_MM;
+//		} */
+//
+//	} else if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_LIFTER_ARM) {
+//		// If the lifter arm is equipped, adjust the position for the lifter arm offset
+//		x_pos += LIFTER_X_OFFSET_MM;
+//		y_pos += LIFTER_Y_OFFSET_MM;
+//
+//		/* Example of clamping to max position if out of bounds
+//		if (x_pos > LIFTER_MAX_X_POS_MM) {
+//			x_pos = LIFTER_MAX_X_POS_MM;
+//		} */
+//	}
 
 	// Send the G-code command to move the CNC system to the given position
 	char gcode[50];
@@ -282,8 +252,7 @@ SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index) {
 
 	// Can't move to hole if invalid channel/hole index or toolhead not 
 	// determined
-	if (channel_index >= CNC_NUM_NFT_CHANNELS || hole_index >= CNC_NUM_NET_POTS_PER_NFT_CHANNEL
-	 || CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_UNKNOWN) 
+	if (channel_index >= CNC_NUM_NFT_CHANNELS || hole_index >= CNC_NUM_NET_POTS_PER_NFT_CHANNEL) 
 	{
 		return SYS_INVALID; 
 	}
@@ -291,17 +260,34 @@ SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index) {
 	x_destination = CNC_DATA.channel_holes[channel_index][hole_index].x_pos;
 	y_destination = CNC_DATA.channel_holes[channel_index][hole_index].y_pos;
 
-	if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_SEED_DISPENSER) {
-		// If the seed dispenser is equipped, adjust the position for the dispenser offset
-		x_destination -= (SEED_DISPENSER_X_OFFSET_MM + SEED_DISPENSER_X_OFFSET_MM);
-		y_destination -= (SEED_DISPENSER_Y_OFFSET_MM + SEED_DISPENSER_Y_OFFSET_MM);
-
-	} else if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_LIFTER_ARM) {
-		// If the lifter arm is equipped, adjust the position for the lifter arm offset
-		x_destination -= (LIFTER_X_OFFSET_MM + LIFTER_X_OFFSET_MM);
-		y_destination -= (LIFTER_Y_OFFSET_MM + LIFTER_Y_OFFSET_MM);
-
-	}
+//	if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_SEED_DISPENSER) {
+//		// If the seed dispenser is equipped, adjust the position for the dispenser offset
+//		x_destination -= (SEED_DISPENSER_X_OFFSET_MM + SEED_DISPENSER_X_OFFSET_MM);
+//		y_destination -= (SEED_DISPENSER_Y_OFFSET_MM + SEED_DISPENSER_Y_OFFSET_MM);
+//
+//	} else if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_LIFTER_ARM) {
+//		// If the lifter arm is equipped, adjust the position for the lifter arm offset
+//		x_destination -= (LIFTER_X_OFFSET_MM + LIFTER_X_OFFSET_MM);
+//		y_destination -= (LIFTER_Y_OFFSET_MM + LIFTER_Y_OFFSET_MM);
+//
+//	}
 
 	return CNC_Move_To_Position(x_destination, y_destination);
+}
+
+SYS_RESULT CNC_Dispense_Seeds() {
+	// If CNC_Initialized is false, return error. 
+	// It should be initialized (homed) before this function is called.
+	if (!CNC_Initialized) {
+		return SYS_NOT_INITIALIZED;
+	}
+	// Use static variables to keep track of state between calls
+
+	// Send movement commands using CNC_Move_To_Hole()
+	// Poll for confirmation that the gantry has made it to the hole. (This packet has not yet been defined)
+	// Once the gantry is above the hole, Dispense seeds (PWM signal to a servo: THIS IS NOT YET IMPLEMENTED)
+	// After a short time, close seed dispenser shutter (another PWM signal change)
+	// Dwell for a second for seeds to finish falling
+	// Send movement command to next hole.
+	// Iterate through these steps for all 40 holes.
 }

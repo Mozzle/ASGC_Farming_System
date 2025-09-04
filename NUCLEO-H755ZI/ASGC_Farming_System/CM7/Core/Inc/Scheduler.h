@@ -33,10 +33,11 @@ INCLUDES
 /*-----------------------------------------------------------------------------
 DEFINES
 -----------------------------------------------------------------------------*/
-#define AHT20_TASK_DEFAULT_INTERVAL_MS			30000
-#define SEN0169_TASK_DEFAULT_INTERVAL_MS		30000
-#define SEN0244_TASK_DEFAULT_INTERVAL_MS		30000
-#define AS7341_TASK_DEFAULT_INTERVAL_MS			30000
+#define AHT20_TASK_DEFAULT_INTERVAL_MS				30000
+#define SEN0169_TASK_DEFAULT_INTERVAL_MS			30000
+#define SEN0244_TASK_DEFAULT_INTERVAL_MS			30000
+#define AS7341_TASK_DEFAULT_INTERVAL_MS				30000
+#define CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS	100
 
 /*-----------------------------------------------------------------------------
 TYPEDEFS
@@ -57,7 +58,8 @@ enum {
 	AHT20_GET_DATA_TASK,
 	SEN0169_GET_DATA_TASK,
 	SEN0244_GET_DATA_TASK,
-	AS7341_GET_DATA_TASK, // Many more to add!
+	AS7341_GET_DATA_TASK,
+	CNC_DISPENSE_SEEDS_TASK,
 	NUM_SCHEDULER_TASKS
 };
 
