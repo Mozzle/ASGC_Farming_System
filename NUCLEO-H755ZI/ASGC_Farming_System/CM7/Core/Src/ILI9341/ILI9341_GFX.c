@@ -79,9 +79,9 @@ void Display_EStopScreen()
 	There are a maximum of 3 pages (0, 1, 2)
 	If an invalid integer/page number is passed, it will default to page 0
 
-	Page 0: Water TDS and pH
-	Page 1: Temperature and Humidity
-	Page 2: Daily light target, pump status and uptime
+	Page 0: Water TDS, Water pH and Humidity
+	Page 1: Temperature, Pump Status, Uptime and Daily Light Target
+	Page 2+: (Reserved for future use)
 
 	--- Example of sample data displayed ---
 	Water TDS: 640ppm
@@ -101,20 +101,17 @@ void Display_Dashboard(uint8_t page)
 
 	switch (page) {
 		case 1:
-			// Display Temperature and Humidity
+			// Display Temperature, Pump Status, Uptime and Daily Light Target
 			ILI9341_Draw_Text("Temp:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
-			break;
-		case 2:
-			// Display Daily Light Target, Pump Status and Uptime
-			ILI9341_Draw_Text("Daily Light Target:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Uptime:", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Daily Light Target:", StartingXPos, StartingYPos + (1*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Pump Status", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Uptime:", StartingXPos, StartingYPos + (3*TextPixelHeight), BLUE, fontSize, BLACK);
 			break;
 		default:
-			// Display Water TDS and pH
+			// Display Water TDS, Water pH and Humidity
 			ILI9341_Draw_Text("Water TDS:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Water pH:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Water pH:", StartingXPos, StartingYPos + (1*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
 			break;
 	}
 }
