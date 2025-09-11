@@ -52,6 +52,12 @@
 #define HORIZONTAL_IMAGE	0
 #define VERTICAL_IMAGE		1
 
+// Aeroponics Project Related Methods
+void Display_StartupScreen();
+void Display_EStopScreen();
+void Display_Dashboard(uint8_t page);
+void Write_Logo();
+
 void ILI9341_Draw_Hollow_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);
 void ILI9341_Draw_Filled_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);
 void ILI9341_Draw_Hollow_Rectangle_Coord(uint16_t X0, uint16_t Y0, uint16_t X1, uint16_t Y1, uint16_t Colour);

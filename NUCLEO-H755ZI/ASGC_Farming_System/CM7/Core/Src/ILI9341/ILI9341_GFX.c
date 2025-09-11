@@ -51,6 +51,96 @@
 #include "stm32h7xx_hal_spi.h"
 #include "main.h"
 
+/*
+	These variables are shared between Display_Dashboard() and Write_Logo()
+	Write_Logo() should be called before Display_Dashboard to initalize these variables
+*/
+static uint8_t xBoundary;
+static uint8_t yBoundary;
+
+/*
+	This method displays the startup screen
+	This should ideally encourage the user to press the "Start" button
+*/
+void Display_StartupScreen()
+{
+}
+
+/*
+	This method displays the EStop screen
+	This should ideally encourage the user to power cycle the system to restart
+*/
+void Display_EStopScreen()
+{
+}
+
+/*
+	This method handles the actual display of sensor data via a dashboard/pages system
+	There are a maximum of 3 pages (0, 1, 2)
+	If an invalid integer/page number is passed, it will default to page 0
+
+	Page 0: Water TDS and pH
+	Page 1: Temperature and Humidity
+	Page 2: Daily light target, pump status and uptime
+
+	--- Example of sample data displayed ---
+	Water TDS: 640ppm
+	Water pH: 6.5
+	Temperature: 88 F
+	Humidity: 72%
+	Daily Light Target: 65%
+	(Maybe) [Status] Circulating Pump Running
+	Uptime: 15d 16h
+*/
+void Display_Dashboard(uint8_t page)
+{
+	uint16_t StartingXPos = 5;
+	uint16_t StartingYPos = yBoundary + 10;
+	uint8_t fontSize = 3;
+	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+
+	switch (page) {
+		case 1:
+			// Display Temperature and Humidity
+			ILI9341_Draw_Text("Temp:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
+			break;
+		case 2:
+			// Display Daily Light Target, Pump Status and Uptime
+			ILI9341_Draw_Text("Daily Light Target:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Uptime:", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			break;
+		default:
+			// Display Water TDS and pH
+			ILI9341_Draw_Text("Water TDS:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text("Water pH:", StartingXPos, StartingYPos + TextPixelHeight, BLUE, fontSize, BLACK);
+			break;
+	}
+}
+
+/*
+	This method is simply prints the logo text at the top of the screen
+	This mainly exists just for clarity/modularity
+*/
+void Write_Logo()
+{
+	// Define constants & calculate where to place our 'things'
+	uint8_t fontSize = 4;
+	uint8_t xOffset = 5;
+	uint8_t yOffset = 5;
+	char Text[] = "ASGC Farm";
+	uint8_t TextPixelWidth = strlen(Text) * fontSize * CHAR_WIDTH;
+	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+
+	xBoundary = xOffset + TextPixelWidth;
+	yBoundary = yOffset + TextPixelHeight;
+
+	// Draw 'things'
+	ILI9341_Draw_Hollow_Rectangle_Coord(xOffset, yOffset, xBoundary, yBoundary, BLUE);
+	ILI9341_Draw_Text(Text, xOffset, yOffset, RED, fontSize, BLACK);
+}
+
 /*Draw hollow circle at X,Y location with specified radius and colour. X and Y represent circles center */
 void ILI9341_Draw_Hollow_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour)
 {

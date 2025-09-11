@@ -237,10 +237,11 @@ Error_Handler();
   Scheduler_Init();
   HAL_Delay(100);
   
-  // Set screen orientation
+  // Set screen orientation and background
   ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
   ILI9341_Fill_Screen(BLACK);
-  ILI9341_Draw_Text("ASGC Farm Sys", 10, 20, RED, 3, BLACK);
+  Write_Logo();
+  Display_Dashboard(0);
 
   /* USER CODE END 2 */
 
