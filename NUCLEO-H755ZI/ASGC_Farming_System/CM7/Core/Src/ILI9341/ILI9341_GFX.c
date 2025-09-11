@@ -259,14 +259,41 @@ void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, ui
     }
 }
 
-/*Draws an array of characters (fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
+/*Draws an array of characters (MAX STRING SIZE OF 13 USUALLY -- fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
 void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
 {
-    while (*Text) {
-        ILI9341_Draw_Char(*Text++, X, Y, Colour, Size, Background_Colour);
-        X += CHAR_WIDTH*Size*0.87;
+	// Typical formula for maxChars would be:
+	// (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)))
+	// However, currently there is a screen clipping issue which I can't diagnose yet
+	// For the time being, we will "reduce" the screen dimensions by 50 pixels until this is resolved
+	uint16_t ScreenWidthForDrawing = ILI9341_SCREEN_WIDTH - 50;
+
+	// Boundary check on x-axis
+	uint8_t maxCharacters = (floor((ScreenWidthForDrawing - X) / (Size * CHAR_WIDTH)));
+	char* drawText = Text;
+	if (strlen(Text) > maxCharacters) {
+		// Allocate memory to clear previous text array
+		drawText = malloc(maxCharacters + 1);
+		if (drawText == NULL) {
+			// Memory allocation failed, exit function early
+			return;
+		}
+
+		// Copy the previous text array up to the maximum allowed characters
+		strncpy(drawText, Text, maxCharacters);
+        drawText[maxCharacters] = '\0';
+	}
+
+    while (*drawText) {
+        ILI9341_Draw_Char(*drawText++, X, Y, Colour, Size, Background_Colour);
+        X += CHAR_WIDTH*Size;
     }
+
+	// Free any previously allocated memory (no memory leaks allowed!)
+	if (drawText != Text) {
+		free(drawText);
+	}
 }
 
 /*Draws a full screen picture from flash. Image converted from RGB .jpeg/other to C array using online converter*/

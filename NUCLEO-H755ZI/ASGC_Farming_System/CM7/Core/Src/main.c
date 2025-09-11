@@ -237,14 +237,10 @@ Error_Handler();
   Scheduler_Init();
   HAL_Delay(100);
   
+  // Set screen orientation
   ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
   ILI9341_Fill_Screen(BLACK);
-  ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 10, BLACK, 1, WHITE);
-  ILI9341_Draw_Text("HELLO WORLD, TEST", 10, 20, RED, 2, WHITE);
-  ILI9341_Draw_Text("Lorem Ipsum Booty", 10, 40, BLUE, 3, PINK);
-  ILI9341_Draw_Text("Test test test", 50, 210, WHITE, 3, BLACK);
-  ILI9341_Draw_Filled_Rectangle_Coord(10, 70, 30, 150, GREEN);
-  ILI9341_Draw_Filled_Circle(70, 200, 10, BLUE);
+  ILI9341_Draw_Text("ASGC Farm Sys", 10, 20, RED, 3, BLACK);
 
   /* USER CODE END 2 */
 
