@@ -94,24 +94,116 @@ void Display_EStopScreen()
 */
 void Display_Dashboard(uint8_t page)
 {
+	// If this is enabled, dummy info will be displayed instead of pulling from sensor data
+	_Bool debugMode = false;
+
+	// Calculate variables used for drawing
 	uint16_t StartingXPos = 5;
 	uint16_t StartingYPos = yBoundary + 10;
 	uint8_t fontSize = 3;
+	uint8_t displayValueFontSize = fontSize - 1;
+	auto displayValueColor = WHITE;
 	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+	uint8_t ScalingFactor = 100;
+
+	/*
+	Define static buffers that persist across several calls for this method
+	This keeps our memory/makes sprintf calls not produce jumbled garbage text
+	*/
+    static char temperatureTextBuffer[20];
+    static char lightLevelTextBuffer[20];
+    static char waterTDSTextBuffer[20];
+    static char waterpHTextBuffer[20];
+    static char humidityTextBuffer[20];
 
 	switch (page) {
 		case 1:
-			// Display Temperature, Pump Status, Uptime and Daily Light Target
-			ILI9341_Draw_Text("Temp:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Daily Light Target:", StartingXPos, StartingYPos + (1*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Pump Status", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Uptime:", StartingXPos, StartingYPos + (3*TextPixelHeight), BLUE, fontSize, BLACK);
+
+			// Grab Temperature
+			const char *temperatureText;
+			sprintf(temperatureTextBuffer, "%u.%u F", temperatureValue / ScalingFactor, temperatureValue % ScalingFactor);
+			temperatureText = temperatureTextBuffer;
+
+			// Grab Light Level
+			const char *lightLevelText;
+			sprintf(lightLevelTextBuffer, "%u %%", dliValue);
+			lightLevelText = lightLevelTextBuffer;
+
+			// Grab Uptime
+			const char *uptimeText;
+			uptimeText = uptimeValue;
+
+			// Grab pump status
+			const char *pumpStatusText;
+			auto pumpStatusColour = BLUE;
+			if (pumpStatusValue || debugMode) {
+				pumpStatusText = "ONLINE";
+				pumpStatusColour = GREEN;
+			} else {
+				pumpStatusText = "OFFLINE";
+				pumpStatusColour = RED;
+			}
+
+			// If debug mode is enabled, use dummy data
+			if (debugMode) {
+				temperatureText = "500.51 F";
+				lightLevelText = "65%";
+				uptimeText = "78d 21h 3m";
+			}
+
+			/// Draw the actual text ///
+			// Temperature
+			ILI9341_Draw_Text("Temp", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(temperatureText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Light Level
+			ILI9341_Draw_Text("Light Level", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(lightLevelText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Pump Status
+			ILI9341_Draw_Text("Pump Status", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(pumpStatusText, StartingXPos, StartingYPos + (5*TextPixelHeight), pumpStatusColour, displayValueFontSize, BLACK);
+
+			// Uptime
+			ILI9341_Draw_Text("Uptime", StartingXPos, StartingYPos + (6*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(uptimeText, StartingXPos, StartingYPos + (7*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
 			break;
 		default:
-			// Display Water TDS, Water pH and Humidity
-			ILI9341_Draw_Text("Water TDS:", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Water pH:", StartingXPos, StartingYPos + (1*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text("Humidity:", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+
+			// Grab Water TDS
+			const char *waterTDSText;
+			sprintf(waterTDSTextBuffer, "%u.%u ppm", waterTDSValue / ScalingFactor, waterTDSValue % ScalingFactor);
+			waterTDSText = waterTDSTextBuffer;
+
+			// Grab Water pH
+			const char *waterpHText;
+			sprintf(waterpHTextBuffer, "%u.%u", waterpHValue / ScalingFactor, waterpHValue % ScalingFactor);
+			waterpHText = waterpHTextBuffer;
+
+			// Grab Humidity Level
+			const char *humidityText;
+			sprintf(humidityTextBuffer, "%u.%u %%", humidityValue / ScalingFactor, humidityValue % ScalingFactor);
+			humidityText = humidityTextBuffer;
+
+			// If debug mode is enabled, use dummy data
+			if (debugMode) {
+				waterTDSText = "750 ppm";
+				waterpHText = "6.0";
+				humidityText = "66%";
+			}
+
+			/// Draw the actual text ///
+			// Water TDS
+			ILI9341_Draw_Text("Water TDS", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(waterTDSText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Water pH
+			ILI9341_Draw_Text("Water pH", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(waterpHText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Humidity
+			ILI9341_Draw_Text("Humidity", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(humidityText, StartingXPos, StartingYPos + (5*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
 			break;
 	}
 }
@@ -136,6 +228,41 @@ void Write_Logo()
 	// Draw 'things'
 	ILI9341_Draw_Hollow_Rectangle_Coord(xOffset, yOffset, xBoundary, yBoundary, BLUE);
 	ILI9341_Draw_Text(Text, xOffset, yOffset, RED, fontSize, BLACK);
+}
+
+void ILI9341_Update_DLI(uint16_t dliValueNew)
+{
+	dliValue = dliValueNew;
+}
+
+void ILI9341_Update_Temperature(uint32_t temperatureValueNew)
+{
+	temperatureValue = temperatureValueNew;
+}
+
+void ILI9341_Update_Humidity(uint16_t humidityValueNew)
+{
+	humidityValue = humidityValueNew;
+}
+
+void ILI9341_Update_WaterpH(uint16_t pHValueNew)
+{
+	waterpHValue = pHValueNew;
+}
+
+void ILI9341_Update_WaterTDS(uint32_t tdsValueNew)
+{
+	waterTDSValue = tdsValueNew;
+}
+
+void ILI9341_Update_Uptime(char *uptimeStringNew)
+{
+	uptimeValue = uptimeStringNew;
+}
+
+void ILI9341_Update_PumpStatus(_Bool isPumpOnlineNew)
+{
+	pumpStatusValue = isPumpOnlineNew;
 }
 
 /*Draw hollow circle at X,Y location with specified radius and colour. X and Y represent circles center */

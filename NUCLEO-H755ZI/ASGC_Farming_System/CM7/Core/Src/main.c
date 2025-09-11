@@ -241,7 +241,7 @@ Error_Handler();
   ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
   ILI9341_Fill_Screen(BLACK);
   Write_Logo();
-  Display_Dashboard(0);
+  Display_Dashboard(1);
 
   /* USER CODE END 2 */
 

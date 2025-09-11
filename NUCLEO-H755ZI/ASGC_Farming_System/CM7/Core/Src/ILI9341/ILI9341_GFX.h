@@ -52,11 +52,32 @@
 #define HORIZONTAL_IMAGE	0
 #define VERTICAL_IMAGE		1
 
-// Aeroponics Project Related Methods
+// Sensor values
+static uint32_t temperatureValue = 9310; //Default to 93.1 F
+static _Bool pumpStatusValue = true; //Default to ONLINE
+static uint16_t dliValue = 0; //Default to 0%
+static char* uptimeValue = "0d 0h 0m"; //Default to 0d 0h 0m 
+static uint32_t waterTDSValue = 75000; //Default to 750.00 ppm
+static uint16_t waterpHValue = 660; //Default to 6.6
+static uint16_t humidityValue = 10000; //Default to 100.00%
+
+// Aeroponics Project Drawing Methods
 void Display_StartupScreen();
 void Display_EStopScreen();
 void Display_Dashboard(uint8_t page);
 void Write_Logo();
+
+/*
+    Aeroponics Project Update Sensor Value Methods.
+    Any values expected to be a decimal will be uint16_t or uint32_t and require a scaling factor of 100 (i.e. 500.43 F = 50043)
+*/
+void ILI9341_Update_DLI(uint16_t dliValueNew);
+void ILI9341_Update_Temperature(uint32_t temperatureValueNew);
+void ILI9341_Update_Humidity(uint16_t humidityValueNew);
+void ILI9341_Update_WaterpH(uint16_t pHValueNew);
+void ILI9341_Update_WaterTDS(uint32_t tdsValueNew);
+void ILI9341_Update_Uptime(char* uptimeStringNew);
+void ILI9341_Update_PumpStatus(_Bool isPumpOnlineNew);
 
 void ILI9341_Draw_Hollow_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);
 void ILI9341_Draw_Filled_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);
