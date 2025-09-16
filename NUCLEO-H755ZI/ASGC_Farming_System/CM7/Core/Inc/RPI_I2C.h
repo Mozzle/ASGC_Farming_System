@@ -20,6 +20,8 @@
 #define I2C_PACKETS_H
 
 #include "AHT20.h"
+#include "SEN0169.h"
+#include "SEN0244.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -47,7 +49,10 @@ enum {
 	RPI_GCODE_3_PKT_ID,
 	RPI_GCODE_4_PKT_ID,
 	RPI_AHT20_PKT_ID,
-	RPI_WATER_DATA_PKT_ID,		// Water EC and pH Data
+	RPI_SEN0169_PKT_ID,
+	RPI_SEN0244_PKT_ID,
+	RPI_AS7341_0_PKT_ID,
+	RPI_AS7341_1_PKT_ID,
 	RPI_BUTTONS_PKT_ID,			// EStop and Start Button Data
 	RPI_NET_POT_STATUS_PKT_ID,
 	RPI_GET_AXES_POS_PKT_ID,
@@ -111,6 +116,56 @@ typedef struct RPI_I2C_AHT20_Packet {
 #define RPI_I2C_AHT20_PACKET_SIZE	sizeof(RPI_I2C_AHT20_Packet_t)
 
 /*-----------------------------------------------------------------------------
+SEN0169 Packet Definition
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_SEN0169_Packet {
+	RPI_Packet_ID packet_id;
+	uint8_t pad1[3];			// Structs (and most other multi-byte data types) must be aligned on memory addresses
+	SEN0169_pH_Data SEN0169_data;	// that are a multiple of 4. So we add this 2-byte padding after the uint8 and bool to
+								// be explicit about what the data structure looks like.
+} RPI_I2C_SEN0169_Packet_t;
+
+#define RPI_I2C_SEN0169_PACKET_SIZE	sizeof(RPI_I2C_SEN0169_Packet_t)
+
+/*-----------------------------------------------------------------------------
+SEN0244 Packet Definition
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_SEN0244_Packet {
+	RPI_Packet_ID packet_id;
+	uint8_t pad1[3];			// Structs (and most other multi-byte data types) must be aligned on memory addresses
+	SEN0244_TDS_Data SEN0244_data;	// that are a multiple of 4. So we add this 2-byte padding after the uint8 and bool to
+								// be explicit about what the data structure looks like.
+} RPI_I2C_SEN0244_Packet_t;
+
+#define RPI_I2C_SEN0244_PACKET_SIZE	sizeof(RPI_I2C_SEN0244_Packet_t)
+
+#pragma pack(push, 1)
+/*-----------------------------------------------------------------------------
+AS7341, first Packet Definition
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_AS7341_Packet_0 {
+	RPI_Packet_ID packet_id;
+	uint16_t AS7341_data[7];
+
+} RPI_I2C_AS7341_Packet_0_t;
+
+#define RPI_I2C_AS7341_PACKET_0_SIZE	sizeof(RPI_I2C_AS7341_Packet_0_t)
+
+/*-----------------------------------------------------------------------------
+AS7341, second Packet Definition
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_AS7341_Packet_1 {
+	RPI_Packet_ID packet_id;
+	uint16_t AS7341_data[5];
+
+} RPI_I2C_AS7341_Packet_1_t;
+
+#define RPI_I2C_AS7341_PACKET_1_SIZE	sizeof(RPI_I2C_AS7341_Packet_1_t)
+
+#pragma pack(pop)
+
+_Static_assert(sizeof(RPI_I2C_AS7341_Packet_0_t) <= 16, "Packet too large");
+/*-----------------------------------------------------------------------------
 ACK Packet Definition
 -----------------------------------------------------------------------------*/
 typedef struct RPI_I2C_ACK_Packet {
@@ -125,5 +180,10 @@ typedef struct RPI_I2C_ACK_Packet {
 Function Prototypes
 -----------------------------------------------------------------------------*/
 SYS_RESULT RPI_I2C_Send_Gcode_Pkt(const char *gcode, uint32_t timeout);
+SYS_RESULT RPI_I2C_Send_AHT20_Pkt(struct AHT20_Data AHT20_data, uint32_t timeout);
+SYS_RESULT RPI_I2C_Send_SEN0169_Pkt(SEN0169_pH_Data SEN0169_data, uint32_t timeout);
+SYS_RESULT RPI_I2C_Send_SEN0244_Pkt(SEN0244_TDS_Data SEN0244_data, uint32_t timeout);
+SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout);
+
 
 #endif // I2C_PACKETS_H

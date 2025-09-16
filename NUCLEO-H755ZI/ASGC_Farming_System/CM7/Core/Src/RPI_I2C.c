@@ -154,7 +154,146 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	return SYS_SUCCESS;
 }
 
+SYS_RESULT RPI_I2C_Send_AHT20_Pkt(struct AHT20_Data AHT20_data, uint32_t timeout) {
 
+	RPI_I2C_AHT20_Packet_t aht20_pkt;
+	RPI_I2C_ACK_Packet_t ack_packet;
+	HAL_StatusTypeDef status;
+
+	/*-------------------------------------------------------------------------
+	Clear structs
+	-------------------------------------------------------------------------*/
+	memset(&aht20_pkt, 0, RPI_I2C_AHT20_PACKET_SIZE);
+	memset(&ack_packet, 0, sizeof(ack_packet));
+
+	/*-------------------------------------------------------------------------
+	Pack the packet
+	-------------------------------------------------------------------------*/
+	aht20_pkt.packet_id = RPI_AHT20_PKT_ID;
+	aht20_pkt.valid = true;
+	aht20_pkt.aht20_data = AHT20_data;
+
+	/*-------------------------------------------------------------------------
+	Send packet
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&aht20_pkt, RPI_I2C_AHT20_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	return status;
+}
+
+SYS_RESULT RPI_I2C_Send_SEN0169_Pkt(SEN0169_pH_Data SEN0169_data, uint32_t timeout) {
+
+	RPI_I2C_SEN0169_Packet_t SEN0169_pkt;
+	RPI_I2C_ACK_Packet_t ack_packet;
+	HAL_StatusTypeDef status;
+
+	/*-------------------------------------------------------------------------
+	Clear structs
+	-------------------------------------------------------------------------*/
+	memset(&SEN0169_pkt, 0, RPI_I2C_SEN0169_PACKET_SIZE);
+	memset(&ack_packet, 0, sizeof(ack_packet));
+
+	/*-------------------------------------------------------------------------
+	Pack the packet
+	-------------------------------------------------------------------------*/
+	SEN0169_pkt.packet_id = RPI_SEN0169_PKT_ID;
+	SEN0169_pkt.SEN0169_data = SEN0169_data;
+
+	/*-------------------------------------------------------------------------
+	Send packet
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&SEN0169_pkt, RPI_I2C_SEN0169_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	return status;
+
+}
+
+SYS_RESULT RPI_I2C_Send_SEN0244_Pkt(SEN0244_TDS_Data SEN0244_data, uint32_t timeout) {
+
+	RPI_I2C_SEN0244_Packet_t SEN0244_pkt;
+	RPI_I2C_ACK_Packet_t ack_packet;
+	HAL_StatusTypeDef status;
+
+	/*-------------------------------------------------------------------------
+	Clear structs
+	-------------------------------------------------------------------------*/
+	memset(&SEN0244_pkt, 0, RPI_I2C_SEN0244_PACKET_SIZE);
+	memset(&ack_packet, 0, sizeof(ack_packet));
+
+	/*-------------------------------------------------------------------------
+	Pack the packet
+	-------------------------------------------------------------------------*/
+	SEN0244_pkt.packet_id = RPI_SEN0244_PKT_ID;
+	SEN0244_pkt.SEN0244_data = SEN0244_data;
+
+	/*-------------------------------------------------------------------------
+	Send packet
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&SEN0244_pkt, RPI_I2C_SEN0244_PACKET_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	return status;
+}
+
+//uint16_t AS7341_Values[12];
+SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
+
+	RPI_I2C_AS7341_Packet_0_t AS7341_0_pkt;
+	RPI_I2C_AS7341_Packet_1_t AS7341_1_pkt;
+	RPI_I2C_ACK_Packet_t ack_packet;
+	HAL_StatusTypeDef status;
+
+	/*-------------------------------------------------------------------------
+	Clear structs
+	-------------------------------------------------------------------------*/
+	memset(&AS7341_0_pkt, 0, RPI_I2C_AS7341_PACKET_0_SIZE);
+	memset(&AS7341_1_pkt, 0, RPI_I2C_AS7341_PACKET_1_SIZE);
+	memset(&ack_packet, 0, sizeof(ack_packet));
+
+	/*-------------------------------------------------------------------------
+	Pack the packet
+	-------------------------------------------------------------------------*/
+	AS7341_0_pkt.packet_id = RPI_AS7341_0_PKT_ID;
+	AS7341_1_pkt.packet_id = RPI_AS7341_1_PKT_ID;
+	for (int i = 0; i < 7; i++) {
+		AS7341_0_pkt.AS7341_data[i] = AS7341_data[i];
+	}
+
+	for (int i = 7; i < 12; i++) {
+		AS7341_1_pkt.AS7341_data[i-7] = AS7341_data[i];
+	}
+
+	/*-------------------------------------------------------------------------
+	Send packet
+	-------------------------------------------------------------------------*/
+	status = _send_i2c_packet(&AS7341_0_pkt, RPI_I2C_AS7341_PACKET_0_SIZE, ack_packet, timeout);
+
+
+	if (status != HAL_OK) {
+		return SYS_FAIL;
+	}
+
+	memset(&ack_packet, 0, sizeof(ack_packet));
+
+	status = _send_i2c_packet(&AS7341_1_pkt, RPI_I2C_AS7341_PACKET_1_SIZE, ack_packet, timeout);
+
+	if (status != HAL_OK) {
+			return SYS_FAIL;
+	}
+
+	return status;
+}
 /*-----------------------------------------------------------------------------
  *
  * _send_i2c_packet
