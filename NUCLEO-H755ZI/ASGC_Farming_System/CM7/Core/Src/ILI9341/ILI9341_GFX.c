@@ -64,6 +64,24 @@ static uint8_t yBoundary;
 */
 void Display_StartupScreen()
 {
+	// Find the center of the screen
+	uint16_t centerX = ILI9341_SCREEN_WIDTH / 2;
+	uint16_t centerY = ILI9341_SCREEN_HEIGHT / 2;
+
+	// Declare our text and font size
+	const char *Text = "Press the START button";
+	uint8_t fontSize = 3;
+
+	// Find the pixel width and height of our text
+	uint8_t TextPixelWidth = strlen(Text) * fontSize * CHAR_WIDTH;
+	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+
+	// Calculate position to draw text at
+	uint16_t drawX = centerX - (TextPixelWidth);
+	uint16_t drawY = centerY - (TextPixelHeight / 2);
+
+	// Draw the text
+	ILI9341_Draw_Text(Text, drawX, drawY, WHITE, fontSize, BLACK);
 }
 
 /*
@@ -72,6 +90,34 @@ void Display_StartupScreen()
 */
 void Display_EStopScreen()
 {
+		// Find the center of the screen
+	uint16_t centerX = ILI9341_SCREEN_WIDTH / 2;
+	uint16_t centerY = ILI9341_SCREEN_HEIGHT / 2;
+
+	// Declare our text and font size
+	const char *TextLine1 = "E-STOP PRESSED";
+	const char *TextLine2 = "Power Cycle to Reset";
+	uint8_t fontSize = 4;
+
+	// Find the pixel width and height of our first line
+	uint8_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
+	uint8_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
+
+	// Find the pixel width and height of our second line
+	uint8_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
+	uint8_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Calculate where to draw our first line of text
+	uint16_t drawX1 = centerX - (Text1PixelWidth);
+	uint16_t drawY1 = centerY - (Text1PixelHeight);
+
+	// Calculate where to draw our second line of text
+	uint16_t drawX2 = centerX - (Text2PixelWidth);
+	uint16_t drawY2 = centerY + (Text2PixelHeight / 2);
+
+	// Draw the text
+	ILI9341_Draw_Text(TextLine1, drawX1, drawY1, RED, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine2, drawX2, drawY2, WHITE, fontSize, BLACK);
 }
 
 /*
