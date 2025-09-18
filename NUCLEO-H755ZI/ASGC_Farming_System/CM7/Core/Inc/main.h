@@ -177,6 +177,7 @@ void ASGC_System_Startup();
 void ASGC_System_ESTOP();
 
 // TASK FUNCTIONS - These are all the functions that will be registered in Scheduler.c
+SYS_RESULT AHT20_Request_Measurement_TASK();
 SYS_RESULT AHT20_Get_Data_TASK();
 SYS_RESULT SEN0169_Get_Data_TASK();
 SYS_RESULT SEN0244_Get_Data_TASK();

@@ -38,6 +38,7 @@
 #include "FSM.h"
 #include "Scheduler.h"
 #include "VL53L1X_prj.h"
+#include "RPI_I2C.h"
 
 /* USER CODE END Includes */
 
@@ -1013,6 +1014,28 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 /*------------------------------------------------------------------------------
  *
+ * 	AHT20_Request_Measurement_TASK
+ *
+ * 		Scheduler task to request the AHT20 sensor to take a .
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT AHT20_Request_Measurement_TASK() {
+  SYS_RESULT ret_val;
+
+  ret_val = AHT20_Request_Measurement(&hi2c1);
+
+  if (ret_val == SYS_SUCCESS) {
+    // Measurement collection and calculation for AHT20 takes 80ms.
+    Scheduler_Schedule_Task_ms_From_Now(AHT20_GET_DATA_TASK, 80);
+  }
+
+  return ret_val;
+}
+
+/*------------------------------------------------------------------------------
+ *
  * 	AHT20_Get_Data_TASK
  *
  * 		Scheduler task to get data from the AHT20 sensor.
@@ -1024,6 +1047,7 @@ SYS_RESULT AHT20_Get_Data_TASK() {
   AHT20_data = AHT20_Get_Data(&hi2c1);
 
   // Send Data to Raspberry Pi
+  RPI_I2C_Send_AHT20_Pkt(AHT20_data, 2);
 
   // Send Data to Display
 
@@ -1044,6 +1068,7 @@ SYS_RESULT SEN0169_Get_Data_TASK() {
   SEN0169_Measure(&pH_Data);
 
   // Send Data to Raspberry Pi
+  RPI_I2C_Send_SEN0169_Pkt(pH_Data, 2);
 
   // Send Data to Display
 
@@ -1064,6 +1089,7 @@ SYS_RESULT SEN0244_Get_Data_TASK() {
   SEN0244_Measure(&tdsData, AHT20_data.temperature);
 
   // Send Data to Raspberry Pi
+  RPI_I2C_Send_SEN0244_Pkt(tdsData, 2);
 
   // Send Data to Display
 

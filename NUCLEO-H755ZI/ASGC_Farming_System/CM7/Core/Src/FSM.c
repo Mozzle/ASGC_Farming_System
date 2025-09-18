@@ -173,6 +173,7 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
 
     /*-------------------------------------------------------------------------
     Experimentally determined task time to complete, as of commit dedd01f:
+    AHT20_REQUEST_MEASUREMENT_TASK: 
     AHT20_GET_DATA_TASK: ~81ms
     SEN0169_GET_DATA_TASK: ~2ms
     SEN0244_GET_DATA_TASK: ~1ms
@@ -182,10 +183,11 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
     See the 'SW Task Timing' sheet in the ASGC_Automated_Farming_System 
     spreadsheet for a visualization of the task scheduling.
     -------------------------------------------------------------------------*/ 
-    Scheduler_Enable_Task(AHT20_GET_DATA_TASK, 0);
-    Scheduler_Enable_Task(SEN0169_GET_DATA_TASK, 116);
-    Scheduler_Enable_Task(SEN0244_GET_DATA_TASK, 153);
-    Scheduler_Enable_Task(AS7341_GET_DATA_TASK, 189);
+    Scheduler_Enable_Task(AHT20_REQUEST_MEASUREMENT_TASK, 0);
+    Scheduler_Enable_Task(SEN0169_GET_DATA_TASK, 5);
+    Scheduler_Enable_Task(SEN0244_GET_DATA_TASK, 40);
+    Scheduler_Enable_Task(AHT20_GET_DATA_TASK, 81);
+    Scheduler_Enable_Task(AS7341_GET_DATA_TASK, 116);
 
 
     return SYS_SUCCESS;

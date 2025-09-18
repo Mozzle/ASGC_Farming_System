@@ -35,8 +35,8 @@ Raspberry Pi Addresses
 /*-----------------------------------------------------------------------------
 Raspberry Pi Packets
 -----------------------------------------------------------------------------*/
-// All RPI packets are 128 bytes long
-#define RPI_I2C_MAX_PACKET_SIZE 		128
+// All RPI packets are MAX 16 bytes long
+#define RPI_I2C_MAX_PACKET_SIZE 		16
 // Number of attempts to send a packet before giving up
 #define RPI_I2C_NUM_PKT_SEND_ATTEMPTS	3
 
@@ -120,9 +120,9 @@ SEN0169 Packet Definition
 -----------------------------------------------------------------------------*/
 typedef struct RPI_I2C_SEN0169_Packet {
 	RPI_Packet_ID packet_id;
-	uint8_t pad1[3];			// Structs (and most other multi-byte data types) must be aligned on memory addresses
+	uint8_t pad1[3];				// Structs (and most other multi-byte data types) must be aligned on memory addresses
 	SEN0169_pH_Data SEN0169_data;	// that are a multiple of 4. So we add this 2-byte padding after the uint8 and bool to
-								// be explicit about what the data structure looks like.
+									// be explicit about what the data structure looks like.
 } RPI_I2C_SEN0169_Packet_t;
 
 #define RPI_I2C_SEN0169_PACKET_SIZE	sizeof(RPI_I2C_SEN0169_Packet_t)
@@ -132,14 +132,19 @@ SEN0244 Packet Definition
 -----------------------------------------------------------------------------*/
 typedef struct RPI_I2C_SEN0244_Packet {
 	RPI_Packet_ID packet_id;
-	uint8_t pad1[3];			// Structs (and most other multi-byte data types) must be aligned on memory addresses
+	uint8_t pad1[3];				// Structs (and most other multi-byte data types) must be aligned on memory addresses
 	SEN0244_TDS_Data SEN0244_data;	// that are a multiple of 4. So we add this 2-byte padding after the uint8 and bool to
-								// be explicit about what the data structure looks like.
+									// be explicit about what the data structure looks like.
 } RPI_I2C_SEN0244_Packet_t;
 
 #define RPI_I2C_SEN0244_PACKET_SIZE	sizeof(RPI_I2C_SEN0244_Packet_t)
 
+/*-----------------------------------------------------------------------------
+This pragma directive will forcibly pack the following packets, to remove the
+need for byte padding
+-----------------------------------------------------------------------------*/
 #pragma pack(push, 1)
+
 /*-----------------------------------------------------------------------------
 AS7341, first Packet Definition
 -----------------------------------------------------------------------------*/
@@ -164,7 +169,6 @@ typedef struct RPI_I2C_AS7341_Packet_1 {
 
 #pragma pack(pop)
 
-_Static_assert(sizeof(RPI_I2C_AS7341_Packet_0_t) <= 16, "Packet too large");
 /*-----------------------------------------------------------------------------
 ACK Packet Definition
 -----------------------------------------------------------------------------*/
@@ -175,6 +179,21 @@ typedef struct RPI_I2C_ACK_Packet {
 
 #define RPI_I2C_ACK_PACKET_SIZE	sizeof(RPI_I2C_ACK_Packet_t)
 
+/*-----------------------------------------------------------------------------
+PACKET SIZE COMPILE-TIME ASSERTS
+If any of the following comparisons evaluate to false, a compile error will be
+thrown.
+-----------------------------------------------------------------------------*/
+_Static_assert( (RPI_I2C_GCODE_0_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_GCODE_1_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_GCODE_2_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_GCODE_3_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_GCODE_4_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_AHT20_PACKET_SIZE 		<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_SEN0169_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_SEN0244_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_AS7341_PACKET_0_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_AS7341_PACKET_1_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
 
 /*-----------------------------------------------------------------------------
 Function Prototypes

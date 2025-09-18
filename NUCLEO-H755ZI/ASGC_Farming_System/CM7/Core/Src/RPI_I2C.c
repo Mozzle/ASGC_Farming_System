@@ -18,7 +18,6 @@ warning: passing argument 1 of '_send_i2c_packet' from incompatible pointer type
 #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 
 #include "RPI_I2C.h"
-
 #include <string.h>
 
 extern I2C_HandleTypeDef hi2c1;
@@ -162,7 +161,9 @@ SYS_RESULT RPI_I2C_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 }
 
 SYS_RESULT RPI_I2C_Send_AHT20_Pkt(struct AHT20_Data AHT20_data, uint32_t timeout) {
-
+	/*-------------------------------------------------------------------------
+	Local Variables
+	-------------------------------------------------------------------------*/
 	RPI_I2C_AHT20_Packet_t aht20_pkt;
 	RPI_I2C_ACK_Packet_t ack_packet;
 	HAL_StatusTypeDef status;
@@ -193,7 +194,9 @@ SYS_RESULT RPI_I2C_Send_AHT20_Pkt(struct AHT20_Data AHT20_data, uint32_t timeout
 }
 
 SYS_RESULT RPI_I2C_Send_SEN0169_Pkt(SEN0169_pH_Data SEN0169_data, uint32_t timeout) {
-
+	/*-------------------------------------------------------------------------
+	Local Variables
+	-------------------------------------------------------------------------*/
 	RPI_I2C_SEN0169_Packet_t SEN0169_pkt;
 	RPI_I2C_ACK_Packet_t ack_packet;
 	HAL_StatusTypeDef status;
@@ -224,7 +227,9 @@ SYS_RESULT RPI_I2C_Send_SEN0169_Pkt(SEN0169_pH_Data SEN0169_data, uint32_t timeo
 }
 
 SYS_RESULT RPI_I2C_Send_SEN0244_Pkt(SEN0244_TDS_Data SEN0244_data, uint32_t timeout) {
-
+	/*-------------------------------------------------------------------------
+	Local Variables
+	-------------------------------------------------------------------------*/
 	RPI_I2C_SEN0244_Packet_t SEN0244_pkt;
 	RPI_I2C_ACK_Packet_t ack_packet;
 	HAL_StatusTypeDef status;
@@ -253,9 +258,10 @@ SYS_RESULT RPI_I2C_Send_SEN0244_Pkt(SEN0244_TDS_Data SEN0244_data, uint32_t time
 	return status;
 }
 
-//uint16_t AS7341_Values[12];
 SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
-
+	/*-------------------------------------------------------------------------
+	Local Variables
+	-------------------------------------------------------------------------*/
 	RPI_I2C_AS7341_Packet_0_t AS7341_0_pkt;
 	RPI_I2C_AS7341_Packet_1_t AS7341_1_pkt;
 	RPI_I2C_ACK_Packet_t ack_packet;
@@ -273,11 +279,11 @@ SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
 	-------------------------------------------------------------------------*/
 	AS7341_0_pkt.packet_id = RPI_AS7341_0_PKT_ID;
 	AS7341_1_pkt.packet_id = RPI_AS7341_1_PKT_ID;
-	for (int i = 0; i < 7; i++) {
+	for (uint8_t i = 0; i < 7; i++) {
 		AS7341_0_pkt.AS7341_data[i] = AS7341_data[i];
 	}
 
-	for (int i = 7; i < 12; i++) {
+	for (uint8_t i = 7; i < 12; i++) {
 		AS7341_1_pkt.AS7341_data[i-7] = AS7341_data[i];
 	}
 

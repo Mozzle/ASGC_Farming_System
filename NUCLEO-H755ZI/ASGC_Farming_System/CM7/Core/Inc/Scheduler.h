@@ -55,11 +55,13 @@ typedef struct Scheduler_Task{
 
 typedef uint8_t Scheduler_Task_ID_t;
 enum {
+	AHT20_REQUEST_MEASUREMENT_TASK,
 	AHT20_GET_DATA_TASK,
 	SEN0169_GET_DATA_TASK,
 	SEN0244_GET_DATA_TASK,
 	AS7341_GET_DATA_TASK,
 	CNC_DISPENSE_SEEDS_TASK,
+
 	NUM_SCHEDULER_TASKS
 };
 
@@ -73,6 +75,7 @@ void Scheduler_Disable_Task(Scheduler_Task_ID_t task_id);
 void Scheduler_Set_Task_Interval(Scheduler_Task_ID_t task_id, uint32_t interval_ms);
 void Scheduler_Set_Task_Function(Scheduler_Task_ID_t task_id, SYS_RESULT (*task_function)());
 void Scheduler_Set_Task_Failure_Handler(Scheduler_Task_ID_t task_id, SYS_RESULT (*failure_handler)(struct Scheduler_Task*));
+void Scheduler_Schedule_Task_ms_From_Now(Scheduler_Task_ID_t task_id, uint32_t ms_from_now);
 
 
 #endif /* INC_SCHEDULER_H_ */

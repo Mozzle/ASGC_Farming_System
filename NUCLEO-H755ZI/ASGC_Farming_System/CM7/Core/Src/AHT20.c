@@ -48,11 +48,49 @@ bool AHT20_Init(I2C_HandleTypeDef *hi2c, uint32_t timeout) {
 
 /*-----------------------------------------------------------------------------
  *
+ * 		AHT20_Request_Measurement
+ *
+ * 		Sends a command to the AHT20 module to begin the measurement and
+ * 		conversion process. NOTE: this process takes ~80ms before a measurement
+ * 		is ready to be read.
+ * 		AHT20_Get_Data() must be called >80ms after this function.
+ * 
+ ----------------------------------------------------------------------------*/
+SYS_RESULT AHT20_Request_Measurement(I2C_HandleTypeDef *hi2c) {
+	HAL_StatusTypeDef ret;	// I2C Receipt Status
+	uint32_t timeout = 2;	// I2C Timeout
+	uint8_t outMsg[3] = {AHT20_MEASURE_TRIGGER_REG, 0x33, 0x00}; // Take Measurement Command
+
+	// If AHT20 is disabled, set invalid values and return
+	if (AHT20_ENABLED == SYS_FEATURE_DISABLED) {
+		return SYS_SUCCESS;
+	}
+
+	// If AHT20 is not initialized, return
+	if (!AHT20_Initialized) {
+		return SYS_NOT_INITIALIZED;
+	}
+
+	// Send Take Measurement Command
+	ret = HAL_I2C_Master_Transmit(hi2c, AHT20_I2C_ADDR_WRITE, outMsg, 3, timeout);
+
+	// If failed to send, set valid byte
+	if (ret != HAL_OK) {
+		return SYS_MEASUREMENT_SEND_FAIL;
+	}
+
+	return SYS_SUCCESS;
+}
+
+/*-----------------------------------------------------------------------------
+ *
  * 		AHT20_Get_Data
  *
- * 		Returns a struct containing the temperature and relative humidity data
- * 		from the AHT20 module. NOTE: This is currently a blocking function that
- * 		will block execution for about 85ms
+ * 		Gets the most recent measurement data from the AHT20 module. Returns a
+ * 		struct containing the temperature and relative humidity data
+ * 		from the AHT20 module. NOTE: AHT20_Request_Data must be called at
+ * 		least 80ms prior to this function, to receive a real, updated
+ * 		measurement.
  *
  ----------------------------------------------------------------------------*/
 
@@ -60,11 +98,10 @@ struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c) {
 	HAL_StatusTypeDef ret;	// I2C Receipt Status
 	uint32_t timeout;		// I2C Timeout
 	uint8_t inMsg[7];		// Message to be received
-	uint8_t outMsg[3] = {AHT20_MEASURE_TRIGGER_REG, 0x33, 0x00}; // Take Measurement Command
 	uint32_t rawData;
 	struct AHT20_Data newData;
 
-	timeout = 2000;
+	timeout = 2;
 	newData.temperature = 	0x0;
 	newData.humidity = 		0x0;
 	newData.validity = 		SYS_INVALID;
@@ -82,18 +119,6 @@ struct AHT20_Data AHT20_Get_Data(I2C_HandleTypeDef *hi2c) {
 		newData.validity = SYS_NOT_INITIALIZED;
 		return newData;
 	}
-
-	// Send Take Measurement Command
-	ret = HAL_I2C_Master_Transmit(hi2c, AHT20_I2C_ADDR_WRITE, outMsg, 3, timeout);
-
-	// If failed to send, set valid byte
-	if (ret != HAL_OK) {
-		newData.validity = SYS_MEASUREMENT_SEND_FAIL;
-		return newData;
-	}
-
-	// HAL Delay for now, will maybe add scheduling at some point
-	HAL_Delay(80);
 
 	// Fetch Measurement
 	ret = HAL_I2C_Master_Receive(hi2c, AHT20_I2C_ADDR_READ, inMsg, 7, timeout);

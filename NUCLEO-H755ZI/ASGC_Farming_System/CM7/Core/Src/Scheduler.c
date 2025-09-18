@@ -23,6 +23,14 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
  *
  ----------------------------------------------------------------------------*/
  void Scheduler_Init() {
+	// AHT20 Data Request Task
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].enabled = false;
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].interval_ms = AHT20_TASK_DEFAULT_INTERVAL_MS;
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].last_run_timestamp = 0;
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].num_consecutive_failures = 0;
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].task_function = AHT20_Request_Measurement_TASK;
+	Task_List[AHT20_REQUEST_MEASUREMENT_TASK].failure_handler = NULL; // Add failure handler later
+
 	// AHT20 Data Retrieval Task
 	Task_List[AHT20_GET_DATA_TASK].enabled = false;
 	Task_List[AHT20_GET_DATA_TASK].interval_ms = AHT20_TASK_DEFAULT_INTERVAL_MS;
@@ -139,6 +147,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 		if (newLastRunTime > curTime) {
 			newLastRunTime = ms_delay;
 		}
+		// Add delay
 		else {
 			newLastRunTime = newLastRunTime + ms_delay;
 		}
@@ -212,5 +221,30 @@ void Scheduler_Disable_Task(Scheduler_Task_ID_t task_id) {
 	// If the task ID is valid
 	if (task_id < NUM_SCHEDULER_TASKS) {
 		Task_List[task_id].failure_handler = failure_handler;
+	}
+ }
+
+  /*-----------------------------------------------------------------------------
+ *
+ * 		Scheduler_Schedule_Task_ms_From_Now()
+ *
+ * 		Schedule a task to run ms_from_now.
+ *
+ ----------------------------------------------------------------------------*/
+ void Scheduler_Schedule_Task_ms_From_Now(Scheduler_Task_ID_t task_id, uint32_t ms_from_now) {
+	uint64_t curTime = getTimestamp();
+
+	// If task ID is valid
+	if (task_id < NUM_SCHEDULER_TASKS) {
+
+		// protect from underflow
+		if ((curTime - Task_List[task_id].interval_ms) > curTime) {
+			return;
+		} 
+
+		Task_List[task_id].enabled = true;
+
+		// Set next run to be ms_from_now
+		Task_List[task_id].last_run_timestamp = curTime - Task_List[task_id].interval_ms + ms_from_now;
 	}
  }
