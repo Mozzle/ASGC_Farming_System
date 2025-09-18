@@ -64,24 +64,36 @@ static uint8_t yBoundary;
 */
 void Display_StartupScreen()
 {
-	// Find the center of the screen
-	uint16_t centerX = ILI9341_SCREEN_WIDTH / 2;
-	uint16_t centerY = ILI9341_SCREEN_HEIGHT / 2;
-
 	// Declare our text and font size
-	const char *Text = "Press the START button";
-	uint8_t fontSize = 3;
+	const char *TextLine1 = "Press the";
+	const char *TextLine2 = "START Button";
+	uint8_t fontSize = 4;
 
-	// Find the pixel width and height of our text
-	uint8_t TextPixelWidth = strlen(Text) * fontSize * CHAR_WIDTH;
-	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+	// Find the pixel width and height of our first line
+	uint16_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
+	uint16_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
 
-	// Calculate position to draw text at
-	uint16_t drawX = centerX - (TextPixelWidth);
-	uint16_t drawY = centerY - (TextPixelHeight / 2);
+	// Find the pixel width and height of our second line
+	uint16_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
+	uint16_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Calculate where to draw our first line of text
+	uint16_t drawX1 = (ILI9341_SCREEN_WIDTH - Text1PixelWidth) / 2;
+	uint16_t drawY1 = (ILI9341_SCREEN_HEIGHT - Text1PixelHeight) / 2;
+
+	// Calculate where to draw our second line of text
+	uint16_t drawX2 = (ILI9341_SCREEN_WIDTH - Text2PixelWidth) / 2;
+	uint16_t drawY2 = drawY1 + Text1PixelHeight + 6; // 6 pixel gap between lines
+
+	// Clamp X and Y to 0 if we get negative calculations
+	drawX1 = (drawX1 > ILI9341_SCREEN_WIDTH) ? 0 : drawX1;
+	drawX2 = (drawX2 > ILI9341_SCREEN_WIDTH) ? 0 : drawX2;
+	drawY1 = (drawY1 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY1;
+	drawY2 = (drawY2 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY2;
 
 	// Draw the text
-	ILI9341_Draw_Text(Text, drawX, drawY, WHITE, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine1, drawX1, drawY1, WHITE, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine2, drawX2, drawY2, WHITE, fontSize, BLACK);
 }
 
 /*
@@ -90,34 +102,48 @@ void Display_StartupScreen()
 */
 void Display_EStopScreen()
 {
-		// Find the center of the screen
-	uint16_t centerX = ILI9341_SCREEN_WIDTH / 2;
-	uint16_t centerY = ILI9341_SCREEN_HEIGHT / 2;
-
 	// Declare our text and font size
-	const char *TextLine1 = "E-STOP PRESSED";
-	const char *TextLine2 = "Power Cycle to Reset";
+	const char *TextLine1 = "ESTOP Pressed";
+	const char *TextLine2 = "Power Cycle";
+	const char *TextLine3 = "to Reset";
 	uint8_t fontSize = 4;
 
 	// Find the pixel width and height of our first line
-	uint8_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
-	uint8_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
+	uint16_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
+	uint16_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
 
 	// Find the pixel width and height of our second line
-	uint8_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
-	uint8_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+	uint16_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
+	uint16_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Find the pixel width and height of our third line
+	uint16_t Text3PixelWidth = strlen(TextLine3) * fontSize * CHAR_WIDTH;
+	uint16_t Text3PixelHeight = Text1PixelHeight; // Same height as first line
 
 	// Calculate where to draw our first line of text
-	uint16_t drawX1 = centerX - (Text1PixelWidth);
-	uint16_t drawY1 = centerY - (Text1PixelHeight);
+	uint16_t drawX1 = (ILI9341_SCREEN_WIDTH - Text1PixelWidth) / 2;
+	uint16_t drawY1 = (ILI9341_SCREEN_HEIGHT - Text1PixelHeight) / 2;
 
 	// Calculate where to draw our second line of text
-	uint16_t drawX2 = centerX - (Text2PixelWidth);
-	uint16_t drawY2 = centerY + (Text2PixelHeight / 2);
+	uint16_t drawX2 = (ILI9341_SCREEN_WIDTH - Text2PixelWidth) / 2;
+	uint16_t drawY2 = drawY1 + Text1PixelHeight + 6; // 6 pixel gap between lines
+
+	// Calculate where to draw our third line of text
+	uint16_t drawX3 = (ILI9341_SCREEN_WIDTH - Text3PixelWidth) / 2;
+	uint16_t drawY3 = drawY2 + Text2PixelHeight + 6; // 6 pixel gap between lines
+
+	// Clamp X and Y to 0 if we get negative calculations
+	drawX1 = (drawX1 > ILI9341_SCREEN_WIDTH) ? 0 : drawX1;
+	drawX2 = (drawX2 > ILI9341_SCREEN_WIDTH) ? 0 : drawX2;
+	drawY1 = (drawY1 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY1;
+	drawY2 = (drawY2 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY2;
+	drawX3 = (drawX3 > ILI9341_SCREEN_WIDTH) ? 0 : drawX3;
+	drawY3 = (drawY3 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY3;
 
 	// Draw the text
 	ILI9341_Draw_Text(TextLine1, drawX1, drawY1, RED, fontSize, BLACK);
 	ILI9341_Draw_Text(TextLine2, drawX2, drawY2, WHITE, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine3, drawX3, drawY3, WHITE, fontSize, BLACK);
 }
 
 /*
