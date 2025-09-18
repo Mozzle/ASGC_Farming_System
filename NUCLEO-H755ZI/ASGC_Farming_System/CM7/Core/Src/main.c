@@ -1083,7 +1083,16 @@ SYS_RESULT SEN0244_Get_Data_TASK() {
 ------------------------------------------------------------------------------*/
 SYS_RESULT AS7341_Get_Data_TASK() {
   Adafruit_AS7341_ReadAllChannels();
+
+  /*----------------------------------------------------------------------------
+  Use GCC Pragmas to suppress the following warning:
+  warning: passing argument 1 of 'Adafruit_AS7341_getAllChannels' from
+  incompatible pointer type
+  ----------------------------------------------------------------------------*/
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
   Adafruit_AS7341_getAllChannels(&AS7341_Values);
+  #pragma GCC diagnostic pop
 
   // Update DLI calculation
 

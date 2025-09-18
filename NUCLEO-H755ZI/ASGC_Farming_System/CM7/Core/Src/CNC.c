@@ -290,4 +290,5 @@ SYS_RESULT CNC_Dispense_Seeds() {
 	// Dwell for a second for seeds to finish falling
 	// Send movement command to next hole.
 	// Iterate through these steps for all 40 holes.
+	return SYS_SUCCESS;
 }

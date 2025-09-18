@@ -10,6 +10,13 @@
  *
 -----------------------------------------------------------------------------*/
 
+/*-----------------------------------------------------------------------------
+Use GCC Pragmas to suppress the following warning:
+warning: passing argument 1 of '_send_i2c_packet' from incompatible pointer type
+-----------------------------------------------------------------------------*/
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+
 #include "RPI_I2C.h"
 
 #include <string.h>
@@ -313,6 +320,7 @@ SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
  * 		NOTE: No individual packet should be longer than 16 bytes.
  *
 -----------------------------------------------------------------------------*/
+
 static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_ACK_Packet_t ackPacket, uint32_t timeout ) {
 	HAL_StatusTypeDef status;
 	uint8_t i;
@@ -342,3 +350,5 @@ static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetS
 	return status;
 
 }
+#pragma GCC diagnostic pop
+
