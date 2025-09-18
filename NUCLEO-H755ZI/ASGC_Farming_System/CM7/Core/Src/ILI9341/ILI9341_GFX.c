@@ -482,7 +482,7 @@ void ILI9341_Draw_Filled_Rectangle_Coord(uint16_t X0, uint16_t Y0, uint16_t X1, 
 
 /*Draws a character (fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
-void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour) 
+void ILI9341_Draw_Char(char Character, uint16_t X, uint16_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour) 
 {
 		uint8_t 	function_char;
     uint8_t 	i,j;
@@ -521,7 +521,7 @@ void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, ui
 
 /*Draws an array of characters (MAX STRING SIZE OF 13 USUALLY -- fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
-void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
+void ILI9341_Draw_Text(const char* Text, uint16_t X, uint16_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
 {
 	// Calculate max characters we can fit on the screen
 	uint8_t maxCharacters = (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)));
@@ -544,7 +544,7 @@ void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, 
 	const char* iter = drawText;
 	while (*iter) {
 		// Boundary check for x-axis
-		if (X + CHAR_WIDTH * Size > ILI9341_SCREEN_WIDTH) {
+		if (X + CHAR_WIDTH * Size - 1 > ILI9341_SCREEN_WIDTH) {
 			break;
 		}
 
