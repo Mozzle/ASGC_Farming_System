@@ -523,36 +523,39 @@ void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, ui
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
 void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
 {
-	// Typical formula for maxChars would be:
-	// (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)))
-	// However, currently there is a screen clipping issue which I can't diagnose yet
-	// For the time being, we will "reduce" the screen dimensions by 50 pixels until this is resolved
-	uint16_t ScreenWidthForDrawing = ILI9341_SCREEN_WIDTH;
+	// Calculate max characters we can fit on the screen
+	uint8_t maxCharacters = (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)));
+	char* drawTextBuf = NULL;
+	const char* drawText = Text;
 
-	// Boundary check on x-axis
-	uint8_t maxCharacters = (floor((ScreenWidthForDrawing - X) / (Size * CHAR_WIDTH)));
-	char* drawText = Text;
+	// Truncation check
 	if (strlen(Text) > maxCharacters) {
-		// Allocate memory to clear previous text array
-		drawText = malloc(maxCharacters + 1);
-		if (drawText == NULL) {
-			// Memory allocation failed, exit function early
-			return;
+		drawTextBuf = malloc(maxCharacters + 1);
+		if (drawTextBuf == NULL) {
+			return; // Exit if memory allocation failed
 		}
 
-		// Copy the previous text array up to the maximum allowed characters
-		strncpy(drawText, Text, maxCharacters);
-        drawText[maxCharacters] = '\0';
+		// Fill the drawTextBuf with the truncated version of Text
+		strncpy(drawTextBuf, Text, maxCharacters);
+		drawTextBuf[maxCharacters] = '\0'; // Null-terminator, my friend
+		drawText = drawTextBuf;
 	}
 
-    while (*drawText) {
-        ILI9341_Draw_Char(*drawText++, X, Y, Colour, Size, Background_Colour);
-        X += CHAR_WIDTH*Size;
-    }
+	const char* iter = drawText;
+	while (*iter) {
+		// Boundary check for x-axis
+		if (X + CHAR_WIDTH * Size > ILI9341_SCREEN_WIDTH) {
+			break;
+		}
 
-	// Free any previously allocated memory (no memory leaks allowed!)
-	if (drawText != Text) {
-		free(drawText);
+		// Draw the character, move to next position
+		ILI9341_Draw_Char(*iter++, X, Y, Colour, Size, Background_Colour);
+		X += CHAR_WIDTH * Size;
+	}
+
+	// After we've drawn everything, free the buffer we allocated previously (if we did use it)
+	if (drawTextBuf != NULL) {
+		free(drawTextBuf);
 	}
 }
 

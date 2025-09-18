@@ -1,4 +1,3 @@
-
 //	MIT License
 //
 //	Copyright (c) 2017 Matej Artnak
@@ -482,3 +481,10 @@ ILI9341_Set_Address(X, Y, X, Y + Height - 1);
 ILI9341_Draw_Colour_Burst(Colour, Height);
 }
 
+// Debug: Draw vertical lines at leftmost and rightmost columns
+void ILI9341_Draw_Debug_Borders(uint16_t colour) {
+	// Draw leftmost column
+	ILI9341_Draw_Vertical_Line(0, 0, LCD_HEIGHT, colour);
+	// Draw rightmost column
+	ILI9341_Draw_Vertical_Line(LCD_WIDTH - 1, 0, LCD_HEIGHT, colour);
+}
