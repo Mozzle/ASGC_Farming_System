@@ -527,7 +527,7 @@ void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, 
 	// (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)))
 	// However, currently there is a screen clipping issue which I can't diagnose yet
 	// For the time being, we will "reduce" the screen dimensions by 50 pixels until this is resolved
-	uint16_t ScreenWidthForDrawing = ILI9341_SCREEN_WIDTH - 50;
+	uint16_t ScreenWidthForDrawing = ILI9341_SCREEN_WIDTH;
 
 	// Boundary check on x-axis
 	uint8_t maxCharacters = (floor((ScreenWidthForDrawing - X) / (Size * CHAR_WIDTH)));

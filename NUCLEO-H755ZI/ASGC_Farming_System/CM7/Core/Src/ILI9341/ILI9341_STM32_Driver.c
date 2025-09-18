@@ -417,8 +417,8 @@ HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);
 /*Sets address (entire screen) and Sends Height*Width ammount of colour information to LCD*/
 void ILI9341_Fill_Screen(uint16_t Colour)
 {
-ILI9341_Set_Address(0,0,LCD_WIDTH,LCD_HEIGHT);	
-ILI9341_Draw_Colour_Burst(Colour, LCD_WIDTH*LCD_HEIGHT);	
+ILI9341_Set_Address(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
+ILI9341_Draw_Colour_Burst(Colour, LCD_WIDTH * LCD_HEIGHT);
 }
 
 //DRAW PIXEL AT XY POSITION WITH SELECTED COLOUR
@@ -429,47 +429,16 @@ ILI9341_Draw_Colour_Burst(Colour, LCD_WIDTH*LCD_HEIGHT);
 //
 void ILI9341_Draw_Pixel(uint16_t X,uint16_t Y,uint16_t Colour) 
 {
-if((X >=LCD_WIDTH) || (Y >=LCD_HEIGHT)) return;	//OUT OF BOUNDS!
-	
-//ADDRESS
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_RESET);	
+if ((X >= LCD_WIDTH) || (Y >= LCD_HEIGHT)) return; // OUT OF BOUNDS!
+
+// Set address window to a single pixel (X,Y)
+ILI9341_Set_Address(X, Y, X, Y);
+
+// Write color
+unsigned char Temp_Buffer2[2] = {Colour >> 8, Colour};
 HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);
-ILI9341_SPI_Send(0x2A);
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_SET);	
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);		
-
-//XDATA
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);	
-unsigned char Temp_Buffer[4] = {X>>8,X, (X+1)>>8, (X+1)};
-HAL_SPI_Transmit(HSPI_INSTANCE, Temp_Buffer, 4, 1);
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);
-
-//ADDRESS
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_RESET);	
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);	
-ILI9341_SPI_Send(0x2B);
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_SET);			
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);			
-
-//YDATA
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);
-unsigned char Temp_Buffer1[4] = {Y>>8,Y, (Y+1)>>8, (Y+1)};
-HAL_SPI_Transmit(HSPI_INSTANCE, Temp_Buffer1, 4, 1);
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);
-
-//ADDRESS	
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_RESET);	
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);	
-ILI9341_SPI_Send(0x2C);
-HAL_GPIO_WritePin(LCD_DC_PORT, LCD_DC_PIN, GPIO_PIN_SET);			
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);			
-
-//COLOUR	
-HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_RESET);
-unsigned char Temp_Buffer2[2] = {Colour>>8, Colour};
 HAL_SPI_Transmit(HSPI_INSTANCE, Temp_Buffer2, 2, 1);
 HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);
-	
 }
 
 //DRAW RECTANGLE OF SET SIZE AND HEIGTH AT X and Y POSITION WITH CUSTOM COLOUR
@@ -480,40 +449,36 @@ HAL_GPIO_WritePin(LCD_CS_PORT, LCD_CS_PIN, GPIO_PIN_SET);
 
 void ILI9341_Draw_Rectangle(uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, uint16_t Colour)
 {
-if((X >=LCD_WIDTH) || (Y >=LCD_HEIGHT)) return;
-if((X+Width-1)>=LCD_WIDTH)
-	{
-		Width=LCD_WIDTH-X;
-	}
-if((Y+Height-1)>=LCD_HEIGHT)
-	{
-		Height=LCD_HEIGHT-Y;
-	}
-ILI9341_Set_Address(X, Y, X+Width-1, Y+Height-1);
-ILI9341_Draw_Colour_Burst(Colour, Height*Width);
+if ((X >= LCD_WIDTH) || (Y >= LCD_HEIGHT)) return;
+if ((X + Width - 1) >= LCD_WIDTH) {
+	Width = LCD_WIDTH - X;
+}
+if ((Y + Height - 1) >= LCD_HEIGHT) {
+	Height = LCD_HEIGHT - Y;
+}
+ILI9341_Set_Address(X, Y, X + Width - 1, Y + Height - 1);
+ILI9341_Draw_Colour_Burst(Colour, Height * Width);
 }
 
 //DRAW LINE FROM X,Y LOCATION to X+Width,Y LOCATION
 void ILI9341_Draw_Horizontal_Line(uint16_t X, uint16_t Y, uint16_t Width, uint16_t Colour)
 {
-if((X >=LCD_WIDTH) || (Y >=LCD_HEIGHT)) return;
-if((X+Width-1)>=LCD_WIDTH)
-	{
-		Width=LCD_WIDTH-X;
-	}
-ILI9341_Set_Address(X, Y, X+Width-1, Y);
+if ((X >= LCD_WIDTH) || (Y >= LCD_HEIGHT)) return;
+if ((X + Width - 1) >= LCD_WIDTH) {
+	Width = LCD_WIDTH - X;
+}
+ILI9341_Set_Address(X, Y, X + Width - 1, Y);
 ILI9341_Draw_Colour_Burst(Colour, Width);
 }
 
 //DRAW LINE FROM X,Y LOCATION to X,Y+Height LOCATION
 void ILI9341_Draw_Vertical_Line(uint16_t X, uint16_t Y, uint16_t Height, uint16_t Colour)
 {
-if((X >=LCD_WIDTH) || (Y >=LCD_HEIGHT)) return;
-if((Y+Height-1)>=LCD_HEIGHT)
-	{
-		Height=LCD_HEIGHT-Y;
-	}
-ILI9341_Set_Address(X, Y, X, Y+Height-1);
+if ((X >= LCD_WIDTH) || (Y >= LCD_HEIGHT)) return;
+if ((Y + Height - 1) >= LCD_HEIGHT) {
+	Height = LCD_HEIGHT - Y;
+}
+ILI9341_Set_Address(X, Y, X, Y + Height - 1);
 ILI9341_Draw_Colour_Burst(Colour, Height);
 }
 
