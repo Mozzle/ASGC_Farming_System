@@ -52,32 +52,42 @@
 #define HORIZONTAL_IMAGE	0
 #define VERTICAL_IMAGE		1
 
-// Sensor values
-static uint32_t temperatureValue = 9310; //Default to 93.1 F
-static _Bool pumpStatusValue = true; //Default to ONLINE
-static uint16_t dliValue = 0; //Default to 0%
-static char* uptimeValue = "0d 0h 0m"; //Default to 0d 0h 0m 
-static uint32_t waterTDSValue = 75000; //Default to 750.00 ppm
-static uint16_t waterpHValue = 660; //Default to 6.6
-static uint16_t humidityValue = 10000; //Default to 100.00%
+#define DASHBOARD_STARTING_X_POS            5
+#define DASHBOARD_TEXT_FONT_SIZE            3
+#define DASHBOARD_VALUE_FONT_SIZE           2
+#define DASHBOARD_TEXT_FONT_HEIGHT_PIXELS   (CHAR_HEIGHT * DASHBOARD_TEXT_FONT_SIZE)
+#define DASHBOARD_SCALING_FACTOR            100
+
+#define DASHBOARD_DISPLAY_VALUE_COLOR       WHITE
+
+enum {
+    DASHBOARD_PAGE_TDS_PH_HUMIDITY,
+    DASHBOARD_PAGE_TEMP_PUMP_DLI,
+    //...
+    NUM_DASHBOARD_PAGES,
+    DASHBOARD_NOT_ACTIVE = NUM_DASHBOARD_PAGES
+};
+typedef uint8_t Dashboard_page_t;
 
 // Aeroponics Project Drawing Methods
 void Display_StartupScreen();
 void Display_EStopScreen();
-void Display_Dashboard(uint8_t page);
+void Display_Dashboard();
 void Write_Logo();
 
 /*
     Aeroponics Project Update Sensor Value Methods.
     Any values expected to be a decimal will be uint16_t or uint32_t and require a scaling factor of 100 (i.e. 500.43 F = 50043)
 */
-void ILI9341_Update_DLI(uint16_t dliValueNew);
-void ILI9341_Update_Temperature(uint32_t temperatureValueNew);
-void ILI9341_Update_Humidity(uint16_t humidityValueNew);
-void ILI9341_Update_WaterpH(uint16_t pHValueNew);
-void ILI9341_Update_WaterTDS(uint32_t tdsValueNew);
-void ILI9341_Update_Uptime(char* uptimeStringNew);
+void ILI9341_Update_DLI(float dliValueNew);
+void ILI9341_Update_Temperature(float temperatureValueNew);
+void ILI9341_Update_Humidity(float humidityValueNew);
+void ILI9341_Update_WaterpH(double pHValueNew);
+void ILI9341_Update_WaterTDS(double tdsValueNew);
+void ILI9341_Update_Uptime(uint64_t msSinceStart);
 void ILI9341_Update_PumpStatus(_Bool isPumpOnlineNew);
+Dashboard_page_t ILI9431_Get_Current_Dashboard_Page();
+void ILI9431_Set_Current_Dashboard_Page(Dashboard_page_t page);
 
 void ILI9341_Draw_Hollow_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);
 void ILI9341_Draw_Filled_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour);

@@ -69,4 +69,6 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_TCF();
 SYS_RESULT FSM_State_CNC_HOMING_SAF();
 SYS_RESULT FSM_State_CNC_HOMING_TCF();
 
+uint64_t FSM_GetSystemUptime();
+
 #endif /* INC_FSM_H */

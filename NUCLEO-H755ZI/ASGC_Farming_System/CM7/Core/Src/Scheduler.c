@@ -70,6 +70,20 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[CNC_DISPENSE_SEEDS_TASK].num_consecutive_failures = 0;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].task_function = CNC_Dispense_Seeds_TASK;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].failure_handler = NULL; // Add failure handler later
+
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].enabled = false;
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].interval_ms = ILI9341_TASK_DEFAULT_INTERVAL_MS;
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].last_run_timestamp = 0;
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].num_consecutive_failures = 0;
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].task_function = ILI9341_Change_Dashboard_Screen_TASK;
+	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].failure_handler = NULL; // Add failure handler later
+
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].enabled = false;
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].interval_ms = ILI9341_UPDATE_UPTIME_INTERVAL_MS;
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].last_run_timestamp = 0;
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].num_consecutive_failures = 0;
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].task_function = ILI9341_Update_Uptime_TASK;
+	Task_List[ILI9341_UPDATE_UPTIME_TASK].failure_handler = NULL; // Add failure handler later
  }
 
 /*-----------------------------------------------------------------------------

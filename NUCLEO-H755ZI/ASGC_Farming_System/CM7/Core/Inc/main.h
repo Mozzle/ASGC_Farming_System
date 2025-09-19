@@ -183,6 +183,8 @@ SYS_RESULT SEN0169_Get_Data_TASK();
 SYS_RESULT SEN0244_Get_Data_TASK();
 SYS_RESULT AS7341_Get_Data_TASK();
 SYS_RESULT CNC_Dispense_Seeds_TASK();
+SYS_RESULT ILI9341_Change_Dashboard_Screen_TASK();
+SYS_RESULT ILI9341_Update_Uptime_TASK();
 
 /* USER CODE END Private defines */
 

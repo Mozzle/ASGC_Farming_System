@@ -219,8 +219,8 @@ Error_Handler();
   SEN0169_Init();
   SEN0244_Init();
   GPIO_switching_intf_Init();
-  //Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
-  //VL53L1X_prj_Init(Dev, &hi2c1);
+  Adafruit_AS7341_begin(AS7341_I2CADDR_DEFAULT, &hi2c1, 0);
+  VL53L1X_prj_Init(Dev, &hi2c1);
   ILI9341_Init();
 
   if (CNC_Init() == SYS_SUCCESS) {
@@ -1047,8 +1047,9 @@ SYS_RESULT AHT20_Get_Data_TASK() {
 
   // Send Data to Raspberry Pi
   RPI_I2C_Send_AHT20_Pkt(AHT20_data, 2);
-
   // Send Data to Display
+  ILI9341_Update_Temperature(AHT20_data.temperature);
+  ILI9341_Update_Humidity(AHT20_data.humidity);
 
   return SYS_SUCCESS;
 }
@@ -1070,6 +1071,7 @@ SYS_RESULT SEN0169_Get_Data_TASK() {
   RPI_I2C_Send_SEN0169_Pkt(pH_Data, 2);
 
   // Send Data to Display
+  ILI9341_Update_WaterpH(pH_Data);
 
   return SYS_SUCCESS;
 }
@@ -1091,6 +1093,7 @@ SYS_RESULT SEN0244_Get_Data_TASK() {
   RPI_I2C_Send_SEN0244_Pkt(tdsData, 2);
 
   // Send Data to Display
+  ILI9341_Update_WaterTDS(tdsData);
 
   return SYS_SUCCESS;
 }
@@ -1139,6 +1142,44 @@ SYS_RESULT AS7341_Get_Data_TASK() {
 ------------------------------------------------------------------------------*/
 SYS_RESULT CNC_Dispense_Seeds_TASK() {
   CNC_Dispense_Seeds();
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	ILI9341_Change_Dashboard_Screen_TASK
+ *
+ * 		If the Dashboard is the currently displayed screen, this task will iterate
+ *    through the Dashboard slides
+ *
+------------------------------------------------------------------------------*/
+
+SYS_RESULT ILI9341_Change_Dashboard_Screen_TASK() {
+
+  if (ILI9431_Get_Current_Dashboard_Page() == DASHBOARD_NOT_ACTIVE) {
+    return SYS_SUCCESS;
+  }
+
+  // Iterate the dashboard screen
+  ILI9431_Set_Current_Dashboard_Page((ILI9431_Get_Current_Dashboard_Page() + 1) % NUM_DASHBOARD_PAGES);
+  Display_Dashboard();
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
+ * 	ILI9341_Update_Uptime_TASK
+ *
+ * 		Updates the uptime value for the ILI9341 display
+ *
+------------------------------------------------------------------------------*/
+
+SYS_RESULT ILI9341_Update_Uptime_TASK() {
+  ILI9341_Update_Uptime(FSM_GetSystemUptime());
 
   return SYS_SUCCESS;
 }

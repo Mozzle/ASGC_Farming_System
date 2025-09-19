@@ -12,7 +12,8 @@
 		"gpio_switching_intf.h": "c",
 		"rpi_i2c.h": "c",
 		"stm32h7xx_hal.h": "c",
-		"fsm.h": "c"
+		"fsm.h": "c",
+		"functionality_mngmnt.h": "c"
 	},
 	"workbench.colorTheme": "Default Dark Modern"
 }

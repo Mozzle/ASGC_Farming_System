@@ -13,6 +13,7 @@
 #include "timer.h"
 #include "Scheduler.h"
 #include "gpio_switching_intf.h"
+#include "ILI9341/ILI9341_GFX.h"
 
 /*-----------------------------------------------------------------------------
 STATIC VARIABLES
@@ -126,7 +127,8 @@ SYS_RESULT FSM_State_INIT_TCF() {
         -> FSM_STATE_INIT
 
     Action Upon State Activation:
-        NONE, we are waiting on the 'Start' button to be pressed
+        Display the start screen on the ILI9341, we are waiting on the 'Start'
+        button to be pressed
 
     Transitions out of this state:
         -> FSM_STATE_FILL_RESERVOIR
@@ -137,6 +139,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 
 SYS_RESULT FSM_State_WAITING_ON_START_SAF() {
+    Display_StartupScreen();
     return SYS_SUCCESS;
 }
 
@@ -158,7 +161,7 @@ SYS_RESULT FSM_State_WAITING_ON_START_TCF() {
 
     Action Upon State Activation:
         Open Fill Valve, Enable AHT20 Task, Enable SEN0169 Task, Enable SEN0244
-        Task, Enable AS7341 Task
+        Task, Enable AS7341 Task, enable ILI9341 dashboard tasks
 
     Transitions out of this state:
         -> CNC_HOMING
@@ -171,10 +174,15 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
 
     GPIO_set_fill_valve(VALVE_OPEN);
 
+    ILI9341_Update_PumpStatus(PUMP_OFF);
+    ILI9341_Update_Uptime(FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateStartTimestamp);
+    ILI9431_Set_Current_Dashboard_Page(DASHBOARD_PAGE_TDS_PH_HUMIDITY);
+    Display_Dashboard();
+
     /*-------------------------------------------------------------------------
-    Experimentally determined task time to complete, as of commit dedd01f:
-    AHT20_REQUEST_MEASUREMENT_TASK: 
-    AHT20_GET_DATA_TASK: ~81ms
+    Experimentally determined task time to complete, as of the commit AFTER 3757dc0:
+    AHT20_REQUEST_MEASUREMENT_TASK: ~1ms
+    AHT20_GET_DATA_TASK: ~1ms
     SEN0169_GET_DATA_TASK: ~2ms
     SEN0244_GET_DATA_TASK: ~1ms
     AS7341_GET_DATA_TASK: ~535ms
@@ -187,7 +195,9 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
     Scheduler_Enable_Task(SEN0169_GET_DATA_TASK, 5);
     Scheduler_Enable_Task(SEN0244_GET_DATA_TASK, 40);
     Scheduler_Enable_Task(AHT20_GET_DATA_TASK, 81);
+    Scheduler_Enable_Task(ILI9341_CHANGE_DASHBOARD_SCREEN_TASK, 100);
     Scheduler_Enable_Task(AS7341_GET_DATA_TASK, 116);
+    Scheduler_Enable_Task(ILI9341_UPDATE_UPTIME_TASK, 2);
 
 
     return SYS_SUCCESS;
@@ -228,6 +238,7 @@ SYS_RESULT FSM_State_CNC_HOMING_SAF() {
 
     GPIO_set_fill_valve(VALVE_CLOSED);
     GPIO_set_circulating_pump(PUMP_ON);
+    ILI9341_Update_PumpStatus(PUMP_ON);
     CNC_Home_Command();
 
     return SYS_SUCCESS;
@@ -239,4 +250,19 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
     // If homing is complete, transition to next state.
     // otherwise, wait another short amount of time and check again.
     return SYS_SUCCESS;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		FSM_GetSystemUptime()
+ *
+ * 		Returns the number of milliseconds since FSM_STATE_FILL_RESERVOIR was
+ *      activated. This state start time is what is displayed on the ILI9341
+ *      as uptime.
+ *
+ ----------------------------------------------------------------------------*/
+
+uint64_t FSM_GetSystemUptime() {
+    return getTimestamp() - FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateStartTimestamp;
 }

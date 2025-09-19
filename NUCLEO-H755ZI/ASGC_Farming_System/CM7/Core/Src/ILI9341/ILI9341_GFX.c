@@ -50,6 +50,8 @@
 #include "5x5_font.h"
 #include "stm32h7xx_hal_spi.h"
 #include "main.h"
+#include <string.h>
+#include <stdio.h>
 
 /*
 	These variables are shared between Display_Dashboard() and Write_Logo()
@@ -57,6 +59,18 @@
 */
 static uint8_t xBoundary;
 static uint8_t yBoundary;
+static Dashboard_page_t currentDashboardPage = DASHBOARD_NOT_ACTIVE;
+// If this is enabled, dummy info will be displayed instead of pulling from sensor data
+static _Bool debugMode = false;
+
+// Sensor values
+static uint32_t temperatureValue = 9310; //Default to 93.1 F
+static _Bool pumpStatusValue = true; //Default to ONLINE
+static uint16_t dliValue = 0; //Default to 0%
+static char* uptimeValue = "999d 99h 99m\0"; //Default to 999d 99h 99m 
+static uint32_t waterTDSValue = 75000; //Default to 750.00 ppm
+static uint16_t waterpHValue = 660; //Default to 6.6
+static uint16_t humidityValue = 10000; //Default to 100.00%
 
 /*
 	This method displays the startup screen
@@ -102,6 +116,8 @@ void Display_StartupScreen()
 */
 void Display_EStopScreen()
 {
+	currentDashboardPage = DASHBOARD_NOT_ACTIVE;
+	
 	// Declare our text and font size
 	const char *TextLine1 = "ESTOP Pressed";
 	const char *TextLine2 = "Power Cycle";
@@ -118,7 +134,7 @@ void Display_EStopScreen()
 
 	// Find the pixel width and height of our third line
 	uint16_t Text3PixelWidth = strlen(TextLine3) * fontSize * CHAR_WIDTH;
-	uint16_t Text3PixelHeight = Text1PixelHeight; // Same height as first line
+	//uint16_t Text3PixelHeight = Text1PixelHeight; // Same height as first line
 
 	// Calculate where to draw our first line of text
 	uint16_t drawX1 = (ILI9341_SCREEN_WIDTH - Text1PixelWidth) / 2;
@@ -164,19 +180,12 @@ void Display_EStopScreen()
 	(Maybe) [Status] Circulating Pump Running
 	Uptime: 15d 16h
 */
-void Display_Dashboard(uint8_t page)
+void Display_Dashboard()
 {
-	// If this is enabled, dummy info will be displayed instead of pulling from sensor data
-	_Bool debugMode = false;
 
 	// Calculate variables used for drawing
-	uint16_t StartingXPos = 5;
 	uint16_t StartingYPos = yBoundary + 10;
-	uint8_t fontSize = 3;
-	uint8_t displayValueFontSize = fontSize - 1;
-	auto displayValueColor = WHITE;
-	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
-	uint8_t ScalingFactor = 100;
+
 
 	/*
 	Define static buffers that persist across several calls for this method
@@ -188,12 +197,12 @@ void Display_Dashboard(uint8_t page)
     static char waterpHTextBuffer[20];
     static char humidityTextBuffer[20];
 
-	switch (page) {
-		case 1:
+	switch (currentDashboardPage) {
+		case DASHBOARD_PAGE_TEMP_PUMP_DLI:
 
 			// Grab Temperature
 			const char *temperatureText;
-			sprintf(temperatureTextBuffer, "%u.%u F", temperatureValue / ScalingFactor, temperatureValue % ScalingFactor);
+			sprintf(temperatureTextBuffer, "%lu.%lu F", temperatureValue / DASHBOARD_SCALING_FACTOR, temperatureValue % DASHBOARD_SCALING_FACTOR);
 			temperatureText = temperatureTextBuffer;
 
 			// Grab Light Level
@@ -207,7 +216,7 @@ void Display_Dashboard(uint8_t page)
 
 			// Grab pump status
 			const char *pumpStatusText;
-			auto pumpStatusColour = BLUE;
+			int pumpStatusColour = BLUE;
 			if (pumpStatusValue || debugMode) {
 				pumpStatusText = "ONLINE";
 				pumpStatusColour = GREEN;
@@ -225,36 +234,36 @@ void Display_Dashboard(uint8_t page)
 
 			/// Draw the actual text ///
 			// Temperature
-			ILI9341_Draw_Text("Temp", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(temperatureText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Temp", DASHBOARD_STARTING_X_POS, StartingYPos, BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(temperatureText, DASHBOARD_STARTING_X_POS, StartingYPos + (1*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 
 			// Light Level
-			ILI9341_Draw_Text("Light Level", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(lightLevelText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Light Level", DASHBOARD_STARTING_X_POS, StartingYPos + (2*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(lightLevelText, DASHBOARD_STARTING_X_POS, StartingYPos + (3*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 
 			// Pump Status
-			ILI9341_Draw_Text("Pump Status", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(pumpStatusText, StartingXPos, StartingYPos + (5*TextPixelHeight), pumpStatusColour, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Pump Status", DASHBOARD_STARTING_X_POS, StartingYPos + (4*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(pumpStatusText, DASHBOARD_STARTING_X_POS, StartingYPos + (5*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), pumpStatusColour, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 
 			// Uptime
-			ILI9341_Draw_Text("Uptime", StartingXPos, StartingYPos + (6*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(uptimeText, StartingXPos, StartingYPos + (7*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text(uptimeText, DASHBOARD_STARTING_X_POS, StartingYPos + (7*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text("Uptime", DASHBOARD_STARTING_X_POS, StartingYPos + (6*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
 			break;
-		default:
+		case DASHBOARD_PAGE_TDS_PH_HUMIDITY:
 
 			// Grab Water TDS
 			const char *waterTDSText;
-			sprintf(waterTDSTextBuffer, "%u.%u ppm", waterTDSValue / ScalingFactor, waterTDSValue % ScalingFactor);
+			sprintf(waterTDSTextBuffer, "%lu.%lu ppm", waterTDSValue / DASHBOARD_SCALING_FACTOR, waterTDSValue % DASHBOARD_SCALING_FACTOR);
 			waterTDSText = waterTDSTextBuffer;
 
 			// Grab Water pH
 			const char *waterpHText;
-			sprintf(waterpHTextBuffer, "%u.%u", waterpHValue / ScalingFactor, waterpHValue % ScalingFactor);
+			sprintf(waterpHTextBuffer, "%u.%u", waterpHValue / DASHBOARD_SCALING_FACTOR, waterpHValue % DASHBOARD_SCALING_FACTOR);
 			waterpHText = waterpHTextBuffer;
 
 			// Grab Humidity Level
 			const char *humidityText;
-			sprintf(humidityTextBuffer, "%u.%u %%", humidityValue / ScalingFactor, humidityValue % ScalingFactor);
+			sprintf(humidityTextBuffer, "%u.%u %%", humidityValue / DASHBOARD_SCALING_FACTOR, humidityValue % DASHBOARD_SCALING_FACTOR);
 			humidityText = humidityTextBuffer;
 
 			// If debug mode is enabled, use dummy data
@@ -266,16 +275,16 @@ void Display_Dashboard(uint8_t page)
 
 			/// Draw the actual text ///
 			// Water TDS
-			ILI9341_Draw_Text("Water TDS", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(waterTDSText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Water TDS", DASHBOARD_STARTING_X_POS, StartingYPos, BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(waterTDSText, DASHBOARD_STARTING_X_POS, StartingYPos + (1*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 
 			// Water pH
-			ILI9341_Draw_Text("Water pH", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(waterpHText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Water pH", DASHBOARD_STARTING_X_POS, StartingYPos + (2*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(waterpHText, DASHBOARD_STARTING_X_POS, StartingYPos + (3*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 
 			// Humidity
-			ILI9341_Draw_Text("Humidity", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
-			ILI9341_Draw_Text(humidityText, StartingXPos, StartingYPos + (5*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			ILI9341_Draw_Text("Humidity", DASHBOARD_STARTING_X_POS, StartingYPos + (4*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), BLUE, DASHBOARD_TEXT_FONT_SIZE, BLACK);
+			ILI9341_Draw_Text(humidityText, DASHBOARD_STARTING_X_POS, StartingYPos + (5*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 			break;
 	}
 }
@@ -302,39 +311,125 @@ void Write_Logo()
 	ILI9341_Draw_Text(Text, xOffset, yOffset, RED, fontSize, BLACK);
 }
 
-void ILI9341_Update_DLI(uint16_t dliValueNew)
-{
-	dliValue = dliValueNew;
+void ILI9341_Update_DLI(float dliValueNew)
+{	
+	uint16_t StartingYPos = yBoundary + 10;
+	dliValue = (uint16_t)(dliValueNew * 100 + 0.5f);
+
+	if (dliValue > 100) {
+		dliValue = 100;
+	}
+	else if (dliValue < 0) {
+		dliValue = 0;
+	}
+	char lightLevelText[6];
+	sprintf(lightLevelText, "%u %%", dliValue);
+
+	if (currentDashboardPage == DASHBOARD_PAGE_TEMP_PUMP_DLI) {
+		ILI9341_Draw_Text(lightLevelText, DASHBOARD_STARTING_X_POS, StartingYPos + (3*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
 }
 
-void ILI9341_Update_Temperature(uint32_t temperatureValueNew)
+void ILI9341_Update_Temperature(float temperatureValueNew)
 {
-	temperatureValue = temperatureValueNew;
+	uint16_t StartingYPos = yBoundary + 10;
+	temperatureValue = (uint32_t)((temperatureValueNew * 1.8f + 32.0f)* 100 + 0.5f);
+	char temperatureText[8];
+	sprintf(temperatureText, "%lu.%lu F", temperatureValue / DASHBOARD_SCALING_FACTOR, temperatureValue % DASHBOARD_SCALING_FACTOR);
+
+	if (currentDashboardPage == DASHBOARD_PAGE_TEMP_PUMP_DLI) {
+		ILI9341_Draw_Text(temperatureText, DASHBOARD_STARTING_X_POS, StartingYPos + (1*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
+
 }
 
-void ILI9341_Update_Humidity(uint16_t humidityValueNew)
+void ILI9341_Update_Humidity(float humidityValueNew)
 {
-	humidityValue = humidityValueNew;
+	uint16_t StartingYPos = yBoundary + 10;
+	humidityValue = (uint16_t)(humidityValueNew * 100 + 0.5f);
+
+	char humidityText[9];
+	sprintf(humidityText, "%u.%u %%", humidityValue / DASHBOARD_SCALING_FACTOR, humidityValue % DASHBOARD_SCALING_FACTOR);
+	if (currentDashboardPage == DASHBOARD_PAGE_TDS_PH_HUMIDITY) {
+		ILI9341_Draw_Text(humidityText, DASHBOARD_STARTING_X_POS, StartingYPos + (5*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
+
 }
 
-void ILI9341_Update_WaterpH(uint16_t pHValueNew)
+void ILI9341_Update_WaterpH(double pHValueNew)
 {
-	waterpHValue = pHValueNew;
+	uint16_t StartingYPos = yBoundary + 10;
+	waterpHValue = (int16_t)(pHValueNew * 100 + 0.5f);
+
+	char waterpHText[6];
+	sprintf(waterpHText, "%u.%u", waterpHValue / DASHBOARD_SCALING_FACTOR, waterpHValue % DASHBOARD_SCALING_FACTOR);
+	if (currentDashboardPage == DASHBOARD_PAGE_TDS_PH_HUMIDITY) {
+		ILI9341_Draw_Text(waterpHText, DASHBOARD_STARTING_X_POS, StartingYPos + (3*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
 }
 
-void ILI9341_Update_WaterTDS(uint32_t tdsValueNew)
+void ILI9341_Update_WaterTDS(double tdsValueNew)
 {
-	waterTDSValue = tdsValueNew;
+	uint16_t StartingYPos = yBoundary + 10;
+	waterTDSValue = (uint32_t)(tdsValueNew * 100 + 0.5f);
+
+	char waterTDSText[10];
+	sprintf(waterTDSText, "%lu.%lu ppm", waterTDSValue / DASHBOARD_SCALING_FACTOR, waterTDSValue % DASHBOARD_SCALING_FACTOR);
+	if (currentDashboardPage == DASHBOARD_PAGE_TDS_PH_HUMIDITY) {
+		ILI9341_Draw_Text(waterTDSText, DASHBOARD_STARTING_X_POS, StartingYPos + (1*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
+
 }
 
-void ILI9341_Update_Uptime(char *uptimeStringNew)
+void ILI9341_Update_Uptime(uint64_t msSinceStart)
 {
-	uptimeValue = uptimeStringNew;
+	uint16_t StartingYPos = yBoundary + 10;
+
+	uint16_t minutes;
+	uint16_t hours;
+	uint16_t days;
+	uint64_t total_seconds = msSinceStart / 1000;
+    days = total_seconds / (24 * 3600);
+    total_seconds %= (24 * 3600);
+    hours = total_seconds / 3600;
+    total_seconds %= 3600;
+    minutes = total_seconds / 60;
+
+	sprintf(uptimeValue, "%dd %dh %dm", days, hours, minutes);
+
+	if (currentDashboardPage == DASHBOARD_PAGE_TEMP_PUMP_DLI) {
+		ILI9341_Draw_Text(uptimeValue, DASHBOARD_STARTING_X_POS, StartingYPos + (7*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
 }
 
 void ILI9341_Update_PumpStatus(_Bool isPumpOnlineNew)
-{
+{	
+	uint16_t StartingYPos = yBoundary + 10;
 	pumpStatusValue = isPumpOnlineNew;
+
+	char *pumpStatusText;
+	int pumpStatusColour = BLUE;
+	if (pumpStatusValue || debugMode) {
+		pumpStatusText = "ONLINE\0";
+		pumpStatusColour = GREEN;
+	} else {
+		pumpStatusText = "OFFLINE\0";
+		pumpStatusColour = RED;
+	}
+
+	if (currentDashboardPage == DASHBOARD_PAGE_TEMP_PUMP_DLI) {
+		ILI9341_Draw_Text(pumpStatusText, DASHBOARD_STARTING_X_POS, StartingYPos + (5*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), pumpStatusColour, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+	}
+}
+
+Dashboard_page_t ILI9431_Get_Current_Dashboard_Page() {
+	return currentDashboardPage;
+}
+
+void ILI9431_Set_Current_Dashboard_Page(Dashboard_page_t page) {
+	if (page <= NUM_DASHBOARD_PAGES) {
+		currentDashboardPage = page;
+	}
 }
 
 /*Draw hollow circle at X,Y location with specified radius and colour. X and Y represent circles center */
@@ -551,19 +646,19 @@ void ILI9341_Draw_Text(const char* Text, uint16_t X, uint16_t Y, uint16_t Colour
 {
 	// Calculate max characters we can fit on the screen
 	uint8_t maxCharacters = (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)));
-	char* drawTextBuf = NULL;
+	char drawTextBuf[54]; // 54 is Max possible characters for size 1 font
 	const char* drawText = Text;
 
 	// Truncation check
-	if (strlen(Text) > maxCharacters) {
-		drawTextBuf = malloc(maxCharacters + 1);
-		if (drawTextBuf == NULL) {
-			return; // Exit if memory allocation failed
+	if (strlen(Text) > maxCharacters) {			// F**k Dynamic allocation
+		for (uint8_t i = 0; i < 54; i++) {		// All my homies hate dynamic allocation in embedded systems
+			drawTextBuf[i] = Text[i];
+
+			if (i >= maxCharacters) {
+				drawTextBuf[i] = '\0';
+			}
 		}
 
-		// Fill the drawTextBuf with the truncated version of Text
-		strncpy(drawTextBuf, Text, maxCharacters);
-		drawTextBuf[maxCharacters] = '\0'; // Null-terminator, my friend
 		drawText = drawTextBuf;
 	}
 
@@ -579,10 +674,6 @@ void ILI9341_Draw_Text(const char* Text, uint16_t X, uint16_t Y, uint16_t Colour
 		X += CHAR_WIDTH * Size;
 	}
 
-	// After we've drawn everything, free the buffer we allocated previously (if we did use it)
-	if (drawTextBuf != NULL) {
-		free(drawTextBuf);
-	}
 }
 
 /*Draws a full screen picture from flash. Image converted from RGB .jpeg/other to C array using online converter*/
