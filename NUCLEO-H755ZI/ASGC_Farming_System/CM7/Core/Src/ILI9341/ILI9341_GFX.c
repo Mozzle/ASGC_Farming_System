@@ -51,6 +51,292 @@
 #include "stm32h7xx_hal_spi.h"
 #include "main.h"
 
+/*
+	These variables are shared between Display_Dashboard() and Write_Logo()
+	Write_Logo() should be called before Display_Dashboard to initalize these variables
+*/
+static uint8_t xBoundary;
+static uint8_t yBoundary;
+
+/*
+	This method displays the startup screen
+	This should ideally encourage the user to press the "Start" button
+*/
+void Display_StartupScreen()
+{
+	// Declare our text and font size
+	const char *TextLine1 = "Press the";
+	const char *TextLine2 = "START Button";
+	uint8_t fontSize = 4;
+
+	// Find the pixel width and height of our first line
+	uint16_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
+	uint16_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
+
+	// Find the pixel width and height of our second line
+	uint16_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
+	uint16_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Calculate where to draw our first line of text
+	uint16_t drawX1 = (ILI9341_SCREEN_WIDTH - Text1PixelWidth) / 2;
+	uint16_t drawY1 = (ILI9341_SCREEN_HEIGHT - Text1PixelHeight) / 2;
+
+	// Calculate where to draw our second line of text
+	uint16_t drawX2 = (ILI9341_SCREEN_WIDTH - Text2PixelWidth) / 2;
+	uint16_t drawY2 = drawY1 + Text1PixelHeight + 6; // 6 pixel gap between lines
+
+	// Clamp X and Y to 0 if we get negative calculations
+	drawX1 = (drawX1 > ILI9341_SCREEN_WIDTH) ? 0 : drawX1;
+	drawX2 = (drawX2 > ILI9341_SCREEN_WIDTH) ? 0 : drawX2;
+	drawY1 = (drawY1 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY1;
+	drawY2 = (drawY2 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY2;
+
+	// Draw the text
+	ILI9341_Draw_Text(TextLine1, drawX1, drawY1, WHITE, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine2, drawX2, drawY2, WHITE, fontSize, BLACK);
+}
+
+/*
+	This method displays the EStop screen
+	This should ideally encourage the user to power cycle the system to restart
+*/
+void Display_EStopScreen()
+{
+	// Declare our text and font size
+	const char *TextLine1 = "ESTOP Pressed";
+	const char *TextLine2 = "Power Cycle";
+	const char *TextLine3 = "to Reset";
+	uint8_t fontSize = 4;
+
+	// Find the pixel width and height of our first line
+	uint16_t Text1PixelWidth = strlen(TextLine1) * fontSize * CHAR_WIDTH;
+	uint16_t Text1PixelHeight = CHAR_HEIGHT * fontSize;
+
+	// Find the pixel width and height of our second line
+	uint16_t Text2PixelWidth = strlen(TextLine2) * fontSize * CHAR_WIDTH;
+	uint16_t Text2PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Find the pixel width and height of our third line
+	uint16_t Text3PixelWidth = strlen(TextLine3) * fontSize * CHAR_WIDTH;
+	uint16_t Text3PixelHeight = Text1PixelHeight; // Same height as first line
+
+	// Calculate where to draw our first line of text
+	uint16_t drawX1 = (ILI9341_SCREEN_WIDTH - Text1PixelWidth) / 2;
+	uint16_t drawY1 = (ILI9341_SCREEN_HEIGHT - Text1PixelHeight) / 2;
+
+	// Calculate where to draw our second line of text
+	uint16_t drawX2 = (ILI9341_SCREEN_WIDTH - Text2PixelWidth) / 2;
+	uint16_t drawY2 = drawY1 + Text1PixelHeight + 6; // 6 pixel gap between lines
+
+	// Calculate where to draw our third line of text
+	uint16_t drawX3 = (ILI9341_SCREEN_WIDTH - Text3PixelWidth) / 2;
+	uint16_t drawY3 = drawY2 + Text2PixelHeight + 6; // 6 pixel gap between lines
+
+	// Clamp X and Y to 0 if we get negative calculations
+	drawX1 = (drawX1 > ILI9341_SCREEN_WIDTH) ? 0 : drawX1;
+	drawX2 = (drawX2 > ILI9341_SCREEN_WIDTH) ? 0 : drawX2;
+	drawY1 = (drawY1 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY1;
+	drawY2 = (drawY2 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY2;
+	drawX3 = (drawX3 > ILI9341_SCREEN_WIDTH) ? 0 : drawX3;
+	drawY3 = (drawY3 > ILI9341_SCREEN_HEIGHT) ? 0 : drawY3;
+
+	// Draw the text
+	ILI9341_Draw_Text(TextLine1, drawX1, drawY1, RED, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine2, drawX2, drawY2, WHITE, fontSize, BLACK);
+	ILI9341_Draw_Text(TextLine3, drawX3, drawY3, WHITE, fontSize, BLACK);
+}
+
+/*
+	This method handles the actual display of sensor data via a dashboard/pages system
+	There are a maximum of 3 pages (0, 1, 2)
+	If an invalid integer/page number is passed, it will default to page 0
+
+	Page 0: Water TDS, Water pH and Humidity
+	Page 1: Temperature, Pump Status, Uptime and Daily Light Target
+	Page 2+: (Reserved for future use)
+
+	--- Example of sample data displayed ---
+	Water TDS: 640ppm
+	Water pH: 6.5
+	Temperature: 88 F
+	Humidity: 72%
+	Daily Light Target: 65%
+	(Maybe) [Status] Circulating Pump Running
+	Uptime: 15d 16h
+*/
+void Display_Dashboard(uint8_t page)
+{
+	// If this is enabled, dummy info will be displayed instead of pulling from sensor data
+	_Bool debugMode = false;
+
+	// Calculate variables used for drawing
+	uint16_t StartingXPos = 5;
+	uint16_t StartingYPos = yBoundary + 10;
+	uint8_t fontSize = 3;
+	uint8_t displayValueFontSize = fontSize - 1;
+	auto displayValueColor = WHITE;
+	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+	uint8_t ScalingFactor = 100;
+
+	/*
+	Define static buffers that persist across several calls for this method
+	This keeps our memory/makes sprintf calls not produce jumbled garbage text
+	*/
+    static char temperatureTextBuffer[20];
+    static char lightLevelTextBuffer[20];
+    static char waterTDSTextBuffer[20];
+    static char waterpHTextBuffer[20];
+    static char humidityTextBuffer[20];
+
+	switch (page) {
+		case 1:
+
+			// Grab Temperature
+			const char *temperatureText;
+			sprintf(temperatureTextBuffer, "%u.%u F", temperatureValue / ScalingFactor, temperatureValue % ScalingFactor);
+			temperatureText = temperatureTextBuffer;
+
+			// Grab Light Level
+			const char *lightLevelText;
+			sprintf(lightLevelTextBuffer, "%u %%", dliValue);
+			lightLevelText = lightLevelTextBuffer;
+
+			// Grab Uptime
+			const char *uptimeText;
+			uptimeText = uptimeValue;
+
+			// Grab pump status
+			const char *pumpStatusText;
+			auto pumpStatusColour = BLUE;
+			if (pumpStatusValue || debugMode) {
+				pumpStatusText = "ONLINE";
+				pumpStatusColour = GREEN;
+			} else {
+				pumpStatusText = "OFFLINE";
+				pumpStatusColour = RED;
+			}
+
+			// If debug mode is enabled, use dummy data
+			if (debugMode) {
+				temperatureText = "500.51 F";
+				lightLevelText = "65%";
+				uptimeText = "78d 21h 3m";
+			}
+
+			/// Draw the actual text ///
+			// Temperature
+			ILI9341_Draw_Text("Temp", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(temperatureText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Light Level
+			ILI9341_Draw_Text("Light Level", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(lightLevelText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Pump Status
+			ILI9341_Draw_Text("Pump Status", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(pumpStatusText, StartingXPos, StartingYPos + (5*TextPixelHeight), pumpStatusColour, displayValueFontSize, BLACK);
+
+			// Uptime
+			ILI9341_Draw_Text("Uptime", StartingXPos, StartingYPos + (6*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(uptimeText, StartingXPos, StartingYPos + (7*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			break;
+		default:
+
+			// Grab Water TDS
+			const char *waterTDSText;
+			sprintf(waterTDSTextBuffer, "%u.%u ppm", waterTDSValue / ScalingFactor, waterTDSValue % ScalingFactor);
+			waterTDSText = waterTDSTextBuffer;
+
+			// Grab Water pH
+			const char *waterpHText;
+			sprintf(waterpHTextBuffer, "%u.%u", waterpHValue / ScalingFactor, waterpHValue % ScalingFactor);
+			waterpHText = waterpHTextBuffer;
+
+			// Grab Humidity Level
+			const char *humidityText;
+			sprintf(humidityTextBuffer, "%u.%u %%", humidityValue / ScalingFactor, humidityValue % ScalingFactor);
+			humidityText = humidityTextBuffer;
+
+			// If debug mode is enabled, use dummy data
+			if (debugMode) {
+				waterTDSText = "750 ppm";
+				waterpHText = "6.0";
+				humidityText = "66%";
+			}
+
+			/// Draw the actual text ///
+			// Water TDS
+			ILI9341_Draw_Text("Water TDS", StartingXPos, StartingYPos, BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(waterTDSText, StartingXPos, StartingYPos + (1*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Water pH
+			ILI9341_Draw_Text("Water pH", StartingXPos, StartingYPos + (2*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(waterpHText, StartingXPos, StartingYPos + (3*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+
+			// Humidity
+			ILI9341_Draw_Text("Humidity", StartingXPos, StartingYPos + (4*TextPixelHeight), BLUE, fontSize, BLACK);
+			ILI9341_Draw_Text(humidityText, StartingXPos, StartingYPos + (5*TextPixelHeight), displayValueColor, displayValueFontSize, BLACK);
+			break;
+	}
+}
+
+/*
+	This method is simply prints the logo text at the top of the screen
+	This mainly exists just for clarity/modularity
+*/
+void Write_Logo()
+{
+	// Define constants & calculate where to place our 'things'
+	uint8_t fontSize = 4;
+	uint8_t xOffset = 5;
+	uint8_t yOffset = 5;
+	char Text[] = "ASGC Farm";
+	uint8_t TextPixelWidth = strlen(Text) * fontSize * CHAR_WIDTH;
+	uint8_t TextPixelHeight = CHAR_HEIGHT * fontSize;
+
+	xBoundary = xOffset + TextPixelWidth;
+	yBoundary = yOffset + TextPixelHeight;
+
+	// Draw 'things'
+	ILI9341_Draw_Hollow_Rectangle_Coord(xOffset, yOffset, xBoundary, yBoundary, BLUE);
+	ILI9341_Draw_Text(Text, xOffset, yOffset, RED, fontSize, BLACK);
+}
+
+void ILI9341_Update_DLI(uint16_t dliValueNew)
+{
+	dliValue = dliValueNew;
+}
+
+void ILI9341_Update_Temperature(uint32_t temperatureValueNew)
+{
+	temperatureValue = temperatureValueNew;
+}
+
+void ILI9341_Update_Humidity(uint16_t humidityValueNew)
+{
+	humidityValue = humidityValueNew;
+}
+
+void ILI9341_Update_WaterpH(uint16_t pHValueNew)
+{
+	waterpHValue = pHValueNew;
+}
+
+void ILI9341_Update_WaterTDS(uint32_t tdsValueNew)
+{
+	waterTDSValue = tdsValueNew;
+}
+
+void ILI9341_Update_Uptime(char *uptimeStringNew)
+{
+	uptimeValue = uptimeStringNew;
+}
+
+void ILI9341_Update_PumpStatus(_Bool isPumpOnlineNew)
+{
+	pumpStatusValue = isPumpOnlineNew;
+}
+
 /*Draw hollow circle at X,Y location with specified radius and colour. X and Y represent circles center */
 void ILI9341_Draw_Hollow_Circle(uint16_t X, uint16_t Y, uint16_t Radius, uint16_t Colour)
 {
@@ -222,7 +508,7 @@ void ILI9341_Draw_Filled_Rectangle_Coord(uint16_t X0, uint16_t Y0, uint16_t X1, 
 
 /*Draws a character (fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
-void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour) 
+void ILI9341_Draw_Char(char Character, uint16_t X, uint16_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour) 
 {
 		uint8_t 	function_char;
     uint8_t 	i,j;
@@ -259,14 +545,44 @@ void ILI9341_Draw_Char(char Character, uint8_t X, uint8_t Y, uint16_t Colour, ui
     }
 }
 
-/*Draws an array of characters (fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
+/*Draws an array of characters (MAX STRING SIZE OF 13 USUALLY -- fonts imported from fonts.h) at X,Y location with specified font colour, size and Background colour*/
 /*See fonts.h implementation of font on what is required for changing to a different font when switching fonts libraries*/
-void ILI9341_Draw_Text(const char* Text, uint8_t X, uint8_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
+void ILI9341_Draw_Text(const char* Text, uint16_t X, uint16_t Y, uint16_t Colour, uint16_t Size, uint16_t Background_Colour)
 {
-    while (*Text) {
-        ILI9341_Draw_Char(*Text++, X, Y, Colour, Size, Background_Colour);
-        X += CHAR_WIDTH*Size;
-    }
+	// Calculate max characters we can fit on the screen
+	uint8_t maxCharacters = (floor((ILI9341_SCREEN_WIDTH - X) / (Size * CHAR_WIDTH)));
+	char* drawTextBuf = NULL;
+	const char* drawText = Text;
+
+	// Truncation check
+	if (strlen(Text) > maxCharacters) {
+		drawTextBuf = malloc(maxCharacters + 1);
+		if (drawTextBuf == NULL) {
+			return; // Exit if memory allocation failed
+		}
+
+		// Fill the drawTextBuf with the truncated version of Text
+		strncpy(drawTextBuf, Text, maxCharacters);
+		drawTextBuf[maxCharacters] = '\0'; // Null-terminator, my friend
+		drawText = drawTextBuf;
+	}
+
+	const char* iter = drawText;
+	while (*iter) {
+		// Boundary check for x-axis
+		if (X + CHAR_WIDTH * Size - 1 > ILI9341_SCREEN_WIDTH) {
+			break;
+		}
+
+		// Draw the character, move to next position
+		ILI9341_Draw_Char(*iter++, X, Y, Colour, Size, Background_Colour);
+		X += CHAR_WIDTH * Size;
+	}
+
+	// After we've drawn everything, free the buffer we allocated previously (if we did use it)
+	if (drawTextBuf != NULL) {
+		free(drawTextBuf);
+	}
 }
 
 /*Draws a full screen picture from flash. Image converted from RGB .jpeg/other to C array using online converter*/
