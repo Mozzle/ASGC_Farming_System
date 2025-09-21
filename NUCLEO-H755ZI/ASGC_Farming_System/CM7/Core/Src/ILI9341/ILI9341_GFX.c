@@ -64,13 +64,16 @@ static Dashboard_page_t currentDashboardPage = DASHBOARD_NOT_ACTIVE;
 static _Bool debugMode = false;
 
 // Sensor values
-static uint32_t temperatureValue = 9310; //Default to 93.1 F
+static uint32_t temperatureValue = 7540; //Default to 754 F
 static _Bool pumpStatusValue = true; //Default to ONLINE
 static uint16_t dliValue = 0; //Default to 0%
-static char* uptimeValue = "999d 99h 99m\0"; //Default to 999d 99h 99m 
-static uint32_t waterTDSValue = 75000; //Default to 750.00 ppm
-static uint16_t waterpHValue = 660; //Default to 6.6
-static uint16_t humidityValue = 10000; //Default to 100.00%
+//static char* uptimeValue = "999d 99h 99m\0"; //Default to 999d 99h 99m 
+static uint16_t uptimeDays = 0;
+static uint16_t uptimeHours = 0;
+static uint16_t uptimeMins = 0;
+static uint32_t waterTDSValue = 50000; //Default to 500.00 ppm
+static uint16_t waterpHValue = 000; //Default to 0.0
+static uint16_t humidityValue = 5000; //Default to 100.00%
 
 /*
 	This method displays the startup screen
@@ -211,8 +214,8 @@ void Display_Dashboard()
 			lightLevelText = lightLevelTextBuffer;
 
 			// Grab Uptime
-			const char *uptimeText;
-			uptimeText = uptimeValue;
+			char uptimeText[15];
+			sprintf(uptimeText, "%ud %uh %um", uptimeDays, uptimeHours, uptimeMins);
 
 			// Grab pump status
 			const char *pumpStatusText;
@@ -229,7 +232,7 @@ void Display_Dashboard()
 			if (debugMode) {
 				temperatureText = "500.51 F";
 				lightLevelText = "65%";
-				uptimeText = "78d 21h 3m";
+				//uptimeText = "78d 21h 3m";
 			}
 
 			/// Draw the actual text ///
@@ -346,7 +349,7 @@ void ILI9341_Update_Temperature(float temperatureValueNew)
 void ILI9341_Update_Humidity(float humidityValueNew)
 {
 	uint16_t StartingYPos = yBoundary + 10;
-	humidityValue = (uint16_t)(humidityValueNew * 100 + 0.5f);
+	humidityValue = (uint16_t)(humidityValueNew * 10000 + 0.5f);
 
 	char humidityText[9];
 	sprintf(humidityText, "%u.%u %%", humidityValue / DASHBOARD_SCALING_FACTOR, humidityValue % DASHBOARD_SCALING_FACTOR);
@@ -385,20 +388,18 @@ void ILI9341_Update_Uptime(uint64_t msSinceStart)
 {
 	uint16_t StartingYPos = yBoundary + 10;
 
-	uint16_t minutes;
-	uint16_t hours;
-	uint16_t days;
 	uint64_t total_seconds = msSinceStart / 1000;
-    days = total_seconds / (24 * 3600);
+    uptimeDays = total_seconds / (24 * 3600);
     total_seconds %= (24 * 3600);
-    hours = total_seconds / 3600;
+    uptimeHours = total_seconds / 3600;
     total_seconds %= 3600;
-    minutes = total_seconds / 60;
+    uptimeMins = total_seconds / 60;
 
-	sprintf(uptimeValue, "%dd %dh %dm", days, hours, minutes);
+	char uptimeTmp[14];
+	sprintf(uptimeTmp, "%ud %uh %um", uptimeDays, uptimeHours, uptimeMins);
 
 	if (currentDashboardPage == DASHBOARD_PAGE_TEMP_PUMP_DLI) {
-		ILI9341_Draw_Text(uptimeValue, DASHBOARD_STARTING_X_POS, StartingYPos + (7*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
+		ILI9341_Draw_Text(uptimeTmp, DASHBOARD_STARTING_X_POS, StartingYPos + (7*DASHBOARD_TEXT_FONT_HEIGHT_PIXELS), DASHBOARD_DISPLAY_VALUE_COLOR, DASHBOARD_VALUE_FONT_SIZE, BLACK);
 	}
 }
 

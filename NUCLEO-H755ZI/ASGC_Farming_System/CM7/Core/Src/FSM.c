@@ -177,6 +177,7 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_SAF() {
     ILI9341_Update_PumpStatus(PUMP_OFF);
     ILI9341_Update_Uptime(FSM_STATES[FSM_STATE_FILL_RESERVOIR].stateStartTimestamp);
     ILI9431_Set_Current_Dashboard_Page(DASHBOARD_PAGE_TDS_PH_HUMIDITY);
+    Write_Logo();
     Display_Dashboard();
 
     /*-------------------------------------------------------------------------

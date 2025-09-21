@@ -950,11 +950,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  * 	ASGC_System_Startup
  *
  * 		Function called when system transitions on after the start button is
- * 		pressed. Currently does nothing, but they may change at some point.
+ * 		pressed. 
  *
 ------------------------------------------------------------------------------*/
 void ASGC_System_Startup() {
-
+  ILI9341_Fill_Screen(BLACK);
 }
 
 /*------------------------------------------------------------------------------
@@ -967,6 +967,11 @@ void ASGC_System_Startup() {
  *
 ------------------------------------------------------------------------------*/
 void ASGC_System_ESTOP() {
+
+	// Disable all tasks
+	for (Scheduler_Task_ID_t i = 0; i < NUM_SCHEDULER_TASKS; i++) {
+		Scheduler_Disable_Task(i);
+	}
 
 	//Send stop movement command over USB
 
@@ -981,7 +986,8 @@ void ASGC_System_ESTOP() {
 	//Send information to display indicating ESTOP Press
 
 	//Send information to Raspberry Pi indicating ESTOP Press
-
+  ILI9341_Fill_Screen(BLACK);
+  Display_EStopScreen();
 	//Stop USB Host Traffic
 
 	//Shut down any analog traffic (EC/pH sensors)
@@ -1164,6 +1170,8 @@ SYS_RESULT ILI9341_Change_Dashboard_Screen_TASK() {
 
   // Iterate the dashboard screen
   ILI9431_Set_Current_Dashboard_Page((ILI9431_Get_Current_Dashboard_Page() + 1) % NUM_DASHBOARD_PAGES);
+  ILI9341_Draw_Filled_Rectangle_Coord(0, 0, 256, 240, BLACK);
+  Write_Logo();
   Display_Dashboard();
 
   return SYS_SUCCESS;

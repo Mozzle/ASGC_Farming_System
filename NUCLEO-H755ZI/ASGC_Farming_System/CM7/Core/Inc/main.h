@@ -123,11 +123,11 @@ void Error_Handler(void);
 
 
 /* AHT20 Temperature and Humidity Sensor -------------------------------------*/
-#define AHT20_ENABLED					          SYS_FEATURE_DISABLED
+#define AHT20_ENABLED					          SYS_FEATURE_ENABLED
 	 /* AHT20.c */
 
 /* AS7341 Light Sensor -------------------------------------------------------*/
-#define AS7341_ENABLED					        SYS_FEATURE_DISABLED
+#define AS7341_ENABLED					        SYS_FEATURE_ENABLED
 
 
 /* Computer Fan PWM Control Interface ----------------------------------------*/
@@ -140,11 +140,11 @@ void Error_Handler(void);
 
 
 /* SEN0244 Electrical Conductivity Sensor ------------------------------------*/
-#define SEN0244_ENABLED					        SYS_FEATURE_DISABLED
+#define SEN0244_ENABLED					        SYS_FEATURE_ENABLED
 	 /* SEN0244.c */
 
 /* SEN0169-V2 pH Sensor ------------------------------------------------------*/
-#define SEN0169_ENABLED					        SYS_FEATURE_DISABLED
+#define SEN0169_ENABLED					        SYS_FEATURE_ENABLED
 	 /* SEN0169.c */
 
 /* VL53L1X Time-Of-Flight Sensor ---------------------------------------------*/
