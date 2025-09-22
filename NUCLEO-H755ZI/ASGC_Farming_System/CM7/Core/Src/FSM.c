@@ -49,6 +49,14 @@ SYS_RESULT FSM_Init() {
     FSM_STATES[FSM_STATE_CNC_HOMING].state_activation_funciton = FSM_State_CNC_HOMING_SAF;
     FSM_STATES[FSM_STATE_CNC_HOMING].transition_check_function = FSM_State_CNC_HOMING_TCF;
 
+    FSM_STATES[FSM_STATE_SEED_DISPENSE].stateActivated = false;
+    FSM_STATES[FSM_STATE_SEED_DISPENSE].state_activation_funciton = FSM_State_SEED_DISPENSE_SAF;
+    FSM_STATES[FSM_STATE_SEED_DISPENSE].transition_check_function = FSM_State_SEED_DISPENSE_TCF;
+
+    FSM_STATES[FSM_STATE_GROWTH_MONITORING].stateActivated = false;
+    FSM_STATES[FSM_STATE_GROWTH_MONITORING].state_activation_funciton = FSM_State_GROWTH_MONITORING_SAF;
+    FSM_STATES[FSM_STATE_GROWTH_MONITORING].transition_check_function = FSM_State_GROWTH_MONITORING_TCF;
+
     FSM_STATES[FSM_STATE_ESTOP_PRESSED].stateActivated = false;
     FSM_STATES[FSM_STATE_ESTOP_PRESSED].state_activation_funciton = NULL;
     FSM_STATES[FSM_STATE_ESTOP_PRESSED].transition_check_function = NULL;
@@ -250,6 +258,66 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
     // Send command to Raspberry Pi to verify homing is complete.
     // If homing is complete, transition to next state.
     // otherwise, wait another short amount of time and check again.
+    return SYS_SUCCESS;
+}
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    FSM_STATE_SEED_DISPENSE
+
+    Transitions into this state: 
+        -> FSM_STATE_CNC_HOMING
+
+    Action Upon State Activation:
+        [NOT YET IMPLEMENTED]
+
+    Transitions out of this state:
+        -> XXXXX
+            XXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+SYS_RESULT FSM_State_SEED_DISPENSE_SAF() {
+    FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
+
+    /* IMPLEMENT ME */
+
+    return SYS_SUCCESS;
+}
+
+SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
+    /* IMPLEMENT ME */
+    return SYS_SUCCESS;
+}
+
+
+/*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    FSM_STATE_GROWTH_MONITORING
+
+    Transitions into this state: 
+        -> FSM_STATE_CNC_HOMING
+
+    Action Upon State Activation:
+        [NOT YET IMPLEMENTED]
+
+    Transitions out of this state:
+        -> XXXXX
+            XXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
+
+SYS_RESULT FSM_State_GROWTH_MONITORING_SAF() {
+    FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
+
+    /* IMPLEMENT ME */
+
+    return SYS_SUCCESS;
+}
+
+SYS_RESULT FSM_State_GROWTH_MONITORING_TCF() {
+    /* IMPLEMENT ME */
     return SYS_SUCCESS;
 }
 
