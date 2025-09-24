@@ -22,6 +22,7 @@ struct FSM_State_Struct FSM_STATES[NUM_FSM_STATES];
 FSM_State currentFSMState;
 
 extern bool SYSTEM_START_STATE;
+extern uint64_t unixTimeMs;
 
 /*-----------------------------------------------------------------------------
  *

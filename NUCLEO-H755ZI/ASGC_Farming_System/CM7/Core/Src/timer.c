@@ -13,12 +13,74 @@
 
 #include "timer.h"
 
+static uint32_t unixTimeSec;
+static uint32_t nextMidnightTimeSec; 
 static uint64_t s_overflowTimeMs;
 static uint32_t prev_32_bit_timestampMs;
 
 void ASGC_Timer_Init() {
 	s_overflowTimeMs = 0;
 	prev_32_bit_timestampMs = 0;
+	nextMidnightTimeSec = 0;
+}
+
+// Define constants for Midnight Checker/Calculation functions
+#define SEC_IN_DAY 86400
+#define SEC_IN_HOUR 3600
+#define SEC_IN_MIN 60
+
+/*---------------------------------------------------------------------------------------------------
+	updateNextMidnightTime(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours)
+	Takes in a timestamp in seconds (ideally unixTime + system offset)
+	Takes in a timezone offset in hours from UTC (i.e. UTC-5 should pass -5, UTC+5 should pass 5)
+
+	This function calculates the next midnight time in seconds, then updates the static variable
+	nextMidnightTimeSec with the new value.
+---------------------------------------------------------------------------------------------------*/
+void updateNextMidnightTime(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours) {
+
+    // Determine what hour, minute, and second we're at in the day
+    const uint8_t currentHour = (((currentTimeSec % SEC_IN_DAY) / SEC_IN_HOUR) + TimeZoneOffsetUTCHours) % 24;
+    const uint8_t currentMinute = ((currentTimeSec % SEC_IN_HOUR) / SEC_IN_MIN);
+    const uint8_t currentSecond = (currentTimeSec % SEC_IN_MIN);
+
+    // Determine the remaining time to midnight for H:M:S, uses ternary operators to avoid overlap (i.e. if seconds>0, then minutes must be decremented by 1)
+    const uint8_t remainingSeconds = (SEC_IN_MIN - currentSecond) % SEC_IN_MIN;
+    const uint8_t remainingMinutes = (remainingSeconds>0) ? (SEC_IN_MIN - currentMinute) % SEC_IN_MIN - 1 : (SEC_IN_MIN - currentMinute) % SEC_IN_MIN;
+    const uint8_t remainingHours = (remainingMinutes>0) ? (24 - currentHour) % 24 - 1 : (24 - currentHour) % 24;
+    
+    // Calculate remaining seconds to midnight, and update the static variable
+    const uint32_t secondsToMidnight = remainingSeconds + (remainingMinutes * SEC_IN_MIN) + (remainingHours * SEC_IN_HOUR);
+    nextMidnightTimeSec = currentTimeSec + secondsToMidnight;
+}
+
+/*-------------------------------------------------------------------------------------
+	isMidnight(int8_t TimeZoneOffsetUTCHours)
+	Takes in a timezone offset in hours from UTC (i.e. UTC-5 should pass -5)
+
+	Returns uint8_t integer code, 1 = IS_MIDNIGHT, 0 = NOT_MIDNIGHT
+
+	This function checks if the current time is at or past midnight
+	If it is, it calculates the next midnight time, sets it and returns IS_MIDNIGHT
+-------------------------------------------------------------------------------------*/
+uint8_t isMidnight(int8_t TimeZoneOffsetUTCHours) {
+
+	// Get the current time in seconds, calculate using the UnixTime and system offset
+	const uint32_t currentTimeSec = unixTimeSec + (getTimeStamp/1000);
+
+	// Check if we're at or past Midnight -- if we are, recalculate and return IS_MIDNIGHT
+	if (nextMidnightTimeSec != 0 && currentTimeSec >= nextMidnightTimeSec) {
+        updateNextMidnightTime(currentTimeSec, TimeZoneOffsetUTCHours);
+		return IS_MIDNIGHT;
+	} 
+	
+	// Check if we've initialized nextMidnightTimeSec -- if not, initialize it
+	else if (nextMidnightTimeSec == 0) {
+        updateNextMidnightTime(currentTimeSec, TimeZoneOffsetUTCHours);
+	}
+
+	// If nextMidnightTimeSec is initialized and we haven't reached it, return NOT_MIDNIGHT
+	return NOT_MIDNIGHT;
 }
 
 /*-----------------------------------------------------------------------------
