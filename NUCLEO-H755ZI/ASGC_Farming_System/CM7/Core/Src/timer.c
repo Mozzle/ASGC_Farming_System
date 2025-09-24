@@ -28,6 +28,9 @@ void ASGC_Timer_Init() {
 #define SEC_IN_DAY 86400
 #define SEC_IN_HOUR 3600
 #define SEC_IN_MIN 60
+#define IS_MIDNIGHT (uint8_t)1
+#define NOT_MIDNIGHT (uint8_t)0
+#define CST_OFFSET (int8_t)-5
 
 /*---------------------------------------------------------------------------------------------------
 	updateNextMidnightTime(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours)
