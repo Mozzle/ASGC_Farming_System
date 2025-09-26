@@ -300,7 +300,7 @@ SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
         -> FSM_STATE_CNC_HOMING
 
     Action Upon State Activation:
-        [NOT YET IMPLEMENTED]
+        Enable the AS7341 midnight checker task
 
     Transitions out of this state:
         -> XXXXX
@@ -311,7 +311,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 SYS_RESULT FSM_State_GROWTH_MONITORING_SAF() {
     FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
 
-    /* IMPLEMENT ME */
+    // Once we are monitoring the seeds growth, we begin checking if we've hit midnight (for DLI integral purposes)
+    Scheduler_Enable_Task(AS7341_CHECK_FOR_MIDNIGHT_TASK, 0);
 
     return SYS_SUCCESS;
 }
