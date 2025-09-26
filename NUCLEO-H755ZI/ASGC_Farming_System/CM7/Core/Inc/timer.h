@@ -12,7 +12,14 @@
 
 #include "main.h"
 
+// Defines for midnight/time calculation functions
+#define     IS_MIDNIGHT (uint8_t)1
+#define     NOT_MIDNIGHT (uint8_t)0
+#define     CST_OFFSET (int8_t)-5
+
 void 		ASGC_Timer_Init();
 uint64_t 	getTimestamp();
+uint8_t     isMidnight(int8_t TimeZoneOffsetUTCHours)
+void        updateNextMidnightTime(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours)
 
 #endif /* INC_TIMER_H_ */

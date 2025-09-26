@@ -64,6 +64,14 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[AS7341_GET_DATA_TASK].task_function = AS7341_Get_Data_TASK;
 	Task_List[AS7341_GET_DATA_TASK].failure_handler = NULL; // Add failure handler later
 
+	// AS7341 Midnight Check Task
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].enabled = false;
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].interval_ms = AS7341_MIDNIGHT_CHECK_DEFAULT_INTERVAL_MS;
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].last_run_timestamp = 0;
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].num_consecutive_failures = 0;
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].task_function = AS7341_Is_Midnight_TASK;
+	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].failure_handler = NULL; // No failure handler needed
+
 	Task_List[CNC_DISPENSE_SEEDS_TASK].enabled = false;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].interval_ms = CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].last_run_timestamp = 0;

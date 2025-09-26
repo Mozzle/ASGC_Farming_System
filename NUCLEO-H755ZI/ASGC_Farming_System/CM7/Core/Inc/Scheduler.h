@@ -2,7 +2,7 @@
  *
  * 	Scheduler.h
  *
- * 		File used for scheudling tasks.
+ * 	File used for scheduling tasks.
  *
  *  Created on: Sep 2, 2025
  *
@@ -33,13 +33,14 @@ INCLUDES
 /*-----------------------------------------------------------------------------
 DEFINES
 -----------------------------------------------------------------------------*/
-#define AHT20_TASK_DEFAULT_INTERVAL_MS				30000
-#define SEN0169_TASK_DEFAULT_INTERVAL_MS			30000
-#define SEN0244_TASK_DEFAULT_INTERVAL_MS			30000
-#define AS7341_TASK_DEFAULT_INTERVAL_MS				30000
-#define CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS	100
-#define ILI9341_TASK_DEFAULT_INTERVAL_MS			20000
-#define ILI9341_UPDATE_UPTIME_INTERVAL_MS			60000
+#define AHT20_TASK_DEFAULT_INTERVAL_MS							30000
+#define SEN0169_TASK_DEFAULT_INTERVAL_MS						30000
+#define SEN0244_TASK_DEFAULT_INTERVAL_MS						30000
+#define AS7341_TASK_DEFAULT_INTERVAL_MS							30000
+#define AS7341_MIDNIGHT_CHECK_DEFAULT_INTERVAL_MS				60000
+#define CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS				100
+#define ILI9341_TASK_DEFAULT_INTERVAL_MS						20000
+#define ILI9341_UPDATE_UPTIME_INTERVAL_MS						60000
 
 /*-----------------------------------------------------------------------------
 TYPEDEFS
@@ -62,6 +63,7 @@ enum {
 	SEN0169_GET_DATA_TASK,
 	SEN0244_GET_DATA_TASK,
 	AS7341_GET_DATA_TASK,
+	AS7341_CHECK_FOR_MIDNIGHT_TASK,
 	CNC_DISPENSE_SEEDS_TASK,
 	ILI9341_CHANGE_DASHBOARD_SCREEN_TASK,
 	ILI9341_UPDATE_UPTIME_TASK,

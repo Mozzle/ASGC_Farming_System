@@ -1140,6 +1140,32 @@ SYS_RESULT AS7341_Get_Data_TASK() {
 
 /*------------------------------------------------------------------------------
  *
+ * 	AS7341_Is_Midnight_TASK
+ *
+ * 		Scheduler task to check if it is midnight has been reached
+ *    Logic/functionality for if midnight has passed will be added later
+ * 
+ *    Tasks should do very little computation beyond calling functions.
+ *    All task functions should return a SYS_RESULT value.
+ *
+------------------------------------------------------------------------------*/
+SYS_RESULT AS7341_Is_Midnight_TASK() {
+
+  /*
+    Check if it's midnight using the current elapsed UnixTime
+    Returns IS_MIDNIGHT (1) if true, NOT_MIDNIGHT (0) if false
+    Remove this comment after full implementation
+  */
+  if (isMidnight(unixTimeSec)) {
+    // Logic to be applied if it is midnight goes here
+  }
+
+  return SYS_SUCCESS;
+}
+
+
+/*------------------------------------------------------------------------------
+ *
  * 	CNC_Dispense_Seeds_TASK
  *
  * 		Scheduler task to invoke the mini state machine that controls the dispersal
