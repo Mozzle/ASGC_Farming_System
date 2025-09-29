@@ -331,8 +331,7 @@ SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout) {
 	/*-------------------------------------------------------------------------
 	Send packet
 	-------------------------------------------------------------------------*/
-	//status = _send_i2c_packet(&AS7341_0_pkt, RPI_I2C_AS7341_PACKET_0_SIZE, ack_packet, timeout);
-	//Function call to fix the time amount, ie, #4 issue, for jackson
+	status = _send_i2c_unix_time_packet(&UNIX_TIME_REQUEST_pkt, RPI_I2C_Unix_Time_Request_SIZE, UNIX_TIME_pkt, timeout);
 
 	if (status != HAL_OK) {
 			return SYS_FAIL;
@@ -389,5 +388,49 @@ static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetS
 	return status;
 
 }
+
+/*-----------------------------------------------------------------------------
+ *
+ * _send_i2c_unix_time_packet
+ *
+ * 		Copy of _send_i2c_packet, but altered to expect a unix time packet back from the raspberry pi.
+ *
+ * 		Args:
+ * 		*packetData: A packet struct defined in RPI_I2C.h (should always be RPI_I2C_Unix_Time_Request)
+ * 		packetSize: sizeof(packetData)
+ * 		unixTimePacket: the struct container for the unix time packet.
+ * 		timeout: Message send timeout in milliseconds
+ *
+-----------------------------------------------------------------------------*/
+
+static HAL_StatusTypeDef _send_i2c_unix_time_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_Unix_Time unixTimePacket, uint32_t timeout ) {
+	HAL_StatusTypeDef status;
+	uint8_t i;
+
+	for ( i = 0; i < RPI_I2C_NUM_PKT_SEND_ATTEMPTS; i++ ) {
+			/*-------------------------------------------------------------------------
+			Send the packet using HAL
+			-------------------------------------------------------------------------*/
+			status = HAL_I2C_Master_Transmit(&hi2c1, RPI_I2C_ADDR_WRITE, packetData, packetSize, timeout);
+
+			/*-------------------------------------------------------------------------
+			If we sent the packet successfully, wait for ack packet
+			-------------------------------------------------------------------------*/
+			if (status == HAL_OK) {
+				HAL_Delay(1);
+
+				/*---------------------------------------------------------------------
+				Receive the ACK packet
+				---------------------------------------------------------------------*/
+				status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &unixTimePacket, RPI_I2C_ACK_PACKET_SIZE, 3);
+
+				if (status == HAL_OK && unixTimePacket.packet_id == RPI_UNIX_TIME_PKT_ID) {
+					break;
+				}
+			}
+		}
+	return status;
+}
+
 #pragma GCC diagnostic pop
 
