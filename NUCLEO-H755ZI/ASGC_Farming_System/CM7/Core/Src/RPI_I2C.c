@@ -307,6 +307,39 @@ SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
 
 	return status;
 }
+
+SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout) {
+	/*-------------------------------------------------------------------------
+	Local Variables
+	-------------------------------------------------------------------------*/
+	RPI_I2C_Unix_Time_Request_t UNIX_TIME_REQUEST_pkt;
+	RPI_I2C_Unix_Time_t UNIX_TIME_pkt;
+	HAL_StatusTypeDef status;
+
+	/*-------------------------------------------------------------------------
+	Clear structs
+	-------------------------------------------------------------------------*/
+	memset(&UNIX_TIME_REQUEST_pkt, 0, RPI_I2C_Unix_Time_Request_SIZE);
+	memset(&UNIX_TIME_pkt, 0, RPI_I2C_Unix_Time_SIZE);
+
+	/*-------------------------------------------------------------------------
+	Pack the packet
+	-------------------------------------------------------------------------*/
+	UNIX_TIME_REQUEST_pkt.packet_id = RPI_UNIX_TIME_REQUEST_PKT_ID;
+	UNIX_TIME_pkt.packet_id = RPI_UNIX_TIME_PKT_ID;
+
+	/*-------------------------------------------------------------------------
+	Send packet
+	-------------------------------------------------------------------------*/
+	//status = _send_i2c_packet(&AS7341_0_pkt, RPI_I2C_AS7341_PACKET_0_SIZE, ack_packet, timeout);
+	//Function call to fix the time amount, ie, #4 issue, for jackson
+
+	if (status != HAL_OK) {
+			return SYS_FAIL;
+	}
+
+	return status;
+}
 /*-----------------------------------------------------------------------------
  *
  * _send_i2c_packet

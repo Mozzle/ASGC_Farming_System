@@ -57,6 +57,8 @@ enum {
 	RPI_NET_POT_STATUS_PKT_ID,
 	RPI_GET_AXES_POS_PKT_ID,
 	RPI_ACK_PKT_ID,
+	RPI_UNIX_TIME_REQUEST_PKT_ID,
+	RPI_UNIX_TIME_PKT_ID,
 
 	RPI_I2C_NUM_PKT_IDS			// Number of packet IDs
 };
@@ -167,6 +169,28 @@ typedef struct RPI_I2C_AS7341_Packet_1 {
 
 #define RPI_I2C_AS7341_PACKET_1_SIZE	sizeof(RPI_I2C_AS7341_Packet_1_t)
 
+/*-----------------------------------------------------------------------------
+UNIX time request packet
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_Unix_Time_Request {
+	RPI_Packet_ID packet_id;
+
+} RPI_I2C_Unix_Time_Request_t;
+
+#define RPI_I2C_Unix_Time_Request_SIZE	sizeof(RPI_I2C_Unix_Time_Request_t)
+
+/*-----------------------------------------------------------------------------
+UNIX time packet
+-----------------------------------------------------------------------------*/
+typedef struct RPI_I2C_Unix_Time {
+	RPI_Packet_ID packet_id;
+	uint32_t UNIX_time_value;
+	uint16_t Offset;
+
+} RPI_I2C_Unix_Time_t;
+
+#define RPI_I2C_Unix_Time_SIZE	sizeof(RPI_I2C_Unix_Time_t)
+
 #pragma pack(pop)
 
 /*-----------------------------------------------------------------------------
@@ -194,6 +218,8 @@ _Static_assert( (RPI_I2C_SEN0169_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi 
 _Static_assert( (RPI_I2C_SEN0244_PACKET_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
 _Static_assert( (RPI_I2C_AS7341_PACKET_0_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
 _Static_assert( (RPI_I2C_AS7341_PACKET_1_SIZE 	<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_Unix_Time_Request_SIZE <= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
+_Static_assert( (RPI_I2C_Unix_Time_SIZE 		<= RPI_I2C_MAX_PACKET_SIZE), "RPi Packet too large");
 
 /*-----------------------------------------------------------------------------
 Function Prototypes
@@ -203,6 +229,8 @@ SYS_RESULT RPI_I2C_Send_AHT20_Pkt(struct AHT20_Data AHT20_data, uint32_t timeout
 SYS_RESULT RPI_I2C_Send_SEN0169_Pkt(SEN0169_pH_Data SEN0169_data, uint32_t timeout);
 SYS_RESULT RPI_I2C_Send_SEN0244_Pkt(SEN0244_TDS_Data SEN0244_data, uint32_t timeout);
 SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout);
+SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout);
+SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_Pkt(uint32_t UNIX_time_value, uint16_t Offset, uint32_t timeout);
 
 
 #endif // I2C_PACKETS_H
