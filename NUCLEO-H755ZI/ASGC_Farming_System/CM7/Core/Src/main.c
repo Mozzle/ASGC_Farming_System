@@ -1131,7 +1131,7 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   // Update DLI calculation
 
   // Send Data to Raspberry Pi
-
+  RPI_I2C_Send_AS7341_Pkt(AS7341_Values, 2);
   // Send Data to Display
 
   return SYS_SUCCESS;
