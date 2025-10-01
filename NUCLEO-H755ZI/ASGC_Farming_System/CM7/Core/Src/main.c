@@ -1156,8 +1156,10 @@ SYS_RESULT AS7341_Is_Midnight_TASK() {
     Returns IS_MIDNIGHT (1) if true, NOT_MIDNIGHT (0) if false
     Remove this comment after full implementation
   */
-  if (isMidnight(unixTimeSec)) {
+  if (isMidnight()) {
     // Logic to be applied if it is midnight goes here
+    // Reset DLI calculation
+    // Probably have to send a packet to raspberry pi to reset its DLI data
   }
 
   return SYS_SUCCESS;

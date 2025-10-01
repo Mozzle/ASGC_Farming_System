@@ -14,6 +14,7 @@
 #include "Scheduler.h"
 #include "gpio_switching_intf.h"
 #include "ILI9341/ILI9341_GFX.h"
+#include "RPI_I2C.h"
 
 /*-----------------------------------------------------------------------------
 STATIC VARIABLES
@@ -281,7 +282,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 SYS_RESULT FSM_State_SEED_DISPENSE_SAF() {
     FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
 
-    /* IMPLEMENT ME */
+    // Request the unix time reference from the Raspberry Pi
+    RPI_I2C_Send_RPI_UNIX_TIME_REQUEST_Pkt(5);
 
     return SYS_SUCCESS;
 }

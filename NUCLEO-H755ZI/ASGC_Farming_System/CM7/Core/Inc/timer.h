@@ -19,7 +19,7 @@
 
 void 		ASGC_Timer_Init();
 uint64_t 	getTimestamp();
-uint8_t     isMidnight(int8_t TimeZoneOffsetUTCHours)
-void        updateNextMidnightTime(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours)
+uint8_t     isMidnight();
+void        setUnixTimeMidnightRef(const uint32_t currentTimeSec, const int8_t TimeZoneOffsetUTCHours);
 
 #endif /* INC_TIMER_H_ */

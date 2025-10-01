@@ -72,6 +72,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].task_function = AS7341_Is_Midnight_TASK;
 	Task_List[AS7341_CHECK_FOR_MIDNIGHT_TASK].failure_handler = NULL; // No failure handler needed
 
+	// CNC Dispense Seeds Task
 	Task_List[CNC_DISPENSE_SEEDS_TASK].enabled = false;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].interval_ms = CNC_DISPENSE_SEEDS_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].last_run_timestamp = 0;
@@ -79,6 +80,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[CNC_DISPENSE_SEEDS_TASK].task_function = CNC_Dispense_Seeds_TASK;
 	Task_List[CNC_DISPENSE_SEEDS_TASK].failure_handler = NULL; // Add failure handler later
 
+	// ILI9341 Change Dashboard Screen Task
 	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].enabled = false;
 	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].interval_ms = ILI9341_TASK_DEFAULT_INTERVAL_MS;
 	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].last_run_timestamp = 0;
@@ -86,6 +88,7 @@ struct Scheduler_Task Task_List[NUM_SCHEDULER_TASKS];
 	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].task_function = ILI9341_Change_Dashboard_Screen_TASK;
 	Task_List[ILI9341_CHANGE_DASHBOARD_SCREEN_TASK].failure_handler = NULL; // Add failure handler later
 
+	// ILI9341 Update 'Uptime' Dashboard Item Task
 	Task_List[ILI9341_UPDATE_UPTIME_TASK].enabled = false;
 	Task_List[ILI9341_UPDATE_UPTIME_TASK].interval_ms = ILI9341_UPDATE_UPTIME_INTERVAL_MS;
 	Task_List[ILI9341_UPDATE_UPTIME_TASK].last_run_timestamp = 0;

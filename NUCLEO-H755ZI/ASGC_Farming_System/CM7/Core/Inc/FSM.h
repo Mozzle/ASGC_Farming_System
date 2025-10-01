@@ -21,7 +21,7 @@ INCLUDES
 DEFINES
 -----------------------------------------------------------------------------*/
 
-extern uint32_t unixTimeSec;
+extern uint32_t unixTimeRefSec;
 #define FSM_STATE_FILL_RESERVOIR_DWELL_TIME         120000
 
 /*-----------------------------------------------------------------------------

@@ -18,11 +18,13 @@ warning: passing argument 1 of '_send_i2c_packet' from incompatible pointer type
 #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 
 #include "RPI_I2C.h"
+#include "timer.h"
 #include <string.h>
 
 extern I2C_HandleTypeDef hi2c1;
 
 static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_ACK_Packet_t ackPacket, uint32_t timeout );
+static HAL_StatusTypeDef _send_i2c_unix_time_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_Unix_Time_t *unixTimePacket, uint32_t timeout );
 
 
 /*-----------------------------------------------------------------------------
@@ -308,7 +310,7 @@ SYS_RESULT RPI_I2C_Send_AS7341_Pkt(uint16_t AS7341_data[12], uint32_t timeout) {
 	return status;
 }
 
-SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout) {
+SYS_RESULT RPI_I2C_Send_RPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout) {
 	/*-------------------------------------------------------------------------
 	Local Variables
 	-------------------------------------------------------------------------*/
@@ -326,16 +328,18 @@ SYS_RESULT RPI_I2C_SendRPI_UNIX_TIME_REQUEST_Pkt(uint32_t timeout) {
 	Pack the packet
 	-------------------------------------------------------------------------*/
 	UNIX_TIME_REQUEST_pkt.packet_id = RPI_UNIX_TIME_REQUEST_PKT_ID;
-	UNIX_TIME_pkt.packet_id = RPI_UNIX_TIME_PKT_ID;
 
 	/*-------------------------------------------------------------------------
 	Send packet
 	-------------------------------------------------------------------------*/
-	status = _send_i2c_unix_time_packet(&UNIX_TIME_REQUEST_pkt, RPI_I2C_Unix_Time_Request_SIZE, UNIX_TIME_pkt, timeout);
+	status = _send_i2c_unix_time_packet(&UNIX_TIME_REQUEST_pkt, RPI_I2C_Unix_Time_Request_SIZE, &UNIX_TIME_pkt, timeout);
 
 	if (status != HAL_OK) {
 			return SYS_FAIL;
 	}
+
+	// Call function to store unix time packet information
+	setUnixTimeMidnightRef(UNIX_TIME_pkt.UNIX_time_value, UNIX_TIME_pkt.Offset);
 
 	return status;
 }
@@ -403,7 +407,7 @@ static HAL_StatusTypeDef _send_i2c_packet( uint8_t *packetData, uint16_t packetS
  *
 -----------------------------------------------------------------------------*/
 
-static HAL_StatusTypeDef _send_i2c_unix_time_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_Unix_Time unixTimePacket, uint32_t timeout ) {
+static HAL_StatusTypeDef _send_i2c_unix_time_packet( uint8_t *packetData, uint16_t packetSize, RPI_I2C_Unix_Time_t *unixTimePacket, uint32_t timeout ) {
 	HAL_StatusTypeDef status;
 	uint8_t i;
 
@@ -422,9 +426,9 @@ static HAL_StatusTypeDef _send_i2c_unix_time_packet( uint8_t *packetData, uint16
 				/*---------------------------------------------------------------------
 				Receive the ACK packet
 				---------------------------------------------------------------------*/
-				status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, &unixTimePacket, RPI_I2C_ACK_PACKET_SIZE, 3);
+				status = HAL_I2C_Master_Receive(&hi2c1, RPI_I2C_ADDR_WRITE, unixTimePacket, RPI_I2C_ACK_PACKET_SIZE, 3);
 
-				if (status == HAL_OK && unixTimePacket.packet_id == RPI_UNIX_TIME_PKT_ID) {
+				if (status == HAL_OK && unixTimePacket->packet_id == RPI_UNIX_TIME_PKT_ID) {
 					break;
 				}
 			}
