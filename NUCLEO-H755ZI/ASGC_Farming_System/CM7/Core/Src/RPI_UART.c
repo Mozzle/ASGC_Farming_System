@@ -247,12 +247,14 @@ static HAL_StatusTypeDef _send_uart_packet( uint8_t *packetData, uint16_t packet
 	HAL_StatusTypeDef status;
 	uint8_t i;
 
+	HAL_UART_Abort(&huart7);
+
 	for ( i = 0; i < RPI_UART_NUM_PKT_SEND_ATTEMPTS; i++ ) {
 			/*-------------------------------------------------------------------------
 			Send the header packet using HAL
 			-------------------------------------------------------------------------*/
 			status = HAL_UART_Transmit(&huart7, (uint8_t*)header_pkt, RPI_UART_HEADER_PACKET_SIZE, timeout);
-			HAL_Delay(1);
+			//HAL_Delay(1);
 			/*-------------------------------------------------------------------------
 			Send the data packet using HAL
 			-------------------------------------------------------------------------*/

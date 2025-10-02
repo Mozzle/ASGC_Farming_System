@@ -1103,7 +1103,7 @@ SYS_RESULT AHT20_Get_Data_TASK() {
   AHT20_data = AHT20_Get_Data(&hi2c1);
 
   // Send Data to Raspberry Pi
-  RPI_UART_Send_AHT20_Pkt(AHT20_data, 2);
+  RPI_UART_Send_AHT20_Pkt(AHT20_data, 4);
   // Send Data to Display
   ILI9341_Update_Temperature(AHT20_data.temperature);
   ILI9341_Update_Humidity(AHT20_data.humidity);
@@ -1125,7 +1125,7 @@ SYS_RESULT SEN0169_Get_Data_TASK() {
   SEN0169_Measure(&pH_Data);
 
   // Send Data to Raspberry Pi
-  RPI_UART_Send_SEN0169_Pkt(pH_Data, 2);
+  RPI_UART_Send_SEN0169_Pkt(pH_Data, 4);
 
   // Send Data to Display
   ILI9341_Update_WaterpH(pH_Data);
@@ -1147,7 +1147,7 @@ SYS_RESULT SEN0244_Get_Data_TASK() {
   SEN0244_Measure(&tdsData, AHT20_data.temperature);
 
   // Send Data to Raspberry Pi
-  RPI_UART_Send_SEN0244_Pkt(tdsData, 2);
+  RPI_UART_Send_SEN0244_Pkt(tdsData, 4);
 
   // Send Data to Display
   ILI9341_Update_WaterTDS(tdsData);
@@ -1182,7 +1182,7 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   // Update DLI calculation
 
   // Send Data to Raspberry Pi
-  RPI_UART_Send_AS7341_Pkt(AS7341_Values, 2);
+  RPI_UART_Send_AS7341_Pkt(AS7341_Values, 5);
   // Send Data to Display
 
   return SYS_SUCCESS;
