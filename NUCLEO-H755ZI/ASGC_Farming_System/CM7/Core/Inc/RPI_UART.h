@@ -141,7 +141,7 @@ UNIX time data packet
 typedef struct RPI_UART_Unix_Time {
 	RPI_Packet_ID packet_id;
 	uint32_t UNIX_time_value;
-	uint8_t Offset;
+	int8_t Offset;
 
 } RPI_UART_Unix_Time_t;
 

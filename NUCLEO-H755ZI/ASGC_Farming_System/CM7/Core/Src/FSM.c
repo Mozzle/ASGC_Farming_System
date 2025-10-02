@@ -259,6 +259,15 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
     // Send command to Raspberry Pi to verify homing is complete.
     // If homing is complete, transition to next state.
     // otherwise, wait another short amount of time and check again.
+
+    static int test = 0;
+
+    if (test >= 100) {
+        currentFSMState = FSM_STATE_SEED_DISPENSE;
+        FSM_STATES[FSM_STATE_CNC_HOMING].stateActivated = false;
+    }
+    test++;
+
     return SYS_SUCCESS;
 }
 
@@ -283,13 +292,24 @@ SYS_RESULT FSM_State_SEED_DISPENSE_SAF() {
     FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
 
     // Request the unix time reference from the Raspberry Pi
-    RPI_UART_Send_RPI_UNIX_TIME_REQUEST_Pkt(5);
+    if (RPI_UART_Send_RPI_UNIX_TIME_REQUEST_Pkt(10) != SYS_SUCCESS) {
+        // GO TO ERROR MODE
+    };
 
     return SYS_SUCCESS;
 }
 
 SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
     /* IMPLEMENT ME */
+
+    static int test = 0;
+
+    if (test >= 100) {
+        currentFSMState = FSM_STATE_GROWTH_MONITORING;
+        FSM_STATES[FSM_STATE_SEED_DISPENSE].stateActivated = false;
+    }
+    test++;
+
     return SYS_SUCCESS;
 }
 
@@ -311,7 +331,7 @@ SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
 SYS_RESULT FSM_State_GROWTH_MONITORING_SAF() {
-    FSM_STATES[FSM_STATE_SEED_DISPENSE].stateStartTimestamp = getTimestamp();
+    FSM_STATES[FSM_STATE_GROWTH_MONITORING].stateStartTimestamp = getTimestamp();
 
     // Once we are monitoring the seeds growth, we begin checking if we've hit midnight (for DLI integral purposes)
     Scheduler_Enable_Task(AS7341_CHECK_FOR_MIDNIGHT_TASK, 0);

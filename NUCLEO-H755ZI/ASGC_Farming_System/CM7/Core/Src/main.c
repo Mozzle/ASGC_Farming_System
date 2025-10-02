@@ -263,9 +263,9 @@ Error_Handler();
     globalTimestamp = getTimestamp();
 
     // Update the FSM state
-    FSM_Update();
+	FSM_Update();
     // Run the scheduler update every loop iteration
-    Scheduler_Update();
+	Scheduler_Update();
 
 
 	  //For testing purposes
@@ -1176,13 +1176,13 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   ----------------------------------------------------------------------------*/
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-  //Adafruit_AS7341_getAllChannels(&AS7341_Values);
+  Adafruit_AS7341_getAllChannels(&AS7341_Values);
   #pragma GCC diagnostic pop
 
   // Update DLI calculation
 
   // Send Data to Raspberry Pi
-  //RPI_UART_Send_AS7341_Pkt(AS7341_Values, 2);
+  RPI_UART_Send_AS7341_Pkt(AS7341_Values, 2);
   // Send Data to Display
 
   return SYS_SUCCESS;

@@ -57,6 +57,7 @@ SYS_RESULT RPI_UART_Send_Gcode_Pkt( const char *gcode, uint32_t timeout ) {
 	Pack the packet
 	-------------------------------------------------------------------------*/
 	gcode_packet.packet_id = RPI_GCODE_PKT_ID;
+	gcode_packet.valid = true;
 	header_pkt.packet_id = RPI_GCODE_PKT_ID;
 	strncpy((char *)gcode_packet.gcode_str, gcode, RPI_UART_GCODE_MAX_STR_LEN);
 
@@ -266,7 +267,7 @@ static HAL_StatusTypeDef _send_uart_packet( uint8_t *packetData, uint16_t packet
 				/*---------------------------------------------------------------------
 				Receive the ACK packet
 				---------------------------------------------------------------------*/
-				status = HAL_UART_Receive(&huart7, (uint8_t*)&ackPacket, RPI_UART_ACK_PACKET_SIZE, 3);
+				status = HAL_UART_Receive(&huart7, (uint8_t*)&ackPacket, RPI_UART_ACK_PACKET_SIZE, timeout);
 
 				if (status == HAL_OK && ackPacket.packet_id == RPI_ACK_PKT_ID && ackPacket.ack == true ) {
 					break;
@@ -295,7 +296,7 @@ static HAL_StatusTypeDef _send_uart_unix_time_packet( uint8_t *packetData, uint1
 				/*---------------------------------------------------------------------
 				Receive the Unix time packet
 				---------------------------------------------------------------------*/
-				status = HAL_UART_Receive(&huart7, (uint8_t*)unixTimePacket, RPI_UART_Unix_Time_SIZE, 3);
+				status = HAL_UART_Receive(&huart7, (uint8_t*)unixTimePacket, RPI_UART_Unix_Time_SIZE, timeout);
 
 				if (status == HAL_OK && unixTimePacket->packet_id == RPI_UNIX_TIME_PKT_ID) {
 					break;
