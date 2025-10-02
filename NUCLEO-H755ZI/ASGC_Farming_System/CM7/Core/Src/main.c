@@ -246,9 +246,7 @@ Error_Handler();
   // Display_Dashboard(int i);           // placeholder for now
   // Display_StartupScreen();            // placeholder for now
   // Display_EStopScreen();             // placeholder for now
-  uint8_t uartTX_Buf[15] = "Hello\r\n";
-  uint8_t uartRX_Buf[15];
-  uint16_t goodPkts = 0;
+
   HAL_Delay(100);
 
   /* USER CODE END 2 */
@@ -260,12 +258,6 @@ Error_Handler();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_UART_Transmit(&huart7, uartTX_Buf, 15, 100);
-	  HAL_UART_Receive (&huart7, uartRX_Buf, 15, 5000);
-
-	  if (uartRX_Buf[0] > 0 || uartRX_Buf[1] > 0) {
-		  goodPkts++;
-	  }
 
     // Update global timestamp
     globalTimestamp = getTimestamp();
