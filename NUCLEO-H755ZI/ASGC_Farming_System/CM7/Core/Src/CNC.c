@@ -12,7 +12,7 @@
 -----------------------------------------------------------------------------*/
 
 #include "CNC.h"
-#include "RPI_I2C.h"
+#include "RPI_UART.h"
 
 static CNC_NFT_Data CNC_DATA;
 bool CNC_Initialized = false;
@@ -42,14 +42,14 @@ SYS_RESULT usb_send_gcode( const char *gcode, uint32_t timeout ) {
 	}
 
 	gcode_len = strlen( gcode );
-	if ( gcode_len == 0 || gcode_len > RPI_I2C_GCODE_MAX_STR_LEN ) {
+	if ( gcode_len == 0 || gcode_len > RPI_UART_GCODE_MAX_STR_LEN ) {
 		return SYS_INVALID;
 	}
 
 	/*-------------------------------------------------------------------------
 	Send Packets
  	-------------------------------------------------------------------------*/
-	if (RPI_I2C_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
+	if (RPI_UART_Send_Gcode_Pkt( gcode, timeout ) == SYS_SUCCESS) {
 		return SYS_SUCCESS; // Return success if the G-code command was sent successfully
 	}
 	return SYS_FAIL; // Return fail if the G-code command was not sent successfully

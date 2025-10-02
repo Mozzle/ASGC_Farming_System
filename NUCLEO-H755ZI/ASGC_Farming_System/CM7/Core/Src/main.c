@@ -38,7 +38,7 @@
 #include "FSM.h"
 #include "Scheduler.h"
 #include "VL53L1X_prj.h"
-#include "RPI_I2C.h"
+#include "RPI_UART.h"
 
 /* USER CODE END Includes */
 
@@ -70,6 +70,7 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
+UART_HandleTypeDef huart7;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
@@ -119,6 +120,7 @@ static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_UART7_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -205,6 +207,7 @@ Error_Handler();
   MX_TIM4_Init();
   MX_ADC2_Init();
   MX_SPI1_Init();
+  MX_UART7_Init();
   /* USER CODE BEGIN 2 */
 
   /*---------------------------------------------------------------------------
@@ -243,7 +246,9 @@ Error_Handler();
   // Display_Dashboard(int i);           // placeholder for now
   // Display_StartupScreen();            // placeholder for now
   // Display_EStopScreen();             // placeholder for now
-
+  uint8_t uartTX_Buf[15] = "Hello\r\n";
+  uint8_t uartRX_Buf[15];
+  uint16_t goodPkts = 0;
   HAL_Delay(100);
 
   /* USER CODE END 2 */
@@ -255,6 +260,12 @@ Error_Handler();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HAL_UART_Transmit(&huart7, uartTX_Buf, 15, 100);
+	  HAL_UART_Receive (&huart7, uartRX_Buf, 15, 5000);
+
+	  if (uartRX_Buf[0] > 0 || uartRX_Buf[1] > 0) {
+		  goodPkts++;
+	  }
 
     // Update global timestamp
     globalTimestamp = getTimestamp();
@@ -711,6 +722,54 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief UART7 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART7_Init(void)
+{
+
+  /* USER CODE BEGIN UART7_Init 0 */
+
+  /* USER CODE END UART7_Init 0 */
+
+  /* USER CODE BEGIN UART7_Init 1 */
+
+  /* USER CODE END UART7_Init 1 */
+  huart7.Instance = UART7;
+  huart7.Init.BaudRate = 115200;
+  huart7.Init.WordLength = UART_WORDLENGTH_8B;
+  huart7.Init.StopBits = UART_STOPBITS_1;
+  huart7.Init.Parity = UART_PARITY_NONE;
+  huart7.Init.Mode = UART_MODE_TX_RX;
+  huart7.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart7.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart7.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart7.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart7.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart7, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart7, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART7_Init 2 */
+
+  /* USER CODE END UART7_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -1052,7 +1111,7 @@ SYS_RESULT AHT20_Get_Data_TASK() {
   AHT20_data = AHT20_Get_Data(&hi2c1);
 
   // Send Data to Raspberry Pi
-  RPI_I2C_Send_AHT20_Pkt(AHT20_data, 2);
+  RPI_UART_Send_AHT20_Pkt(AHT20_data, 2);
   // Send Data to Display
   ILI9341_Update_Temperature(AHT20_data.temperature);
   ILI9341_Update_Humidity(AHT20_data.humidity);
@@ -1074,7 +1133,7 @@ SYS_RESULT SEN0169_Get_Data_TASK() {
   SEN0169_Measure(&pH_Data);
 
   // Send Data to Raspberry Pi
-  RPI_I2C_Send_SEN0169_Pkt(pH_Data, 2);
+  RPI_UART_Send_SEN0169_Pkt(pH_Data, 2);
 
   // Send Data to Display
   ILI9341_Update_WaterpH(pH_Data);
@@ -1096,7 +1155,7 @@ SYS_RESULT SEN0244_Get_Data_TASK() {
   SEN0244_Measure(&tdsData, AHT20_data.temperature);
 
   // Send Data to Raspberry Pi
-  RPI_I2C_Send_SEN0244_Pkt(tdsData, 2);
+  RPI_UART_Send_SEN0244_Pkt(tdsData, 2);
 
   // Send Data to Display
   ILI9341_Update_WaterTDS(tdsData);
@@ -1125,13 +1184,13 @@ SYS_RESULT AS7341_Get_Data_TASK() {
   ----------------------------------------------------------------------------*/
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-  Adafruit_AS7341_getAllChannels(&AS7341_Values);
+  //Adafruit_AS7341_getAllChannels(&AS7341_Values);
   #pragma GCC diagnostic pop
 
   // Update DLI calculation
 
   // Send Data to Raspberry Pi
-  RPI_I2C_Send_AS7341_Pkt(AS7341_Values, 2);
+  //RPI_UART_Send_AS7341_Pkt(AS7341_Values, 2);
   // Send Data to Display
 
   return SYS_SUCCESS;

@@ -133,14 +133,14 @@ bool Adafruit_AS7341_readAllChannels(uint16_t *readings_buffer) {
 
 	Adafruit_AS7341_setSMUXLowChannels(true);        // Configure SMUX to read low channels
 	Adafruit_AS7341_enableSpectralMeasurement(true); // Start integration
-	Adafruit_AS7341_delayForData(0);                 // I'll wait for you for all time
+	Adafruit_AS7341_delayForData(700);                
 
 	bool low_success = Adafruit_AS7341_readRegister(AS7341_CH0_DATA_L, (uint8_t*) readings_buffer,
 			12);
 
 	Adafruit_AS7341_setSMUXLowChannels(false);       // Configure SMUX to read high channels
 	Adafruit_AS7341_enableSpectralMeasurement(true); // Start integration
-	Adafruit_AS7341_delayForData(0);                 // I'll wait for you for all time
+	Adafruit_AS7341_delayForData(700);
 
 	return low_success
 			&& Adafruit_AS7341_readRegister(AS7341_CH0_DATA_L, (uint8_t*) &readings_buffer[6], 12);
