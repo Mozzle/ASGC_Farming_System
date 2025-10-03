@@ -1057,6 +1057,72 @@ void ASGC_System_ESTOP() {
 
 }
 
+/*------------------------------------------------------------------------------
+ *
+ * 	uint8_t ASGC_System_DispenseSeeds(float holeX, float holeY)
+ *
+ *    This function is a helper function which will:
+ *      Move the gantry to the specified position (using G-Code)
+ *      Poll for confirmation that gantry is at the hole
+ *      Send PWM Signal to open the seed dispenser shutter
+ *      Confirm the shutter has opened, then Wait for seeds to dispense
+ *      Send PWM Signal to close seed dispenser shutter
+ *      Confirm the shutter has closed, then Wait for 2 seconds
+ * 
+ *    This function has the following return codes:
+ *        0 = Success
+ *        1 = Gantry failed to reach position
+ *        2 = Shutter failed to open
+ *        3 = X/Y Position is invalid
+ *
+------------------------------------------------------------------------------*/
+uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
+  #define DISPENSE_TIME_MS          (uint16_t)500;   // Time to keep shutter open in ms
+  #define DISPENSE_WAIT_MS          (uint16_t)5000;  // Time to wait after dispensing is finished
+  #define DISPENSE_SUCCESS          (uint8_t)0;
+  #define DISPENSE_FAIL_GANTRY      (uint8_t)1;
+  #define DISPENSE_FAIL_SHUTTER     (uint8_t)2;
+  #define DISPENSE_FAIL_XY_POS      (uint8_t)3;
+
+  // Check X/Y position is within bounds
+  if (holeX < CNC_MIN_X_POS || holeX > CNC_MAX_X_POS
+      || holeY < CNC_MIN_Y_POS || holeY > CNC_MAX_Y_POS) {
+    return DISPENSE_FAIL_XY_POS;
+  }
+
+  // Some switch statement that handles FSM
+  // poll the global timestamp to determine if enough time has passed to move to the next state
+}
+
+/*------------------------------------------------------------------------------
+ *
+ * 	uint16_t ASGC_System_DispenseSeeds()
+ *
+ * 		Function called to dispense seeds over the course of several minutes
+ *    This function should be non-blocking
+ * 
+ *    This function returns the number of seeds that FAILED to dispense
+ *      (so ideally, this function returns 0)
+ *
+------------------------------------------------------------------------------*/
+uint16_t ASGC_System_DispenseSeeds() {
+
+  uint16_t failed_dispenses = 0;
+
+  // Iterate through each channel, and each hole in the channel -- if empty, dispense a seed
+  for (uint8_t channel = 0; channel < CNC_NUM_NFT_CHANNELS; channel++) {
+    for (uint8_t hole = 0; hole < CNC_NUM_NET_POTS_PER_NFT_CHANNEL; hole++) {
+        if (CNC_DATA.channel_holes[channel][hole].is_empty) {
+            if (DispenseSeeds_HelperFunc(CNC_DATA.channel_holes[channel][hole].x_pos, CNC_DATA.channel_holes[channel][hole].y_pos) != 0) {
+              failed_dispenses++;
+            }
+        }
+    }
+  }
+
+  return failed_dispenses;
+}
+
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
  *

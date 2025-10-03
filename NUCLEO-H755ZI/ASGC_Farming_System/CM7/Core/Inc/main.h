@@ -175,6 +175,8 @@ void Error_Handler(void);
 ------------------------------------------------------------------------------*/
 void ASGC_System_Startup();
 void ASGC_System_ESTOP();
+uint8_t DispenseSeeds_HelperFunc();
+uint16_t ASGC_System_DispenseSeeds();
 
 // TASK FUNCTIONS - These are all the functions that will be registered in Scheduler.c
 SYS_RESULT AHT20_Request_Measurement_TASK();
