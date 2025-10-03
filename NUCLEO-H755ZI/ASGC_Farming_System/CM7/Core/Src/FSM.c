@@ -260,13 +260,14 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
     // If homing is complete, transition to next state.
     // otherwise, wait another short amount of time and check again.
 
-    static int test = 0;
+	// NOTE: THIS IS THE 'smoke and mirrors' solution to this state transition.
+	// This transition should actually poll the Raspberry Pi to tell if the CNC is homed or not
 
-    if (test >= 100) {
-        currentFSMState = FSM_STATE_SEED_DISPENSE;
-        FSM_STATES[FSM_STATE_CNC_HOMING].stateActivated = false;
-    }
-    test++;
+	// If 3 minutes have elapsed in this state
+	if (getTimestamp() - FSM_STATES[FSM_STATE_CNC_HOMING].stateStartTimestamp > 180000) {
+		currentFSMState = FSM_STATE_SEED_DISPENSE;
+		FSM_STATES[FSM_STATE_CNC_HOMING].stateActivated = false;
+	}
 
     return SYS_SUCCESS;
 }
@@ -301,14 +302,44 @@ SYS_RESULT FSM_State_SEED_DISPENSE_SAF() {
 
 SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
     /* IMPLEMENT ME */
+	static uint8_t channel_index = 0;
+	static uint8_t hole = 0;
+	static uint64_t timestampOfLastHole;
+	static uint8_t doOnce = 1;
 
-    static int test = 0;
 
-    if (test >= 100) {
-        currentFSMState = FSM_STATE_GROWTH_MONITORING;
-        FSM_STATES[FSM_STATE_SEED_DISPENSE].stateActivated = false;
-    }
-    test++;
+	// NOTE: This is the 'smoke and mirrors' method of
+	// the seed dispensing code. The real code will poll
+	// the raspberry pi to determine if the pi has made it to its
+	// destination, before moving to the next location.
+
+	if (doOnce) {
+		CNC_Move_To_Hole(0, 0);
+		doOnce = 0;
+		timestampOfLastHole = getTimestamp();
+	}
+
+	// If 30 seconds have elapsed since last move command
+	if (getTimestamp() - timestampOfLastHole > 30000) {
+		hole++;
+
+		if (hole % 10 == 0) {
+			channel_index++;
+		}
+
+		if (channel_index >= 4) {
+			currentFSMState = FSM_STATE_GROWTH_MONITORING;
+			FSM_STATES[FSM_STATE_SEED_DISPENSE].stateActivated = false;
+			return SYS_SUCCESS;
+		}
+
+		CNC_Move_To_Hole(channel_index, (hole % 10));
+		timestampOfLastHole = getTimestamp();
+
+	}
+
+
+
 
     return SYS_SUCCESS;
 }

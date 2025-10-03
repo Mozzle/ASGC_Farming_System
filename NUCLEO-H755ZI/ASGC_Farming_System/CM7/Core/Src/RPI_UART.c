@@ -283,6 +283,8 @@ static HAL_StatusTypeDef _send_uart_unix_time_packet( uint8_t *packetData, uint1
 	HAL_StatusTypeDef status;
 	uint8_t i;
 
+	HAL_UART_Abort(&huart7);
+
 	for ( i = 0; i < RPI_UART_NUM_PKT_SEND_ATTEMPTS; i++ ) {
 			/*-------------------------------------------------------------------------
 			Send the packet using HAL
