@@ -171,6 +171,17 @@ void Error_Handler(void);
 #define SYSTEM_OFF    false
 
 /*------------------------------------------------------------------------------
+ * Defines for DispenseSeeds Helper Function
+------------------------------------------------------------------------------*/
+#define DISPENSE_TIME_MS          (uint16_t)500;   // Time to keep shutter open in ms
+#define DISPENSE_WAIT_MS          (uint16_t)5000;  // Time to wait after dispensing is finished
+#define DISPENSE_SUCCESS          (uint8_t)0;
+#define DISPENSE_FAIL_GANTRY      (uint8_t)1;
+#define DISPENSE_FAIL_SHUTTER     (uint8_t)2;
+#define DISPENSE_FAIL_XY_POS      (uint8_t)3;
+#define DISPENSE_BUSY             (uint8_t)4;
+
+/*------------------------------------------------------------------------------
  * Function Declarations
 ------------------------------------------------------------------------------*/
 void ASGC_System_Startup();

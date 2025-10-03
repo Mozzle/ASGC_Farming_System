@@ -1077,12 +1077,6 @@ void ASGC_System_ESTOP() {
  *
 ------------------------------------------------------------------------------*/
 uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
-  #define DISPENSE_TIME_MS          (uint16_t)500;   // Time to keep shutter open in ms
-  #define DISPENSE_WAIT_MS          (uint16_t)5000;  // Time to wait after dispensing is finished
-  #define DISPENSE_SUCCESS          (uint8_t)0;
-  #define DISPENSE_FAIL_GANTRY      (uint8_t)1;
-  #define DISPENSE_FAIL_SHUTTER     (uint8_t)2;
-  #define DISPENSE_FAIL_XY_POS      (uint8_t)3;
 
   // Check X/Y position is within bounds
   if (holeX < CNC_MIN_X_POS || holeX > CNC_MAX_X_POS
@@ -1113,10 +1107,26 @@ uint16_t ASGC_System_DispenseSeeds() {
   for (uint8_t channel = 0; channel < CNC_NUM_NFT_CHANNELS; channel++) {
     for (uint8_t hole = 0; hole < CNC_NUM_NET_POTS_PER_NFT_CHANNEL; hole++) {
         if (CNC_DATA.channel_holes[channel][hole].is_empty) {
-            if (DispenseSeeds_HelperFunc(CNC_DATA.channel_holes[channel][hole].x_pos, CNC_DATA.channel_holes[channel][hole].y_pos) != 0) {
-              failed_dispenses++;
+          uint8_t dispense_result = DispenseSeeds_HelperFunc(CNC_DATA.channel_holes[channel][hole].x_pos, CNC_DATA.channel_holes[channel][hole].y_pos);
+          if (dispense_result != DISPENSE_SUCCESS) {
+
+            // If we're busy-waiting (safely, non-blocking), keep the same channel/hole indexes
+            if (dispense_result == DISPENSE_BUSY) {
+              hole--; // Decrement hole index to retry the same hole
+              if (hole < 0) { // If hole index goes below 0, move to previous channel
+                hole = CNC_NUM_NET_POTS_PER_NFT_CHANNEL - 1;
+                channel--;
+                if (channel < 0) { // If channel index goes below 0, reset to first channel
+                  channel = 0;
+                }
+              }
+              continue; // Retry dispensing at the same position
             }
+
+            // Increment failed dispense counter
+            failed_dispenses++;
         }
+      }
     }
   }
 
