@@ -173,21 +173,24 @@ void Error_Handler(void);
 /*------------------------------------------------------------------------------
  * Defines for DispenseSeeds Helper Function
 ------------------------------------------------------------------------------*/
-#define DISPENSE_TIME_MS          (uint16_t)500;   // Time to keep shutter open in ms
-#define DISPENSE_WAIT_MS          (uint16_t)5000;  // Time to wait after dispensing is finished
+#define DISPENSE_MOVING_MS        (uint16_t)2000;  // Max time to wait for gantry to move to hole in ms
+#define DISPENSE_SHUTTER_MS       (uint16_t)500;   // Time to keep shutter open in ms
+#define DISPENSE_FINISH_MS        (uint16_t)5000;  // Time to wait after dispensing is finished
 #define DISPENSE_SUCCESS          (uint8_t)0;
 #define DISPENSE_FAIL_GANTRY      (uint8_t)1;
 #define DISPENSE_FAIL_SHUTTER     (uint8_t)2;
 #define DISPENSE_FAIL_XY_POS      (uint8_t)3;
 #define DISPENSE_BUSY             (uint8_t)4;
+#define DISPENSE_UNKNOWN_FAIL     (uint8_t)5;
 
 /*------------------------------------------------------------------------------
  * Function Declarations
 ------------------------------------------------------------------------------*/
-void ASGC_System_Startup();
-void ASGC_System_ESTOP();
-uint8_t DispenseSeeds_HelperFunc();
-uint16_t ASGC_System_DispenseSeeds();
+void      ASGC_System_Startup();
+void      ASGC_System_ESTOP();
+uint8_t   DispenseSeeds_HelperFunc();
+uint16_t  ASGC_System_DispenseSeeds();
+void      Reset_DispenseSeeds_FSM();
 
 // TASK FUNCTIONS - These are all the functions that will be registered in Scheduler.c
 SYS_RESULT AHT20_Request_Measurement_TASK();

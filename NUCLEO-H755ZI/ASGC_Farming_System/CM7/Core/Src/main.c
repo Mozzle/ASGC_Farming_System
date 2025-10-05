@@ -1072,20 +1072,140 @@ void ASGC_System_ESTOP() {
  *    This function has the following return codes:
  *        0 = Success
  *        1 = Gantry failed to reach position
- *        2 = Shutter failed to open
+ *        2 = Shutter failed to open/close
  *        3 = X/Y Position is invalid
+ *        4 = Helper function is busy/working
  *
 ------------------------------------------------------------------------------*/
 uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
 
-  // Check X/Y position is within bounds
-  if (holeX < CNC_MIN_X_POS || holeX > CNC_MAX_X_POS
-      || holeY < CNC_MIN_Y_POS || holeY > CNC_MAX_Y_POS) {
-    return DISPENSE_FAIL_XY_POS;
+  // Enum for different states
+  typedef enum {
+    COMPLETE = 0,
+    MOVING_TO_HOLE,
+    OPENING_SHUTTER,
+    CLOSING_SHUTTER,
+    BUSY_WAITING
+  } DISPENSING_STATE;
+
+  // Initialize static vars
+  static uint64_t referenceTimestamp = 0;
+  static DISPENSING_STATE functionState = MOVING_TO_HOLE;
+  static DISPENSING_STATE previousState = BUSY_WAITING;
+
+  switch (functionState) {
+    case MOVING_TO_HOLE:
+      // Check X/Y position is within bounds -- if not, return XY error code
+      if (holeX < CNC_MIN_X_POS || holeX > CNC_MAX_X_POS
+          || holeY < CNC_MIN_Y_POS || holeY > CNC_MAX_Y_POS) {
+        return DISPENSE_FAIL_XY_POS;
+      }
+
+      // Update state machine variables
+      functionState = BUSY_WAITING;
+      previousState = MOVING_TO_HOLE;
+      // referenceTimestamp = getTimestamp(); // wait until Timer.h is included to update timestamp with current time
+
+      // Perform associated function (move to hole)
+      CNC_Move_To_Pos(holeX, holeY);
+      break;
+
+    case OPENING_SHUTTER:
+      // Update state machine variables
+      functionState = BUSY_WAITING;
+      previousState = OPENING_SHUTTER;
+      // referenceTimestamp = getTimestamp(); // wait until Timer.h is included to update timestamp with current time
+
+      // Perform associated function (open shutter)
+      // open_shutter();
+      break;
+
+    case CLOSING_SHUTTER:
+      // Update state machine variables
+      functionState = BUSY_WAITING;
+      previousState = OPENING_SHUTTER;
+      // referenceTimestamp = getTimestamp(); // wait until Timer.h is included to use getTimestamp()
+
+      // Perform associated function (close shutter)
+      // close_shutter();
+      break;
+
+    case BUSY_WAITING:
+
+      // Use our previous state to determine our logic in waiting
+      switch (previousState) {
+        case MOVING_TO_HOLE:
+          // After we've given some time to move, confirm gantry is at hole
+          // if (getTimestamp() - referenceTimestamp > DISPENSE_MOVING_MS) { // wait until Timer.h is included to use getTimestamp()
+
+          // Check if gantry is in position
+          //   if (GantryInPosition)
+          //    functionState = OPENING_SHUTTER;
+          //    previousState = BUSY_WAITING;
+          //    return DISPENSE_BUSY;
+
+          // If gantry is not in position, return gantry fail code
+          //   functionState = MOVING_TO_HOLE;
+          //   previousState = BUSY_WAITING;
+          //   referenceTimestamp = 0;
+          //   return DISPENSE_FAIL_GANTRY;
+          // }
+          break;
+
+        case OPENING_SHUTTER:
+          // Confirm shutter is open and that seeds have had time to dispense (0.5s)
+          // if (ShutterIsOpen && seedsHadTimeToDisperse)
+          //  functionState = CLOSING_SHUTTER;
+          //  previousState = BUSY_WAITING;
+          //  return DISPENSE_BUSY;
+
+          // If the shutter doesn't open after 2 seconds, return shutter fail code
+          // if (getTimestamp() - referenceTimestamp > 2000) { // wait until Timer.h is included to use getTimestamp()
+          //   functionState = MOVING_TO_HOLE;
+          //   previousState = BUSY_WAITING;
+          //   referenceTimestamp = 0;
+          //   return DISPENSE_FAIL_SHUTTER;
+          // }
+          break;
+
+        case CLOSING_SHUTTER:
+          // Confirm shutter is closed
+          // if (ShutterIsClosed)
+          //  functionState = MOVING_TO_HOLE;
+          //  previousState = BUSY_WAITING;
+          //  referenceTimestamp = 0;
+          //  return COMPLETE;
+
+          // If the shutter doesn't open after 2 seconds, return shutter fail code
+          // if (getTimestamp() - referenceTimestamp > 2000) { // wait until Timer.h is included to use getTimestamp()
+          //   functionState = MOVING_TO_HOLE;
+          //   previousState = BUSY_WAITING;
+          //   referenceTimestamp = 0;
+          //   return DISPENSE_FAIL_SHUTTER;
+          // }
+          break;
+
+        // This should never execute, but just incase, reset our FSM
+        default:
+          functionState = MOVING_TO_HOLE;
+          previousState = BUSY_WAITING;
+          referenceTimestamp = 0;
+          return DISPENSE_UNKNOWN_FAIL;
+      }
+
+      return DISPENSE_BUSY;
+      break;
+
+    // This should never execute, but just incase, reset our FSM
+    default:
+      functionState = MOVING_TO_HOLE;
+      previousState = BUSY_WAITING;
+      referenceTimestamp = 0;
+      return DISPENSE_UNKNOWN_FAIL;
   }
 
-  // Some switch statement that handles FSM
-  // poll the global timestamp to determine if enough time has passed to move to the next state
+  // Return as busy if we break out of switch statement
+  return DISPENSE_BUSY;
 }
 
 /*------------------------------------------------------------------------------
@@ -1145,25 +1265,20 @@ uint16_t ASGC_System_DispenseSeeds() {
 
   // If we're busy-waiting (safely, non-blocking), keep the same channel/hole indexes and return early
   if (dispense_result == DISPENSE_BUSY) {
-    hole--; // Decrement hole index to retry the same hole
-    if (hole < 0) { // If hole index goes below 0, move to previous channel
-      hole = CNC_NUM_NET_POTS_PER_NFT_CHANNEL - 1;
-      channel--;
-      if (channel < 0) { // If channel index goes below 0, reset to first channel
-        channel = 0;
-      }
-
-      // Return early so we don't change the number of channels/holes for next function call
       return SYSTEM_BUSY;
-    }
-  } 
+  }
   
   // If dispense failed for any reason other than busy, increment failed dispense counter
   else if (dispense_result != DISPENSE_SUCCESS) {
     failed_dispenses++;
   }
 
-  // Move to next hole
+  // Update CNC Data so hole is not empty
+  else if (dispense_result == DISPENSE_SUCCESS) {
+    CNC_DATA.channel_holes[channel][hole].is_empty = 0;
+  }
+
+  // Move to next hole as dispense attempt was completed
   hole++;
   if (hole >= CNC_NUM_NET_POTS_PER_NFT_CHANNEL) {
     hole = 0;
