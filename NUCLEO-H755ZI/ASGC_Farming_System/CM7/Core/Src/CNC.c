@@ -281,14 +281,14 @@ SYS_RESULT CNC_Dispense_Seeds() {
 	if (!CNC_Initialized) {
 		return SYS_NOT_INITIALIZED;
 	}
-	// Use static variables to keep track of state between calls
+	
+	// Call the high-level wrapper function repeatedly until it returns a value
+	const uint16_t SEED_INDICATOR_VALUE = CNC_NUM_NFT_CHANNELS * CNC_NUM_NET_POTS_PER_NFT_CHANNEL + 1;
+	uint16_t seedsFailedToDispense = ASGC_System_DispenseSeeds();
 
-	// Send movement commands using CNC_Move_To_Hole()
-	// Poll for confirmation that the gantry has made it to the hole. (This packet has not yet been defined)
-	// Once the gantry is above the hole, Dispense seeds (PWM signal to a servo: THIS IS NOT YET IMPLEMENTED)
-	// After a short time, close seed dispenser shutter (another PWM signal change)
-	// Dwell for a second for seeds to finish falling
-	// Send movement command to next hole.
-	// Iterate through these steps for all 40 holes.
+	// Add code to indicate we are ready for transition for the conditional:
+	// if(seedsFailedToDispense < SEED_INDICATOR_VALUE)
+	//		transition_to_next_state();
+
 	return SYS_SUCCESS;
 }
