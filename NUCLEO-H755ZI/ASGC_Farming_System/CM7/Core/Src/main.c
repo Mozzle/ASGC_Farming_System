@@ -1093,44 +1093,94 @@ uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
  * 	uint16_t ASGC_System_DispenseSeeds()
  *
  * 		Function called to dispense seeds over the course of several minutes
- *    This function should be non-blocking
+ *    This function is non-blocking and designed to be called repeatedly
  * 
  *    This function returns the number of seeds that FAILED to dispense
  *      (so ideally, this function returns 0)
+ * 
+ *    If this function returns a value less than or equal to the number of seeds
+ *    in the system, then it's caller knows it is finished dispensing
+ * 
+ *    Otherwise, if this function returns a value greater than the number of seeds
+ *    in the system, then it's caller knows it is still working (SYSTEM_BUSY)
  *
 ------------------------------------------------------------------------------*/
 uint16_t ASGC_System_DispenseSeeds() {
 
-  uint16_t failed_dispenses = 0;
+  static uint8_t channel = 0;
+  static uint8_t hole = 0;
+  static uint16_t failed_dispenses = 0;
 
-  // Iterate through each channel, and each hole in the channel -- if empty, dispense a seed
-  for (uint8_t channel = 0; channel < CNC_NUM_NFT_CHANNELS; channel++) {
-    for (uint8_t hole = 0; hole < CNC_NUM_NET_POTS_PER_NFT_CHANNEL; hole++) {
-        if (CNC_DATA.channel_holes[channel][hole].is_empty) {
-          uint8_t dispense_result = DispenseSeeds_HelperFunc(CNC_DATA.channel_holes[channel][hole].x_pos, CNC_DATA.channel_holes[channel][hole].y_pos);
-          if (dispense_result != DISPENSE_SUCCESS) {
+  /*  
+    Constant indicating the system is busy and has not yet finished dispensing
+    This value is guaranteed to be greater than the maximum number of seeds
+    in the system, so if this value is returned, the caller knows the system is working
+  */
+  const uint16_t SYSTEM_BUSY = CNC_NUM_NFT_CHANNELS * CNC_NUM_NET_POTS_PER_NFT_CHANNEL + 1;
 
-            // If we're busy-waiting (safely, non-blocking), keep the same channel/hole indexes
-            if (dispense_result == DISPENSE_BUSY) {
-              hole--; // Decrement hole index to retry the same hole
-              if (hole < 0) { // If hole index goes below 0, move to previous channel
-                hole = CNC_NUM_NET_POTS_PER_NFT_CHANNEL - 1;
-                channel--;
-                if (channel < 0) { // If channel index goes below 0, reset to first channel
-                  channel = 0;
-                }
-              }
-              continue; // Retry dispensing at the same position
-            }
+  // Check if the current hole is filled -- if so, skip it
+  if (!CNC_DATA.channel_holes[channel][hole].is_empty) {
+    // Move to next hole
+    hole++;
+    if (hole >= CNC_NUM_NET_POTS_PER_NFT_CHANNEL) {
+      hole = 0;
+      channel++;
+      if (channel >= CNC_NUM_NFT_CHANNELS) {
 
-            // Increment failed dispense counter
-            failed_dispenses++;
-        }
+        // If we've iterated through all channels and holes, reset all static values to 0
+        uint16_t returnValue = failed_dispenses;
+        channel = 0;
+        hole = 0;
+        failed_dispenses = 0;
+        return returnValue;
       }
+    }
+
+    // Return as busy if we haven't iterated through all holes
+    return SYSTEM_BUSY;
+  }
+
+  // Attempt to dispense a seed at the current channel&hole location
+  uint8_t dispense_result = DispenseSeeds_HelperFunc(CNC_DATA.channel_holes[channel][hole].x_pos, CNC_DATA.channel_holes[channel][hole].y_pos);
+
+  // If we're busy-waiting (safely, non-blocking), keep the same channel/hole indexes and return early
+  if (dispense_result == DISPENSE_BUSY) {
+    hole--; // Decrement hole index to retry the same hole
+    if (hole < 0) { // If hole index goes below 0, move to previous channel
+      hole = CNC_NUM_NET_POTS_PER_NFT_CHANNEL - 1;
+      channel--;
+      if (channel < 0) { // If channel index goes below 0, reset to first channel
+        channel = 0;
+      }
+
+      // Return early so we don't change the number of channels/holes for next function call
+      return SYSTEM_BUSY;
+    }
+  } 
+  
+  // If dispense failed for any reason other than busy, increment failed dispense counter
+  else if (dispense_result != DISPENSE_SUCCESS) {
+    failed_dispenses++;
+  }
+
+  // Move to next hole
+  hole++;
+  if (hole >= CNC_NUM_NET_POTS_PER_NFT_CHANNEL) {
+    hole = 0;
+    channel++;
+    if (channel >= CNC_NUM_NFT_CHANNELS) {
+
+      // If we've iterated through all channels and holes, reset all static values to 0
+      uint16_t returnValue = failed_dispenses;
+      channel = 0;
+      hole = 0;
+      failed_dispenses = 0;
+      return returnValue;
     }
   }
 
-  return failed_dispenses;
+  // Return as busy if we haven't iterated through all holes
+  return SYSTEM_BUSY;
 }
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
