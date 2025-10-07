@@ -246,6 +246,18 @@ SYS_RESULT CNC_Move_To_Position(float x_pos, float y_pos) {
 	return result; // Return the result of the G-code command
 }
 
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		CNC_Move_To_Hole
+ *
+ * 		Move to the specified net pot hole. The XY positions of every net pot
+ * 		hole are specified in the CNC_DATA, and are ordered in increasing YX
+ * 		order (the channel with the lowest Y value is channel 0, and the hole
+ * 		with the lowest x value is hole 0.)
+ *
+ ----------------------------------------------------------------------------*/
+
 SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index) {
 
 	float x_destination, y_destination;

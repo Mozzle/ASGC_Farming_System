@@ -238,8 +238,8 @@ SYS_RESULT FSM_State_FILL_RESERVOIR_TCF() {
         Raspberry Pi
 
     Transitions out of this state:
-        -> XXXXX
-            XXXX
+        -> FSM_STATE_SEED_DISPENSE
+        Raspberry Pi returns that the CNC system has been successfully homed
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
@@ -281,11 +281,12 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
         -> FSM_STATE_CNC_HOMING
 
     Action Upon State Activation:
-        [NOT YET IMPLEMENTED]
+        Get Unix Time reference value from RPi
+        Activate Seed Dispensing Task
 
     Transitions out of this state:
-        -> XXXXX
-            XXXX
+        -> FSM_STATE_GROWTH_MONITORING
+        Seed dispensing task finishes
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX*/
 
