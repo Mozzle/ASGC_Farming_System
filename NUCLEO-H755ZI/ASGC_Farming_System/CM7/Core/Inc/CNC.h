@@ -37,21 +37,13 @@
 						/* Value TBD but should be ~500			 			 */
 
 
-#define SEED_DISPENSER_X_OFFSET_MM 			9999.9
+#define SEED_DISPENSER_X_OFFSET_MM 			40.833
 						/* X offset of the seed dispenser dispensing tube	 */
 						/* from the absolute CNC Position. Value TBD		 */
-#define SEED_DISPENSER_Y_OFFSET_MM 			9999.9
+#define SEED_DISPENSER_Y_OFFSET_MM 			12.5
 						/* Y offset of the seed dispenser dispensing tube	 */
 						/* from the absolute CNC Position. Value TBD		 */
-#define SEED_DISPENSER_MAX_X_POS_MM 		1980.0
-						/* Maximum X position of the seed dispenser in mm.   */
-						/* Value TBD				 						 */
-#define SEED_DISPENSER_DOCK_X_POS_MM 		9999.9
-						/* X position of the seed dispenser tool change 	 */
-						/* docking station in the farming system. Value TBD	 */
-#define SEED_DISPENSER_DOCK_Y_POS_MM 		9999.9
-						/* Y position of the seed dispenser tool change 	 */
-						/* docking station in the farming system. Value TBD	 */
+
 
 typedef struct {
 	float x_pos; 		/* Hole X position in mm 						 	 */
@@ -66,6 +58,11 @@ typedef struct {
 
 } CNC_NFT_Data;
 
+typedef enum {
+	CNC_TOOL_SEED_DISPENSER,
+	CNC_TOOL_LIFTER_ARM,
+} CNC_Tool_Reference;
+
 /*-----------------------------------------------------------------------------
 FUNCTION DECLARATIONS
 -----------------------------------------------------------------------------*/
@@ -75,7 +72,7 @@ uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos);
 
 SYS_RESULT CNC_Home_Command(void);
 SYS_RESULT CNC_Move_To_Pos(float x_pos, float y_pos);
-SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index);
+SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index, CNC_Tool_Reference tool_to_use);
 SYS_RESULT CNC_Dispense_Seeds();
 
 

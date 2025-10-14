@@ -1079,7 +1079,7 @@ void ASGC_System_ESTOP() {
 ------------------------------------------------------------------------------*/
 uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
 
-  // Enum for different states
+/*  // Enum for different states
   typedef enum {
     COMPLETE = 0,
     MOVING_TO_HOLE,
@@ -1096,8 +1096,8 @@ uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
   switch (functionState) {
     case MOVING_TO_HOLE:
       // Check X/Y position is within bounds -- if not, return XY error code
-      if (holeX < CNC_MIN_X_POS || holeX > CNC_MAX_X_POS
-          || holeY < CNC_MIN_Y_POS || holeY > CNC_MAX_Y_POS) {
+      if (holeX < CNC_MIN_X_POS_MM || holeX > CNC_MAX_X_POS_MM
+          || holeY < CNC_MIN_Y_POS_MM || holeY > CNC_MAX_Y_POS_MM) {
         return DISPENSE_FAIL_XY_POS;
       }
 
@@ -1206,6 +1206,8 @@ uint8_t DispenseSeeds_HelperFunc(float holeX, float holeY) {
 
   // Return as busy if we break out of switch statement
   return DISPENSE_BUSY;
+  */
+ return DISPENSE_SUCCESS;
 }
 
 /*------------------------------------------------------------------------------
@@ -1236,6 +1238,7 @@ uint16_t ASGC_System_DispenseSeeds() {
     This value is guaranteed to be greater than the maximum number of seeds
     in the system, so if this value is returned, the caller knows the system is working
   */
+/*
   const uint16_t SYSTEM_BUSY = CNC_NUM_NFT_CHANNELS * CNC_NUM_NET_POTS_PER_NFT_CHANNEL + 1;
 
   // Check if the current hole is filled -- if so, skip it
@@ -1295,7 +1298,8 @@ uint16_t ASGC_System_DispenseSeeds() {
   }
 
   // Return as busy if we haven't iterated through all holes
-  return SYSTEM_BUSY;
+  return SYSTEM_BUSY; */
+  return SYS_SUCCESS;
 }
 
 /*XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

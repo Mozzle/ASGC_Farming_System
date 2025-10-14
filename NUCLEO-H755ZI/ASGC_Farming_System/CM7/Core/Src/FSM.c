@@ -264,7 +264,7 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
 	// This transition should actually poll the Raspberry Pi to tell if the CNC is homed or not
 
 	// If 3 minutes have elapsed in this state
-	if (getTimestamp() - FSM_STATES[FSM_STATE_CNC_HOMING].stateStartTimestamp > 180000) {
+	if (getTimestamp() - FSM_STATES[FSM_STATE_CNC_HOMING].stateStartTimestamp > 90000) {
 		currentFSMState = FSM_STATE_SEED_DISPENSE;
 		FSM_STATES[FSM_STATE_CNC_HOMING].stateActivated = false;
 	}
@@ -315,7 +315,7 @@ SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
 	// destination, before moving to the next location.
 
 	if (doOnce) {
-		CNC_Move_To_Hole(0, 0);
+		CNC_Move_To_Hole(0, 0, CNC_TOOL_SEED_DISPENSER);
 		doOnce = 0;
 		timestampOfLastHole = getTimestamp();
 	}
@@ -331,16 +331,15 @@ SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
 		if (channel_index >= 4) {
 			currentFSMState = FSM_STATE_GROWTH_MONITORING;
 			FSM_STATES[FSM_STATE_SEED_DISPENSE].stateActivated = false;
+            // Move head out of the way
+            CNC_Move_To_Pos(10.0, 10.0);
 			return SYS_SUCCESS;
 		}
 
-		CNC_Move_To_Hole(channel_index, (hole % 10));
+		CNC_Move_To_Hole(channel_index, (hole % 10), CNC_TOOL_SEED_DISPENSER);
 		timestampOfLastHole = getTimestamp();
 
 	}
-
-
-
 
     return SYS_SUCCESS;
 }

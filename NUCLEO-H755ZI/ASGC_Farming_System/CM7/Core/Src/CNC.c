@@ -193,7 +193,8 @@ uint8_t* CNC_Find_Hole_Closest_To_Position(float x_pos, float y_pos) {
 SYS_RESULT CNC_Home_Command() {
 
 	// Send the G-code command to home the CNC system
-	const char *gcode = "G28"; // G28 is the G-code command for homing
+	const char *gcode = "G28 X435 Y0"; // G28 is the G-code command for homing,
+									   // home only x and y axes
 	SYS_RESULT result = usb_send_gcode(gcode, 100); // 100ms timeout
 
 	return result;
@@ -202,7 +203,7 @@ SYS_RESULT CNC_Home_Command() {
 
 /*-----------------------------------------------------------------------------
  *
- * 		CNC_Move_To_Position
+ * 		CNC_Move_To_Pos
  *
  * 		Sends a G-code command to the CNC control board to move the CNC system 
  * 		to the given (x, y) position in the farming system, accounting for
@@ -211,7 +212,7 @@ SYS_RESULT CNC_Home_Command() {
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT CNC_Move_To_Position(float x_pos, float y_pos) {
+SYS_RESULT CNC_Move_To_Pos(float x_pos, float y_pos) {
 
 	if (!CNC_Initialized) {
 		return SYS_NOT_INITIALIZED; // If CNC is not initialized, return error
@@ -239,8 +240,11 @@ SYS_RESULT CNC_Move_To_Position(float x_pos, float y_pos) {
 //	}
 
 	// Send the G-code command to move the CNC system to the given position
-	char gcode[50];
-	snprintf(gcode, sizeof(gcode), "G0 X%.2f Y%.2f\n", x_pos, y_pos); // G0 is the G-code command for rapid positioning
+	char gcode[75];
+	snprintf(gcode, sizeof(gcode), "G0 X%.2f Y%.2f F420\n", x_pos, y_pos); // G0 is the G-code command for rapid positioning
+	// F420 sets the feedrate to 420 mm/min
+	// A feedrate of 420 mm/min has been chosen as a speed that does not cause stepper motor slipping.
+	// A 600mm/min rate caused slipping. Unsure if this value could be higher.
 	SYS_RESULT result = usb_send_gcode(gcode, 75); // 75ms timeout
 
 	return result; // Return the result of the G-code command
@@ -255,12 +259,18 @@ SYS_RESULT CNC_Move_To_Position(float x_pos, float y_pos) {
  * 		hole are specified in the CNC_DATA, and are ordered in increasing YX
  * 		order (the channel with the lowest Y value is channel 0, and the hole
  * 		with the lowest x value is hole 0.)
+ * 		The tool_to_use parameter specifies which tool to align with the 
+ * 		specified hole.
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index) {
+SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index, CNC_Tool_Reference tool_to_use) {
 
 	float x_destination, y_destination;
+
+	if (!CNC_Initialized) {
+		return SYS_NOT_INITIALIZED; // If CNC is not initialized, return error
+	}
 
 	// Can't move to hole if invalid channel/hole index or toolhead not 
 	// determined
@@ -272,19 +282,18 @@ SYS_RESULT CNC_Move_To_Hole(uint8_t channel_index, uint8_t hole_index) {
 	x_destination = CNC_DATA.channel_holes[channel_index][hole_index].x_pos;
 	y_destination = CNC_DATA.channel_holes[channel_index][hole_index].y_pos;
 
-//	if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_SEED_DISPENSER) {
-//		// If the seed dispenser is equipped, adjust the position for the dispenser offset
-//		x_destination -= (SEED_DISPENSER_X_OFFSET_MM + SEED_DISPENSER_X_OFFSET_MM);
-//		y_destination -= (SEED_DISPENSER_Y_OFFSET_MM + SEED_DISPENSER_Y_OFFSET_MM);
-//
-//	} else if (CNC_DATA.equipped_toolhead == CNC_TOOLHEAD_LIFTER_ARM) {
-//		// If the lifter arm is equipped, adjust the position for the lifter arm offset
-//		x_destination -= (LIFTER_X_OFFSET_MM + LIFTER_X_OFFSET_MM);
-//		y_destination -= (LIFTER_Y_OFFSET_MM + LIFTER_Y_OFFSET_MM);
-//
-//	}
+	if (tool_to_use == CNC_TOOL_SEED_DISPENSER) {
+		x_destination -= SEED_DISPENSER_X_OFFSET_MM;
+		y_destination -= SEED_DISPENSER_Y_OFFSET_MM;
+	}
 
-	return CNC_Move_To_Position(x_destination, y_destination);
+	if (x_destination < 0 || x_destination > CNC_MAX_X_POS_MM || 
+		y_destination < 0 || y_destination > CNC_MAX_Y_POS_MM) 
+	{
+		return SYS_INVALID; // If destination is out of bounds, return error
+	}
+
+	return CNC_Move_To_Pos(x_destination, y_destination);
 }
 
 SYS_RESULT CNC_Dispense_Seeds() {
