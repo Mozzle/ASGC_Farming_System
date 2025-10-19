@@ -77,58 +77,58 @@ SYS_RESULT CNC_Init() {
 
 	CNC_DATA = (CNC_NFT_Data) {
 		.channel_holes = {
-			// The (x, y) of each hole will be experimentally determined and
+			// The (x, y) of each hole has been experimentally determined and
 			// hardcoded here.
 
 			// !TODO: If ROM space becomes an issue, consider making an EEPROM 
 			// config file to store these values.
 			{ // Channel 0
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 0
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 1
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 2
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 3
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 4
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 5
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 6
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 7
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 8
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }  // Hole 9
+				{ .x_pos = 0432.00, .y_pos = 0225.00, .is_empty = false }, // Hole 0
+				{ .x_pos = 0432.00, .y_pos = 0370.00, .is_empty = false }, // Hole 1
+				{ .x_pos = 0432.00, .y_pos = 0517.00, .is_empty = false }, // Hole 2
+				{ .x_pos = 0430.00, .y_pos = 0663.00, .is_empty = false }, // Hole 3
+				{ .x_pos = 0430.00, .y_pos = 0811.00, .is_empty = false }, // Hole 4
+				{ .x_pos = 0430.00, .y_pos = 0957.00, .is_empty = false }, // Hole 5
+				{ .x_pos = 0430.00, .y_pos = 1106.00, .is_empty = false }, // Hole 6
+				{ .x_pos = 0430.00, .y_pos = 1252.00, .is_empty = false }, // Hole 7
+				{ .x_pos = 0430.00, .y_pos = 1398.00, .is_empty = false }, // Hole 8
+				{ .x_pos = 0427.00, .y_pos = 1552.00, .is_empty = false }  // Hole 9
 			},
 			{ // Channel 1
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 0
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 1
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 2
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 3
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 4
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 5
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 6
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 7
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 8
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }  // Hole 9
+				{ .x_pos = 0294.00, .y_pos = 0289.00, .is_empty = false }, // Hole 0
+				{ .x_pos = 0294.00, .y_pos = 0435.00, .is_empty = false }, // Hole 1
+				{ .x_pos = 0296.00, .y_pos = 0581.00, .is_empty = false }, // Hole 2
+				{ .x_pos = 0296.00, .y_pos = 0730.00, .is_empty = false }, // Hole 3
+				{ .x_pos = 0298.00, .y_pos = 0876.00, .is_empty = false }, // Hole 4
+				{ .x_pos = 0298.00, .y_pos = 1022.00, .is_empty = false }, // Hole 5
+				{ .x_pos = 0302.00, .y_pos = 1168.00, .is_empty = false }, // Hole 6
+				{ .x_pos = 0302.00, .y_pos = 1314.00, .is_empty = false }, // Hole 7
+				{ .x_pos = 0302.00, .y_pos = 1463.00, .is_empty = false }, // Hole 8
+				{ .x_pos = 0302.00, .y_pos = 1615.00, .is_empty = false }  // Hole 9
 			},
 			{ // Channel 2
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 0
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 1
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 2
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 3
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 4
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 5
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 6
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 7
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 8
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }  // Hole 9
+				{ .x_pos = 0174.00, .y_pos = 0235.00, .is_empty = false }, // Hole 0
+				{ .x_pos = 0174.00, .y_pos = 0383.00, .is_empty = false }, // Hole 1
+				{ .x_pos = 0177.00, .y_pos = 0529.00, .is_empty = false }, // Hole 2
+				{ .x_pos = 0180.00, .y_pos = 0675.00, .is_empty = false }, // Hole 3
+				{ .x_pos = 0180.00, .y_pos = 0824.00, .is_empty = false }, // Hole 4
+				{ .x_pos = 0183.00, .y_pos = 0970.00, .is_empty = false }, // Hole 5
+				{ .x_pos = 0185.00, .y_pos = 1116.00, .is_empty = false }, // Hole 6
+				{ .x_pos = 0185.00, .y_pos = 1264.00, .is_empty = false }, // Hole 7
+				{ .x_pos = 0188.00, .y_pos = 1413.00, .is_empty = false }, // Hole 8
+				{ .x_pos = 0190.00, .y_pos = 1556.00, .is_empty = false }  // Hole 9
 			},
 			{ // Channel 3
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 0
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 1
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 2
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 3
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 4
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 5
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 6
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 7
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }, // Hole 8
-				{ .x_pos = 0000.00, .y_pos = 0000.00, .is_empty = false }  // Hole 9
+				{ .x_pos = 0053.00, .y_pos = 0271.00, .is_empty = false }, // Hole 0
+				{ .x_pos = 0053.00, .y_pos = 0417.00, .is_empty = false }, // Hole 1
+				{ .x_pos = 0050.00, .y_pos = 0563.00, .is_empty = false }, // Hole 2
+				{ .x_pos = 0053.00, .y_pos = 0712.00, .is_empty = false }, // Hole 3
+				{ .x_pos = 0053.00, .y_pos = 0858.00, .is_empty = false }, // Hole 4
+				{ .x_pos = 0056.00, .y_pos = 1004.00, .is_empty = false }, // Hole 5
+				{ .x_pos = 0056.00, .y_pos = 1150.00, .is_empty = false }, // Hole 6
+				{ .x_pos = 0060.00, .y_pos = 1296.00, .is_empty = false }, // Hole 7
+				{ .x_pos = 0060.00, .y_pos = 1424.00, .is_empty = false }, // Hole 8
+				{ .x_pos = 0060.00, .y_pos = 1572.00, .is_empty = false }  // Hole 9
 			}
 		}
 	};
