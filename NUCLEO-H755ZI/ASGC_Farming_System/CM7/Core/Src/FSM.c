@@ -263,7 +263,7 @@ SYS_RESULT FSM_State_CNC_HOMING_TCF() {
 	// NOTE: THIS IS THE 'smoke and mirrors' solution to this state transition.
 	// This transition should actually poll the Raspberry Pi to tell if the CNC is homed or not
 
-	// If 3 minutes have elapsed in this state
+	// If 1.5 minutes have elapsed in this state
 	if (getTimestamp() - FSM_STATES[FSM_STATE_CNC_HOMING].stateStartTimestamp > 90000) {
 		currentFSMState = FSM_STATE_SEED_DISPENSE;
 		FSM_STATES[FSM_STATE_CNC_HOMING].stateActivated = false;
@@ -320,12 +320,23 @@ SYS_RESULT FSM_State_SEED_DISPENSE_TCF() {
 		timestampOfLastHole = getTimestamp();
 	}
 
-	// If 30 seconds have elapsed since last move command
-	if (getTimestamp() - timestampOfLastHole > 30000) {
-		hole++;
+	// If 40 seconds have elapsed since last move command
+	if (getTimestamp() - timestampOfLastHole > 40000) {
+        if (channel_index == 0 || channel_index == 2) {
+            hole++;
+        }
+        else if (channel_index == 1 || channel_index == 3) {
+            if (hole == 0) {
+                channel_index++;
+            }
+            else {
+                hole--;
+            }
+        }
 
-		if (hole % 10 == 0) {
+		if (hole == 10) {
 			channel_index++;
+            hole = 9;
 		}
 
 		if (channel_index >= 4) {
