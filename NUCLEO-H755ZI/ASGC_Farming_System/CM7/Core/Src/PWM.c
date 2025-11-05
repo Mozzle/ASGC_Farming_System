@@ -20,7 +20,7 @@
  * 	 	- PWM Pulse correlates to SPEED and DIRECTION of lifter
  * 
  *  TODO:
- * 	   - Update lines 58 and 63 to ensure the correct maximum duty values for each servo are set
+ * 	   - Update lines 47 and 62 in PWM.h to ensure the correct maximum duty values for each servo are set
  *     - Update lines 91 and 121 to ensure the correct TIM_CHANNEL_x is set
  *     - Review line 112 and ensure this is the correct "no action" duty cycle for vertical lifter servo
  * 	   - Update lines 158 and 181 with correct TIMx->CCRy registers for each servo
@@ -55,12 +55,12 @@ Servo Configs
 -----------------------------------------------------------------------------*/
 const PWM_Servo_Config VERTICAL_LIFTER_SERVO_CONFIG = {
     .ServoType = VERTICAL_LIFTER_SERVO,
-    .MaxDuty = 12000 // Fix me!
+    .MaxDuty = PWM_VLIFTER_100_PCT_DUTY
 };
 
 const PWM_Servo_Config SHUTTER_SERVO_CONFIG = {
     .ServoType = SHUTTER_SERVO,
-    .MaxDuty = 12000 // Fix me!
+    .MaxDuty = PWM_SHUTTER_100_PCT_DUTY
 };
 
 /*-----------------------------------------------------------------------------
@@ -207,19 +207,4 @@ uint16_t PWM_GetDuty(PWM_Servo_Config config) {
 
 	// Invalid servo type was passed
 	return 0;
-}
-
-/*-----------------------------------------------------------------------------
- *
- * 		uint16_t DutyValueFromPercent(PWM_Servo_Config config, uint8_t percent)
- *
- * 		Returns the duty value corresponding to a percentage of max duty
- * 		for the specified servo config.
- * 
- * 		Used to replace the need to write several defines for each servo.
- * 		Instead, just call this if you want a specific duty value from a %.
- *
- ----------------------------------------------------------------------------*/
-uint16_t DutyValuePCT(PWM_Servo_Config config, uint8_t percent) {
-	return ((config.MaxDuty * percent) / 100);
 }

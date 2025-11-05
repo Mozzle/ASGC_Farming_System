@@ -32,16 +32,46 @@
 #include <stdint.h>
 
 // PWM Success/Failure Defines
-#define PWM_INIT_FAIL		    false
-#define PWM_INIT_SUCCEED 	    true
+#define PWM_INIT_FAIL		        false
+#define PWM_INIT_SUCCEED 	        true
 
 // Servo Type Defines
-#define VERTICAL_LIFTER_SERVO   (uint8_t) 0
-#define SHUTTER_SERVO           (uint8_t) 1
+#define VERTICAL_LIFTER_SERVO       (uint8_t) 0
+#define SHUTTER_SERVO               (uint8_t) 1
 
 // Servo Value Defines
-#define SERVO_OPEN              (uint8_t) 0
-#define SERVO_CLOSED            (uint8_t) 1
+#define SERVO_OPEN                  (uint8_t) 0
+#define SERVO_CLOSED                (uint8_t) 1
+
+// Vertical Lifter Servo PWM Percent Defines
+#define PWM_VLIFTER_100_PCT_DUTY	(uint16_t) 12000 // Fix me!
+#define PWM_VLIFTER_90_PCT_DUTY	    (uint16_t) (0.90) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_80_PCT_DUTY	    (uint16_t) (0.80) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_75_PCT_DUTY	    (uint16_t) (0.75) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_70_PCT_DUTY	    (uint16_t) (0.70) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_60_PCT_DUTY	    (uint16_t) (0.60) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_50_PCT_DUTY	    (uint16_t) (0.50) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_40_PCT_DUTY	    (uint16_t) (0.40) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_30_PCT_DUTY	    (uint16_t) (0.30) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_25_PCT_DUTY	    (uint16_t) (0.25) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_20_PCT_DUTY	    (uint16_t) (0.20) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_10_PCT_DUTY	    (uint16_t) (0.10) * PWM_VLIFTER_100_PCT_DUTY
+#define PWM_VLIFTER_0_PCT_DUTY	    (uint16_t) 0
+
+// Shutter Servo PWM Percent Defines
+#define PWM_SHUTTER_100_PCT_DUTY	(uint16_t) 12000 // Fix me!
+#define PWM_SHUTTER_90_PCT_DUTY	    (uint16_t) (0.90) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_80_PCT_DUTY	    (uint16_t) (0.80) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_75_PCT_DUTY	    (uint16_t) (0.75) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_70_PCT_DUTY	    (uint16_t) (0.70) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_60_PCT_DUTY	    (uint16_t) (0.60) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_50_PCT_DUTY	    (uint16_t) (0.50) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_40_PCT_DUTY	    (uint16_t) (0.40) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_30_PCT_DUTY	    (uint16_t) (0.30) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_25_PCT_DUTY	    (uint16_t) (0.25) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_20_PCT_DUTY	    (uint16_t) (0.20) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_10_PCT_DUTY	    (uint16_t) (0.10) * PWM_SHUTTER_100_PCT_DUTY
+#define PWM_SHUTTER_0_PCT_DUTY	    (uint16_t) 0
 
 /*-----------------------------------------------------------------------------
 STRUCTS FOR SERVO CONFIGURATION
@@ -64,6 +94,5 @@ bool PWM_VerticalServo_Init(TIM_HandleTypeDef htim);
 bool PWM_ShutterServo_Init(TIM_HandleTypeDef htim);
 SYS_RESULT PWM_SetDuty(PWM_Servo_Config config, uint16_t duty);
 uint16_t PWM_GetDuty(PWM_Servo_Config config);
-uint16_t DutyValuePCT(PWM_Servo_Config config, uint8_t percent);
 
 #endif /* PWM_H */
