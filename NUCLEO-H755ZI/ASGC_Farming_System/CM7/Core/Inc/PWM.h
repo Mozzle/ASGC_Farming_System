@@ -10,7 +10,8 @@
  * 
  *  NOTES:
  *   - The PWM Minimum Duty is always 0 (0%)
- *   - The PWM Maximum Duty is set from a PWM_Servo_Config struct, which is defined in PWM.c
+ *   - The PWM Maximum Duty is statically defined from a given PWM_Servo_Config struct, which is defined in PWM.c
+ *   - Use DutyValuePCT(SERVO_CONFIG, percent) to get the correct duty value for a given percentage, instead of using defines as in fan_pwm_intf.h
  * 
  * 	 - The Shutter Servo moves from a 0 degree position (closed) to a 90 degree position (open)
  * 		- PWM Pulse correlates to POSITION of shutter
