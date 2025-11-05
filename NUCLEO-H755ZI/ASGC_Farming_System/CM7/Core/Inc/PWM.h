@@ -92,7 +92,7 @@ FUNCTION PROTOTYPES
 -----------------------------------------------------------------------------*/
 bool PWM_VerticalServo_Init(TIM_HandleTypeDef htim);
 bool PWM_ShutterServo_Init(TIM_HandleTypeDef htim);
-SYS_RESULT PWM_SetDuty(PWM_Servo_Config config, uint16_t duty);
-uint16_t PWM_GetDuty(PWM_Servo_Config config);
+SYS_RESULT PWMServo_SetDutyForConfig(PWM_Servo_Config config, uint16_t duty);
+uint16_t PWMServo_GetDutyForConfig(PWM_Servo_Config config);
 
 #endif /* PWM_H */

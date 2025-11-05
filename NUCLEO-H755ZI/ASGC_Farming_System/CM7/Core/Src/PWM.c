@@ -130,14 +130,14 @@ Function Implementations
 
 /*-----------------------------------------------------------------------------
  *
- * 		PWM_SetDuty(PWM_Servo_Config config, uint16_t duty)
+ * 		PWMServo_SetDutyForConfig(PWM_Servo_Config config, uint16_t duty)
  *
  * 		Sets the PWM Duty Cycle of the specified servo config
  * 		This function will auto-clamp the passed in duty value
  *
  ----------------------------------------------------------------------------*/
 
-SYS_RESULT PWM_SetDuty(PWM_Servo_Config config, uint16_t duty) {
+SYS_RESULT PWMServo_SetDutyForConfig(PWM_Servo_Config config, uint16_t duty) {
 
 	/// Vertical Lifter Servo Logic ///
 	if (config.ServoType == VERTICAL_LIFTER_SERVO) {
@@ -191,13 +191,13 @@ SYS_RESULT PWM_SetDuty(PWM_Servo_Config config, uint16_t duty) {
 
 /*-----------------------------------------------------------------------------
  *
- * 		uint16_t PWM_GetDuty(PWM_Servo_Config config)
+ * 		uint16_t PWMServo_GetDutyForConfig(PWM_Servo_Config config)
  *
  * 		Returns the current PWM duty cycle of the specified servo config
  * 		Returns 0 if invalid servo type is passed
  *
  ----------------------------------------------------------------------------*/
-uint16_t PWM_GetDuty(PWM_Servo_Config config) {
+uint16_t PWMServo_GetDutyForConfig(PWM_Servo_Config config) {
 	if (config.ServoType == VERTICAL_LIFTER_SERVO) {
 		return vlifter_duty_cycle;
 	}
