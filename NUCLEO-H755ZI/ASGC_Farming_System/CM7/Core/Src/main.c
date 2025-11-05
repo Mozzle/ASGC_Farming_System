@@ -24,6 +24,7 @@
 #include "functionality_mngmnt.h"
 #include "AHT20.h"
 #include "FAN_pwm_intf.h"
+#include "PWM.h"
 #include "Buttons.h"
 #include "timer.h"
 #include "CNC.h"
@@ -219,6 +220,8 @@ Error_Handler();
   Buttons_Init(&SYSTEM_START_STATE);
   ASGC_Timer_Init();
   FAN_pwm_intf_Init(htim3);
+  // PWM_VerticalServo_Init(htim); // add timer reference here
+  // PWM_ShutterServo_Init(htim);  // add timer reference here
   mixing_motor_Init(htim4);
   HAL_Delay(45);             // Must be called prior to AHT20_Init()
   AHT20_Init(&hi2c1, 10000); // 10 second timeout
