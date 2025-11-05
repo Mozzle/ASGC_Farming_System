@@ -20,10 +20,9 @@
  * 	 	- PWM Pulse correlates to SPEED and DIRECTION of lifter
  * 
  *  TODO:
- * 	   - Update lines 47 and 62 in PWM.h to ensure the correct maximum duty values for each servo are set
- *     - Update lines 91 and 121 to ensure the correct TIM_CHANNEL_x is set
- *     - Review line 112 and ensure this is the correct "no action" duty cycle for vertical lifter servo
- * 	   - Update lines 158 and 181 with correct TIMx->CCRy registers for each servo
+ *     - Update lines 90 and 120 to ensure the correct TIM_CHANNEL_x is set
+ *     - Review line 111 and ensure this is the correct "no action" duty cycle for vertical lifter servo
+ * 	   - Update lines 156 and 179 with correct TIMx->CCRy registers for each servo
  * 
  * 	   - Implement the following function skeletons for PWM.h:
  * 			- PWM_Set_Seed_Dispenser_Servo(SERVO_VALUE)

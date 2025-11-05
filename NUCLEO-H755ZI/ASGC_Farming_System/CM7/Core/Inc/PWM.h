@@ -44,7 +44,7 @@
 #define SERVO_CLOSED                (uint8_t) 1
 
 // Vertical Lifter Servo PWM Percent Defines
-#define PWM_VLIFTER_100_PCT_DUTY	(uint16_t) 12000 // Fix me!
+#define PWM_VLIFTER_100_PCT_DUTY	(uint16_t) 2000
 #define PWM_VLIFTER_90_PCT_DUTY	    (uint16_t) (0.90) * PWM_VLIFTER_100_PCT_DUTY
 #define PWM_VLIFTER_80_PCT_DUTY	    (uint16_t) (0.80) * PWM_VLIFTER_100_PCT_DUTY
 #define PWM_VLIFTER_75_PCT_DUTY	    (uint16_t) (0.75) * PWM_VLIFTER_100_PCT_DUTY
@@ -59,7 +59,7 @@
 #define PWM_VLIFTER_0_PCT_DUTY	    (uint16_t) 0
 
 // Shutter Servo PWM Percent Defines
-#define PWM_SHUTTER_100_PCT_DUTY	(uint16_t) 12000 // Fix me!
+#define PWM_SHUTTER_100_PCT_DUTY	(uint16_t) 2000
 #define PWM_SHUTTER_90_PCT_DUTY	    (uint16_t) (0.90) * PWM_SHUTTER_100_PCT_DUTY
 #define PWM_SHUTTER_80_PCT_DUTY	    (uint16_t) (0.80) * PWM_SHUTTER_100_PCT_DUTY
 #define PWM_SHUTTER_75_PCT_DUTY	    (uint16_t) (0.75) * PWM_SHUTTER_100_PCT_DUTY
