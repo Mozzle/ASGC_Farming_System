@@ -77,6 +77,9 @@ Function Implementations
 	bool ret_val = PWM_INIT_FAIL;
 	uint8_t pwm_ret_val;
 
+	// Init PWM counter to 0
+	pwm_counter = 0;
+
 	// Init duty cycle to 0
 	shutter_duty_cycle = 0;
 
@@ -107,8 +110,13 @@ Function Implementations
 	bool ret_val = PWM_INIT_FAIL;
 	uint8_t pwm_ret_val;
 
+	// Init PWM counter to 0
+	pwm_counter = 0;
+	VLifter_BobUp = 0;
+	VLifter_State = RESET;
+
 	// Init duty cycle to midpoint of MaxDuty (midpoint = no action for vertical lifter)
-	vlifter_duty_cycle = (VERTICAL_LIFTER_SERVO_CONFIG.MaxDuty / 2);		// Review Me!
+	vlifter_duty_cycle = PWM_VLIFTER_50_PCT_DUTY;		// Review Me!
 
 	// If vertical lifter interface is switchboard disabled, exit without doing anything.
 	if (VLIFTER_SERVO_PWM_INTERFACE_ENABLED == SYS_FEATURE_DISABLED) {
@@ -206,4 +214,93 @@ uint16_t PWMServo_GetDutyForConfig(PWM_Servo_Config config) {
 
 	// Invalid servo type was passed
 	return 0;
+}
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		SYS_RESULT PWM_VerticalServo_DownTask(void *arg)
+ *
+ * 		Task function to move the vertical lifter downwards
+ * 		Returns SYS_SUCCESS once 'Down' motion is complete
+ * 		Returns SYS_DEVICE_DISABLED if task is working
+ * 		Returns SYS_FAILURE if Duty Config couldn't be set
+ *
+ ----------------------------------------------------------------------------*/
+SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
+	uint16_t msToGoDown = 3000;
+	uint16_t msToGoUp = 500;
+
+	// Bob up motion complete
+	if ((VLifter_BobUp == 1) && ((pwm_counter + msToGoUp) >= getTimestamp())) {
+		return (SYS_RESULT) SYS_SUCCESS;
+	}
+
+	// Begin down motion
+	if (pwm_counter == 0) {
+		pwm_counter = getTimestamp();
+		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_30_PCT_DUTY) != (SYS_SUCCESS)) {
+			return (SYS_RESULT) SYS_FAILURE;
+		}
+	}
+
+	// Down motion complete
+	if ((pwm_counter + msToGoDown) >= getTimestamp()) {
+		pwm_counter = 0;
+		VLifter_BobUp = 1;
+	}
+
+	// Start slight bob up motion
+	if ((VLifter_BobUp == 1) && (pwm_counter == 0)) {
+		pwm_counter = getTimestamp();
+		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_70_PCT_DUTY) != (SYS_SUCCESS)) {
+			return (SYS_RESULT) SYS_FAILURE;
+		}
+	}
+
+	return (SYS_RESULT) SYS_DEVICE_DISABLED;
+}
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		SYS_RESULT PWM_VerticalServo_UpTask(void *arg)
+ *
+ * 		Task function to move the vertical lifter upwards
+ *
+ ----------------------------------------------------------------------------*/
+SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
+	uint16_t msToGoUp = 2500;
+
+	// Begin up motion
+	if (pwm_counter == 0) {
+		pwm_counter = getTimestamp();
+		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_70_PCT_DUTY) != (SYS_SUCCESS)) {
+			return (SYS_RESULT) SYS_FAILURE;
+		}
+	}
+
+	// Up motion complete
+	if ((pwm_counter + msToGoUp) >= getTimestamp()) {
+		return (SYS_RESULT) SYS_SUCCESS;
+	}
+
+	return (SYS_RESULT) SYS_DEVICE_DISABLED;
+}
+
+
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg)
+ *
+ * 		Task function to reset duty cycle of vertical servo
+ *
+ ----------------------------------------------------------------------------*/
+SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg) {
+	pwm_counter = 0;
+	VLifter_BobUp = 0;
+	if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_50_PCT_DUTY) != (SYS_SUCCESS)) {
+		return (SYS_RESULT) SYS_FAILURE;
+	}
+	
+	return (SYS_RESULT) SYS_SUCCESS;
 }

@@ -31,6 +31,17 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Static variables for PWM Tasks
+typedef enum {
+    RESET,
+    GO_DOWN,
+    GO_UP,
+    HOLD
+} vlifter_state;
+volatile static uint64_t pwm_counter;
+volatile static vlifter_state VLifter_State;
+volatile static _Bool VLifter_BobUp;
+
 // PWM Success/Failure Defines
 #define PWM_INIT_FAIL		        false
 #define PWM_INIT_SUCCEED 	        true
@@ -94,5 +105,9 @@ bool PWM_VerticalServo_Init(TIM_HandleTypeDef htim);
 bool PWM_ShutterServo_Init(TIM_HandleTypeDef htim);
 SYS_RESULT PWMServo_SetDutyForConfig(PWM_Servo_Config config, uint16_t duty);
 uint16_t PWMServo_GetDutyForConfig(PWM_Servo_Config config);
+
+SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg);
+SYS_RESULT PWM_VerticalServo_DownTask(void *arg);
+SYS_RESULT PWM_VerticalServo_UpTask(void *arg);
 
 #endif /* PWM_H */
