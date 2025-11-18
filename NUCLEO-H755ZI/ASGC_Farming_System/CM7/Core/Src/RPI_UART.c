@@ -264,7 +264,7 @@ static HAL_StatusTypeDef _send_uart_packet( uint8_t *packetData, uint16_t packet
 			If we sent the packet successfully, wait for ack packet
 			-------------------------------------------------------------------------*/
 			if (status == HAL_OK) {
-				HAL_Delay(1);
+				HAL_Delay(3);
 
 				/*---------------------------------------------------------------------
 				Receive the ACK packet
@@ -295,7 +295,7 @@ static HAL_StatusTypeDef _send_uart_unix_time_packet( uint8_t *packetData, uint1
 			If we sent the packet successfully, wait for ack packet
 			-------------------------------------------------------------------------*/
 			if (status == HAL_OK) {
-				HAL_Delay(1);
+				HAL_Delay(3);
 
 				/*---------------------------------------------------------------------
 				Receive the Unix time packet
