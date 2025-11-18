@@ -296,7 +296,7 @@ SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
  ----------------------------------------------------------------------------*/
 SYS_RESULT PWM_ShutterServo_OpenTask(void *arg)
 {
-    if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_80_PCT_DUTY) != (SYS_SUCCESS)) {
+    if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_50_PCT_DUTY) != (SYS_SUCCESS)) {
 		return (SYS_RESULT) SYS_FAIL;
 	}
 
