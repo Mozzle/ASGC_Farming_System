@@ -38,9 +38,9 @@ typedef enum {
 	VLIFTER_GO_UP,
 	VLIFTER_HOLD
 } vlifter_state;
-volatile static uint64_t pwm_counter;
-volatile static vlifter_state VLifter_State;
-volatile static _Bool VLifter_BobUp;
+volatile static uint64_t pwm_counter = 0;
+volatile static vlifter_state VLifter_State = VLIFTER_RESET;
+volatile static _Bool VLifter_BobUp = 0;
 
 // PWM Success/Failure Defines
 #define PWM_INIT_FAIL		        false
@@ -112,5 +112,6 @@ SYS_RESULT PWM_VerticalServo_UpTask(void *arg);
 
 SYS_RESULT PWM_ShutterServo_OpenTask(void *arg);
 SYS_RESULT PWM_ShutterServo_CloseTask(void *arg);
+
 
 #endif /* PWM_H */

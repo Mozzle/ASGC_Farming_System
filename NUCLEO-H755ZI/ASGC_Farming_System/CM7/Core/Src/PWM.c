@@ -232,6 +232,8 @@ SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
 
 	// Bob up motion complete
 	if ((VLifter_BobUp == 1) && ((pwm_counter + msToGoUp) >= getTimestamp())) {
+		pwm_counter = 0;
+		VLifter_BobUp = 0;
 		return (SYS_RESULT) SYS_SUCCESS;
 	}
 
@@ -245,17 +247,19 @@ SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
 
 	// Down motion complete
 	if ((pwm_counter + msToGoDown) >= getTimestamp()) {
-		pwm_counter = 0;
+		pwm_counter = 1;
 		VLifter_BobUp = 1;
 	}
 
 	// Start slight bob up motion
-	if ((VLifter_BobUp == 1) && (pwm_counter == 0)) {
+	if ((VLifter_BobUp == 1) && (pwm_counter == 1)) {
 		pwm_counter = getTimestamp();
 		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_70_PCT_DUTY) != (SYS_SUCCESS)) {
 			return (SYS_RESULT) SYS_FAIL;
 		}
 	}
+	
+	pwm_counter = getTimestamp();
 
 	return (SYS_RESULT) SYS_DEVICE_DISABLED;
 }
@@ -281,9 +285,20 @@ SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
 
 	// Up motion complete
 	if ((pwm_counter + msToGoUp) >= getTimestamp()) {
+		pwm_counter = 0;
+		VLifter_BobUp = ;
 		return (SYS_RESULT) SYS_SUCCESS;
 	}
 
+	// Start slight bob down motion
+	if ((VLifter_BobUp == 1) && (pwm_counter == 1)) {
+		pwm_counter = getTimestamp();
+		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_30_PCT_DUTY) != (SYS_SUCCESS)) {
+			return (SYS_RESULT) SYS_FAIL;
+		}
+	}
+
+	pwm_counter = getTimestamp();
 	return (SYS_RESULT) SYS_DEVICE_DISABLED;
 }
 
@@ -327,11 +342,12 @@ SYS_RESULT PWM_ShutterServo_CloseTask(void *arg)
  *
  ----------------------------------------------------------------------------*/
 SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg) {
-	pwm_counter = 0;
-	VLifter_BobUp = 0;
 	if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_50_PCT_DUTY) != (SYS_SUCCESS)) {
 		return (SYS_RESULT) SYS_FAIL;
 	}
 	
 	return (SYS_RESULT) SYS_SUCCESS;
 }
+
+
+
