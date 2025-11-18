@@ -265,6 +265,7 @@ SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
  * 		SYS_RESULT PWM_VerticalServo_UpTask(void *arg)
  *
  * 		Task function to move the vertical lifter upwards
+ * 		Returns SYS_DEVICE_DISABLED if task is currently working
  *
  ----------------------------------------------------------------------------*/
 SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
@@ -286,7 +287,37 @@ SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
 	return (SYS_RESULT) SYS_DEVICE_DISABLED;
 }
 
+/*-----------------------------------------------------------------------------
+ *
+ * 		SYS_RESULT PWM_ShutterServo_OpenTask(void *arg)
+ *
+ * 		Task function to open the shutter via shutter servo
+ *
+ ----------------------------------------------------------------------------*/
+SYS_RESULT PWM_ShutterServo_OpenTask(void *arg)
+{
+    if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_80_PCT_DUTY) != (SYS_SUCCESS)) {
+		return (SYS_RESULT) SYS_FAIL;
+	}
 
+	return (SYS_RESULT) SYS_SUCCESS;
+}
+
+/*-----------------------------------------------------------------------------
+ *
+ * 		SYS_RESULT PWM_ShutterServo_CloseTask(void *arg)
+ *
+ * 		Task function to close the shutter via shutter servo
+ *
+ ----------------------------------------------------------------------------*/
+SYS_RESULT PWM_ShutterServo_CloseTask(void *arg)
+{
+    if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_0_PCT_DUTY) != (SYS_SUCCESS)) {
+		return (SYS_RESULT) SYS_FAIL;
+	}
+
+	return (SYS_RESULT) SYS_SUCCESS;
+}
 
 /*-----------------------------------------------------------------------------
  *

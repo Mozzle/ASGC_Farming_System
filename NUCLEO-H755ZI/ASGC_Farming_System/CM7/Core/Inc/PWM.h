@@ -110,4 +110,7 @@ SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg);
 SYS_RESULT PWM_VerticalServo_DownTask(void *arg);
 SYS_RESULT PWM_VerticalServo_UpTask(void *arg);
 
+SYS_RESULT PWM_ShutterServo_OpenTask(void *arg);
+SYS_RESULT PWM_ShutterServo_CloseTask(void *arg);
+
 #endif /* PWM_H */
