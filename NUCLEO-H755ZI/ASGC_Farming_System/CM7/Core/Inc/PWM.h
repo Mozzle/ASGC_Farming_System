@@ -33,10 +33,10 @@
 
 // Static variables for PWM Tasks
 typedef enum {
-    RESET,
-    GO_DOWN,
-    GO_UP,
-    HOLD
+    VLIFTER_RESET,
+	VLIFTER_GO_DOWN,
+	VLIFTER_GO_UP,
+	VLIFTER_HOLD
 } vlifter_state;
 volatile static uint64_t pwm_counter;
 volatile static vlifter_state VLifter_State;

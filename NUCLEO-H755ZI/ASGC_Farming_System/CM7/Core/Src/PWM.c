@@ -113,7 +113,7 @@ Function Implementations
 	// Init PWM counter to 0
 	pwm_counter = 0;
 	VLifter_BobUp = 0;
-	VLifter_State = RESET;
+	VLifter_State = VLIFTER_RESET;
 
 	// Init duty cycle to midpoint of MaxDuty (midpoint = no action for vertical lifter)
 	vlifter_duty_cycle = PWM_VLIFTER_50_PCT_DUTY;		// Review Me!
@@ -239,7 +239,7 @@ SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
 	if (pwm_counter == 0) {
 		pwm_counter = getTimestamp();
 		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_30_PCT_DUTY) != (SYS_SUCCESS)) {
-			return (SYS_RESULT) SYS_FAILURE;
+			return (SYS_RESULT) SYS_FAIL;
 		}
 	}
 
@@ -253,7 +253,7 @@ SYS_RESULT PWM_VerticalServo_DownTask(void *arg) {
 	if ((VLifter_BobUp == 1) && (pwm_counter == 0)) {
 		pwm_counter = getTimestamp();
 		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_70_PCT_DUTY) != (SYS_SUCCESS)) {
-			return (SYS_RESULT) SYS_FAILURE;
+			return (SYS_RESULT) SYS_FAIL;
 		}
 	}
 
@@ -274,7 +274,7 @@ SYS_RESULT PWM_VerticalServo_UpTask(void *arg) {
 	if (pwm_counter == 0) {
 		pwm_counter = getTimestamp();
 		if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_70_PCT_DUTY) != (SYS_SUCCESS)) {
-			return (SYS_RESULT) SYS_FAILURE;
+			return (SYS_RESULT) SYS_FAIL;
 		}
 	}
 
@@ -299,7 +299,7 @@ SYS_RESULT PWM_VerticalServo_ResetDutyTask(void *arg) {
 	pwm_counter = 0;
 	VLifter_BobUp = 0;
 	if (PWMServo_SetDutyForConfig(VERTICAL_LIFTER_SERVO_CONFIG, PWM_VLIFTER_50_PCT_DUTY) != (SYS_SUCCESS)) {
-		return (SYS_RESULT) SYS_FAILURE;
+		return (SYS_RESULT) SYS_FAIL;
 	}
 	
 	return (SYS_RESULT) SYS_SUCCESS;
